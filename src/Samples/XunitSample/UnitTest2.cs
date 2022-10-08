@@ -3,12 +3,27 @@ namespace XunitSample;
 public class UnitTest2
 {
     [Fact]
-    public void Test3()
+    public void Test6()
     {
     }
 
     [Fact]
-    public void Test4()
+    public void Test7()
+    {
+    }
+
+    [Fact]
+    public void Test8()
+    {
+    }
+
+    [Fact]
+    public void Test9()
+    {
+    }
+
+    [Fact]
+    public void Test10()
     {
     }
 }

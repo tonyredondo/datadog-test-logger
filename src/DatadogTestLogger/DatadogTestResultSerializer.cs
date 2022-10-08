@@ -114,8 +114,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                         suite = module.GetOrCreateSuite(testSuite, result.StartTime);
                     }
 
-                    string testName = result.Method;
-
+                    var testName = result.Method;
                     var test = suite.CreateTest(testName, result.StartTime);
 
                     // Traits
@@ -148,8 +147,8 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                             test.Close(TestStatus.Skip, result.Duration, result.ErrorMessage);
                         }
                     }
-                    else if (result.Outcome == Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed ||
-                             result.Outcome == Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.NotFound)
+                    else if (result.Outcome is Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed 
+                             or Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.NotFound)
                     {
                         test.SetErrorInfo("Exception", result.ErrorMessage, result.ErrorStackTrace);
                         test.Close(TestStatus.Fail, result.Duration);
