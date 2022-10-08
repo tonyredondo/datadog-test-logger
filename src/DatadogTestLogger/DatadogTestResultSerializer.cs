@@ -21,6 +21,11 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
             Environment.SetEnvironmentVariable("DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
             Environment.SetEnvironmentVariable("DD_API_KEY", this.GetLoggerApiKey());
             Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "true");
+
+            var ciVisibilityType = typeof(TestModule).Assembly.GetType("Datadog.Trace.Ci.CIVisibility", false);
+            var initializeMethod = ciVisibilityType.GetMethod("Initialize");
+            initializeMethod.Invoke(null, null);
+
             Datadog.Trace.ClrProfiler.Instrumentation.Initialize();
         }
 
@@ -77,6 +82,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
             {
                 string testSuite = resultBySuite.Key;
                 TestSuite? suite = null;
+                DateTime suiteEndTime = DateTime.MinValue;
                 foreach (var result in resultBySuite)
                 {
                     if (module is null)
@@ -117,6 +123,12 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                     }
 
                     // Set status
+                    var endTime = result.StartTime.Add(result.Duration);
+                    if (endTime > suiteEndTime)
+                    {
+                        suiteEndTime = endTime;
+                    }
+
                     if (result.Outcome == Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
                     {
                         test.Close(TestStatus.Pass, result.Duration);
@@ -141,7 +153,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                     }
                 }
 
-                suite?.Close(resultBySuite.Last().EndTime.Subtract(suite.StartTime.DateTime));
+                suite?.Close(suiteEndTime.Subtract(suite.StartTime.DateTime));
             }
 
             module?.Close(runConfiguration.EndTime.Subtract(runConfiguration.StartTime));
