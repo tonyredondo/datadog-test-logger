@@ -76,6 +76,8 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         {
             string testModule = AssemblyName.GetAssemblyName(resultByAssembly.Key).Name!;
             TestModule? module = null;
+            DateTime moduleStartTime = DateTime.MinValue;
+            DateTime moduleTime = DateTime.MinValue;
 
             var resultBySuiteGroup = resultByAssembly.GroupBy(g => g.FullTypeName).ToArray();
             foreach (var resultBySuite in resultBySuiteGroup)
@@ -101,7 +103,8 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                             testFramework = "MSTestV2";
                         }
 
-                        module = TestModule.Create(testModule, testFramework, "N/A", runConfiguration.StartTime);
+                        moduleStartTime = result.StartTime;
+                        module = TestModule.Create(testModule, testFramework, "N/A", moduleStartTime);
                         module.SetTag("runtime.name", runtimeName);
                         module.SetTag("runtime.version", runtimeVersion);
                     }
@@ -154,9 +157,13 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                 }
 
                 suite?.Close(suiteEndTime.Subtract(suite.StartTime.DateTime));
+                if (moduleTime < suiteEndTime)
+                {
+                    moduleTime = suiteEndTime;
+                }
             }
 
-            module?.Close(runConfiguration.EndTime.Subtract(runConfiguration.StartTime));
+            module?.Close(moduleTime.Subtract(moduleStartTime));
         }
 
         return string.Empty;
