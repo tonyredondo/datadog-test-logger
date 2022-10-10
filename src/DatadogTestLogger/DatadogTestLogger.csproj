@@ -1,9 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.0.1</Version>
+        <Title>Datadog Test Logger</Title>
+        <Authors>tonyredondo</Authors>
+        <Description>Datadog Test Logger</Description>
+        <Copyright>tonyredondo</Copyright>
+        <PackageProjectUrl>https://github.com/tonyredondo/datadog-test-logger</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/tonyredondo/datadog-test-logger</RepositoryUrl>
+        <PackageTags>Datadog, Test, Logger</PackageTags>
+        <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
