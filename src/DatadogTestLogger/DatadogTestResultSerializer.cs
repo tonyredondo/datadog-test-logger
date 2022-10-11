@@ -11,18 +11,17 @@ using Spekt.TestLogger.Core;
 
 internal class DatadogTestResultSerializer : ITestResultSerializer
 {
-    private static int firstInitialization = 1;
+    public DatadogTestResultSerializer()
+    {
+        Environment.SetEnvironmentVariable("DD_CIVISIBILITY_ENABLED", "true");
+        Environment.SetEnvironmentVariable("DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
+        Environment.SetEnvironmentVariable("DD_API_KEY", this.GetLoggerApiKey());
+        Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "true");
+    }
 
     public string Serialize(LoggerConfiguration loggerConfiguration, TestRunConfiguration runConfiguration, List<TestResultInfo> results, List<TestMessageInfo> messages)
     {
-        if (Interlocked.Exchange(ref firstInitialization, 0) == 1)
-        {
-            Environment.SetEnvironmentVariable("DD_CIVISIBILITY_ENABLED", "true");
-            Environment.SetEnvironmentVariable("DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
-            Environment.SetEnvironmentVariable("DD_API_KEY", this.GetLoggerApiKey());
-            Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "true");
-        }
-
+        var response = string.Empty;
         var runtimeName = string.Empty;
         var runtimeVersion = string.Empty;
         var runtimeNameAndVersionRegex = new Regex("([a-zA-Z.]*),Version=v([0-9.]*)");
@@ -68,7 +67,8 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
         foreach (var resultByAssembly in groupedResults)
         {
-            string testModule = AssemblyName.GetAssemblyName(resultByAssembly.Key).Name!;
+            var testModule = Assembly.LoadFile(resultByAssembly.Key);
+            var testModuleName = AssemblyName.GetAssemblyName(resultByAssembly.Key).Name!;
             TestModule? module = null;
             DateTime moduleStartTime = DateTime.MinValue;
             DateTime moduleTime = DateTime.MinValue;
@@ -84,21 +84,51 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                     if (module is null)
                     {
                         var testFramework = string.Empty;
+                        var testFrameworkVersion = "N/A";
+                        var folder = Path.GetDirectoryName(result.TestCase.Source);
+
                         if (result.TestCase.ExecutorUri.Host.IndexOf("xunit", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             testFramework = "xUnit";
+                            var xunitCoreFile = Path.Combine(folder!, "xunit.core.dll");
+                            if (File.Exists(xunitCoreFile))
+                            {
+                                var xunitCoreAssemblyName = AssemblyName.GetAssemblyName(xunitCoreFile);
+                                if (xunitCoreAssemblyName?.Version is { } version)
+                                {
+                                    testFrameworkVersion = version.ToString();
+                                }
+                            }
                         }
                         else if (result.TestCase.ExecutorUri.Host.IndexOf("nunit", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             testFramework = "NUnit";
+                            var nUnitFramework = Path.Combine(folder!, "nunit.framework.dll");
+                            if (File.Exists(nUnitFramework))
+                            {
+                                var nUnitFrameworkAssemblyName = AssemblyName.GetAssemblyName(nUnitFramework);
+                                if (nUnitFrameworkAssemblyName?.Version is { } version)
+                                {
+                                    testFrameworkVersion = version.ToString();
+                                }
+                            }
                         }
                         else if (result.TestCase.ExecutorUri.Host.IndexOf("mstest", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             testFramework = "MSTestV2";
+                            var msTestFramework = Path.Combine(folder!, "Microsoft.VisualStudio.TestPlatform.TestFramework.dll");
+                            if (File.Exists(msTestFramework))
+                            {
+                                var msTestFrameworkAssemblyName = AssemblyName.GetAssemblyName(msTestFramework);
+                                if (msTestFrameworkAssemblyName?.Version is { } version)
+                                {
+                                    testFrameworkVersion = version.ToString();
+                                }
+                            }
                         }
 
                         moduleStartTime = result.StartTime;
-                        module = TestModule.Create(testModule, testFramework, "N/A", moduleStartTime);
+                        module = TestModule.Create(testModuleName, testFramework, testFrameworkVersion, moduleStartTime);
                         module.SetTag("runtime.name", runtimeName);
                         module.SetTag("runtime.version", runtimeVersion);
                     }
@@ -111,6 +141,19 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                     var testName = result.Method;
                     var test = suite.CreateTest(testName, result.StartTime);
 
+                    // Set test method
+                    var methodName = testName;
+                    if (methodName.IndexOf("(") != -1)
+                    {
+                        methodName = methodName.Substring(0, methodName.IndexOf("("));
+                    }
+
+                    var methodInfo = testModule.GetType(testSuite)?.GetMethod(methodName);
+                    if (methodInfo is not null)
+                    {
+                        test.SetTestMethodInfo(methodInfo);
+                    }
+                    
                     // Traits
                     if (result.Traits.Any())
                     {
@@ -159,7 +202,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
             module?.Close(moduleTime.Subtract(moduleStartTime));
         }
 
-        return string.Empty;
+        return response;
     }
 
     private string? GetLoggerApiKey()
