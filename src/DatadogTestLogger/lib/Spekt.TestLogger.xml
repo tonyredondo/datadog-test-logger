@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Spekt.TestLogger</name>
+    </assembly>
+    <members>
+        <member name="T:Spekt.TestLogger.Core.ITestResultStore">
+            <summary>
+            Store for test run results and messages.
+            Thread safe implementation to allow concurrent operations.
+            </summary>
+        </member>
+        <member name="M:Spekt.TestLogger.Core.LegacyTestCaseNameParser.Parse(System.String)">
+            <summary>
+            This method attempts to parse out a Namespace, Type and Method name from a given string.
+            When a clearly invalid output is encountered, a message is written to the console.
+            </summary>
+            <remarks>
+            This is fragile, because the fully qualified name is constructed by a test adapter and
+            there is no enforcement that the FQN starts with the namespace, or is of the expected
+            format. Because the possible input space is very large and this parser is relatively
+            simple there are some invalid strings, such as "#.#.#" will 'successfully' parse.
+            </remarks>
+            <param name="fullyQualifiedName">
+            String like 'namespace.type.method', where type and or method may be followed by
+            parenthesis containing parameter values.
+            </param>
+            <returns>
+            An instance of ParsedName containing the parsed results. A result is always returned,
+            even in the case when the input could not be full parsed.
+            </returns>
+        </member>
+        <member name="T:Spekt.TestLogger.Core.LoggerConfiguration">
+            <summary>
+            Logger configuration provided by the test platform and command line
+            parameters.
+            </summary>
+        </member>
+        <member name="F:Spekt.TestLogger.Core.TestCaseNameParser.MethodRegex">
+            <summary>
+            This one can handle standard formatting with or without method data.
+            </summary>
+        </member>
+        <member name="F:Spekt.TestLogger.Core.TestCaseNameParser.ClassDataRegex">
+            <summary>
+            Can handle standard formatting with class and method data.
+            </summary>
+        </member>
+        <member name="M:Spekt.TestLogger.Core.TestCaseNameParser.Parse(System.String)">
+            <summary>
+            This method attempts to parse out a Namespace, Type and Method name from a given string.
+            When a clearly invalid output is encountered, a message is written to the console.
+            </summary>
+            <remarks>
+            This can be fragile because qualified name is constructed by a test adapter and
+            there is no enforcement that the FQN starts with the namespace, or is of the expected
+            format.
+            </remarks>
+            <param name="fullyQualifiedName">
+            String like 'namespace.type.method', where type and or method may be followed by
+            parenthesis containing parameter values.
+            </param>
+            <returns>
+            An instance of ParsedName containing the parsed results. A result is always returned,
+            even in the case when the input could not be full parsed.
+            </returns>
+        </member>
+        <member name="T:Spekt.TestLogger.Core.TestMessageInfo">
+            <summary>
+            A message generated during the test run.
+            </summary>
+        </member>
+        <member name="P:Spekt.TestLogger.Core.TestResultInfo.Method">
+            <summary>
+            Gets a string that contain the method name, along with any paramaterized data related to
+            the method. For example, `SomeMethod` or `SomeParameterizedMethod(true)`.
+            </summary>
+        </member>
+        <member name="T:Spekt.TestLogger.Core.TestRunConfiguration">
+            <summary>
+            Configuration for the Test Run.
+            </summary>
+            <remarks>
+            Test run configuration represents immutable settings read from the underlying test platform.
+            See <see cref="T:Spekt.TestLogger.Core.TestRunStartWorkflow"/>.
+            </remarks>
+        </member>
+        <member name="P:Spekt.TestLogger.Core.TestRunConfiguration.StartTime">
+            <summary>
+            Gets the start timestamp of test run (test run start event) in UTC.
+            </summary>
+        </member>
+        <member name="P:Spekt.TestLogger.Core.TestRunConfiguration.EndTime">
+            <summary>
+            Gets the end timestamp of test run (test run complete event) in UTC.
+            </summary>
+        </member>
+        <member name="T:Spekt.TestLogger.Platform.IFileSystem">
+            <summary>
+            Abstraction for the file system IO primitives.
+            </summary>
+        </member>
+        <member name="M:Spekt.TestLogger.Platform.IFileSystem.CreateDirectory(System.String)">
+            <summary>
+            Creates a directory recursively if not exists.
+            </summary>
+            <param name="path">Directory path.</param>
+        </member>
+        <member name="M:Spekt.TestLogger.Platform.IFileSystem.ExistsDirectory(System.String)">
+            <summary>
+            Return true if a Directory exists on the file system.
+            </summary>
+            <param name="path">Directory path.</param>
+            <returns>True if the directory exists.</returns>
+        </member>
+        <member name="M:Spekt.TestLogger.Platform.IFileSystem.RemoveDirectory(System.String)">
+            <summary>
+            Removes a directory.
+            </summary>
+            <param name="path">Directory path.</param>
+        </member>
+        <member name="M:Spekt.TestLogger.Platform.IFileSystem.Read(System.String)">
+            <summary>
+            Read the contents of given file path.
+            </summary>
+            <param name="path">Valid file path.</param>
+            <returns>Content of the file.</returns>
+        </member>
+        <member name="M:Spekt.TestLogger.Platform.IFileSystem.Write(System.String,System.String)">
+            <summary>
+            Writes the content to a path. Creates the path if it doesn't exist.
+            </summary>
+            <param name="path">Path of the file.</param>
+            <param name="content">Content of the file.</param>
+        </member>
+        <member name="M:Spekt.TestLogger.Platform.IFileSystem.Delete(System.String)">
+            <summary>
+            Delete a file if it exists.
+            </summary>
+            <param name="path">File path.</param>
+        </member>
+        <member name="T:Spekt.TestLogger.TestLogger">
+            <summary>
+            Base test logger implementation.
+            </summary>
+        </member>
+        <member name="M:Spekt.TestLogger.TestLogger.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestLoggerEvents,System.String)">
+            <inheritdoc/>
+            <remarks>Overrides <see cref="M:Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestLogger.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestLoggerEvents,System.String)"/> method. Supports older runners.</remarks>
+        </member>
+        <member name="M:Spekt.TestLogger.TestLogger.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestLoggerEvents,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <inheritdoc/>
+            <remarks>
+            Overrides <c>ITestLoggerWithParameters.Initialize(TestLoggerEvents, Dictionary)</c> method.
+            </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+            Required for using the C# 9.0 init properties language feature.
+            Defining this explicitly since this is a .NET standard 1.5 library.
+            </summary>
+        </member>
+    </members>
+</doc>

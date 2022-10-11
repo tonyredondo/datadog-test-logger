@@ -21,12 +21,6 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
             Environment.SetEnvironmentVariable("DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
             Environment.SetEnvironmentVariable("DD_API_KEY", this.GetLoggerApiKey());
             Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "true");
-
-            var ciVisibilityType = typeof(TestModule).Assembly.GetType("Datadog.Trace.Ci.CIVisibility", false);
-            var initializeMethod = ciVisibilityType.GetMethod("Initialize");
-            initializeMethod.Invoke(null, null);
-
-            Datadog.Trace.ClrProfiler.Instrumentation.Initialize();
         }
 
         var runtimeName = string.Empty;

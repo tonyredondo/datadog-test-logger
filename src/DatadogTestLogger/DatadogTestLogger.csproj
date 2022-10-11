@@ -14,11 +14,18 @@
         <RepositoryUrl>https://github.com/tonyredondo/datadog-test-logger</RepositoryUrl>
         <PackageTags>Datadog, Test, Logger</PackageTags>
         <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
+        <BuildPackage>true</BuildPackage>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Datadog.Trace" Version="2.16.0" />
-      <PackageReference Include="Spekt.TestLogger" Version="3.0.84" />
+      <PackageReference Include="Datadog.Trace" Version="2.17.0" />
+      <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Spekt.TestLogger">
+        <HintPath>lib\Spekt.TestLogger.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
