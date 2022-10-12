@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.0.1</Version>
+        <Version>0.0.2</Version>
         <Title>Datadog Test Logger</Title>
         <Authors>tonyredondo</Authors>
         <Description>Datadog Test Logger</Description>
@@ -15,6 +15,7 @@
         <PackageTags>Datadog, Test, Logger</PackageTags>
         <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
         <BuildPackage>true</BuildPackage>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <ItemGroup>
