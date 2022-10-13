@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.0.5</Version>
+        <Version>0.0.6</Version>
         <Title>Datadog Test Logger</Title>
         <Authors>tonyredondo</Authors>
         <Description>Datadog Test Logger</Description>
@@ -13,9 +13,11 @@
         <PackageProjectUrl>https://github.com/tonyredondo/datadog-test-logger</PackageProjectUrl>
         <RepositoryUrl>https://github.com/tonyredondo/datadog-test-logger</RepositoryUrl>
         <PackageTags>Datadog, Test, Logger</PackageTags>
-        <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net48;net472;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net48;net472;net461;netstandard2.0</TargetFrameworks>
         <BuildPackage>true</BuildPackage>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <AssemblyName>Datadog.testlogger</AssemblyName>
+        <PackageId>DatadogTestLogger</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
