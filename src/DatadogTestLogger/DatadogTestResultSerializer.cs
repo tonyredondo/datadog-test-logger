@@ -2,8 +2,8 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-using System.Collections;
 using System.Text;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace DatadogTestLogger;
 
@@ -21,7 +21,8 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         Environment.SetEnvironmentVariable("DD_CIVISIBILITY_ENABLED", "true");
         Environment.SetEnvironmentVariable("DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
         Environment.SetEnvironmentVariable("DD_API_KEY", this.GetLoggerApiKey());
-        Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "true");
+        Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "false");
+        Environment.SetEnvironmentVariable("DD_PROFILING_ENABLED", "false");
 
         var runtimeName = string.Empty;
         var runtimeVersion = string.Empty;
@@ -68,8 +69,21 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
         foreach (var resultByAssembly in groupedResults)
         {
-            var testModule = Assembly.LoadFile(resultByAssembly.Key);
-            var testModuleName = AssemblyName.GetAssemblyName(resultByAssembly.Key).Name!;
+            var moduleFile = resultByAssembly.Key;
+            var modulePdb = Path.ChangeExtension(moduleFile, "pdb");
+            var hasPdbFile = File.Exists(modulePdb);
+            var testModule = Assembly.LoadFile(moduleFile);
+            var testModuleName = testModule.GetName().Name!;
+            output.AppendLine("Test Module File: " + moduleFile);
+            output.AppendLine("Test Module Pdb: " + modulePdb);
+            output.AppendLine("Test Module Pdb Exist: " + hasPdbFile);
+            output.AppendLine("Test Module: " + testModule);
+            output.AppendLine("Test Module Name: " + testModule.GetName());
+            output.AppendLine("AppDomain.CurrentDomain.IsFullyTrusted: " + AppDomain.CurrentDomain.IsFullyTrusted);
+
+            var testFramework = string.Empty;
+            var testFrameworkVersion = "N/A";
+
             TestModule? module = null;
             DateTime moduleStartTime = DateTime.MinValue;
             DateTime moduleTime = DateTime.MinValue;
@@ -84,8 +98,6 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                 {
                     if (module is null)
                     {
-                        var testFramework = string.Empty;
-                        var testFrameworkVersion = "N/A";
                         var folder = Path.GetDirectoryName(result.TestCase.Source);
 
                         if (result.TestCase.ExecutorUri.Host.IndexOf("xunit", StringComparison.OrdinalIgnoreCase) != -1)
@@ -165,22 +177,88 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                         suite = module.GetOrCreateSuite(testSuite, result.StartTime);
                     }
 
-                    var testName = result.Method;
+                    var displayName = result.Method ?? string.Empty;
+                    var testName = displayName;
+                    var testParameters = string.Empty;
+                    var hasParameters = testName.IndexOf("(", StringComparison.Ordinal) != -1;
                     output.AppendLine("    Creating test: " + testName);
-                    var test = suite.CreateTest(testName, result.StartTime);
 
                     // Set test method
-                    var methodName = testName;
-                    if (methodName.IndexOf("(") != -1)
+                    if (hasParameters)
                     {
-                        output.AppendLine("      Test name has been modified (parameters).");
-                        methodName = methodName.Substring(0, methodName.IndexOf("("));
+                        var index = testName.IndexOf("(", StringComparison.Ordinal);
+                        testParameters = testName.Substring(index).Trim();
+                        testName = testName.Substring(0, index).Trim();
+                        output.AppendLine("      Test name has been modified (parameters): " + testName);
+                        output.AppendLine("      Parameters: " + testParameters);
                     }
 
-                    var methodInfo = testModule.GetType(testSuite)?.GetMethod(methodName);
+                    var test = suite.CreateTest(testName, result.StartTime);
+
+                    // Process parameters
+                    if (!string.IsNullOrEmpty(testParameters))
+                    {
+                        if (testFramework == "xUnit")
+                        {
+                            if (testParameters[0] == '(' && testParameters[testParameters.Length - 1] == ')')
+                            {
+                                var parameters = new TestParameters
+                                {
+                                    Metadata = new Dictionary<string, object>
+                                    {
+                                        ["test_name"] = displayName
+                                    },
+                                    Arguments = new Dictionary<string, object>()
+                                };
+
+                                testParameters = testParameters.Substring(1, testParameters.Length - 2);
+                                var paramsArray = testParameters.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var pItem in paramsArray)
+                                {
+                                    var keyValue = pItem.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                                    keyValue[0] = keyValue[0].Trim();
+                                    keyValue[1] = keyValue[1].Trim();
+                                    output.AppendLine($"          Param: {keyValue[0]} = {keyValue[1]}");
+                                    parameters.Arguments[keyValue[0]] = keyValue[1];
+                                }
+                                
+                                test.SetParameters(parameters);
+                            }
+                        }
+                        else if (testFramework is "NUnit" or "MSTestV2")
+                        {
+                            if (testParameters[0] == '(' && testParameters[testParameters.Length - 1] == ')')
+                            {
+                                var parameters = new TestParameters
+                                {
+                                    Metadata = new Dictionary<string, object>
+                                    {
+                                        ["test_name"] = displayName
+                                    },
+                                    Arguments = new Dictionary<string, object>()
+                                };
+
+                                testParameters = testParameters.Substring(1, testParameters.Length - 2);
+                                var paramsArray = testParameters.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                var argIndex = 0;
+                                foreach (var pItem in paramsArray)
+                                {
+                                    var key = "arg" + (argIndex++);
+                                    var value = pItem.Trim();
+                                    output.AppendLine($"          Param: {key} = {value}");
+                                    parameters.Arguments[key] = value;
+                                }
+                                
+                                test.SetParameters(parameters);
+                            }
+                        }
+                    }
+                    
+                    // Set Test method info
+                    var methodInfo = testModule.GetType(testSuite)?.GetMethod(testName);
                     if (methodInfo is not null)
                     {
-                        output.AppendLine("      Setting Test Method Info.");
+                        output.AppendLine("      Setting Test Method Info: " + methodInfo);
                         test.SetTestMethodInfo(methodInfo);
                     }
                     
@@ -193,34 +271,42 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                     }
 
                     // Set status
-                    output.AppendLine("    Closing test: " + testName);
                     var endTime = result.StartTime.Add(result.Duration);
                     if (endTime > suiteEndTime)
                     {
                         suiteEndTime = endTime;
                     }
 
-                    if (result.Outcome == Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
+                    output.AppendLine("    result.Outcome: " + result.Outcome);
+                    if (result.Outcome == TestOutcome.Passed)
                     {
+                        output.AppendLine("    Closing test: " + testName + $" [PASS] [{result.Duration}]");
                         test.Close(TestStatus.Pass, result.Duration);
                     }
-                    else if (result.Outcome == Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped)
+                    else if (result.Outcome == TestOutcome.Skipped)
                     {
                         // xUnit skipped message is stored here
                         if (result.Messages.FirstOrDefault(m => m.Category == "StdOutMsgs") is { } xUnitSkipMessage)
                         {
+                            output.AppendLine("    Closing test: " + testName + $" [SKIP] [{result.Duration}, {xUnitSkipMessage.Text}]");
                             test.Close(TestStatus.Skip, result.Duration, xUnitSkipMessage.Text);
                         }
                         else
                         {
+                            output.AppendLine("    Closing test: " + testName + $" [SKIP] [{result.Duration}, {result.ErrorMessage}]");
                             test.Close(TestStatus.Skip, result.Duration, result.ErrorMessage);
                         }
                     }
-                    else if (result.Outcome is Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed 
-                             or Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.NotFound)
+                    else if (result.Outcome is TestOutcome.Failed or TestOutcome.NotFound)
                     {
+                        output.AppendLine("    Closing test: " + testName + $" [FAIL] [{result.Duration}, {result.ErrorMessage}]");
                         test.SetErrorInfo("Exception", result.ErrorMessage, result.ErrorStackTrace);
                         test.Close(TestStatus.Fail, result.Duration);
+                    }
+                    else if (result.Outcome is TestOutcome.None)
+                    {
+                        output.AppendLine("    Closing test: " + testName + $" [SKIP] [{result.Duration}, {result.ErrorMessage}]");
+                        test.Close(TestStatus.Skip, result.Duration, result.ErrorMessage);
                     }
                 }
 
