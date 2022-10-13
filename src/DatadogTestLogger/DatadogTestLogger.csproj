@@ -13,7 +13,7 @@
         <PackageProjectUrl>https://github.com/tonyredondo/datadog-test-logger</PackageProjectUrl>
         <RepositoryUrl>https://github.com/tonyredondo/datadog-test-logger</RepositoryUrl>
         <PackageTags>Datadog, Test, Logger</PackageTags>
-        <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net472;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net472;netstandard2.0</TargetFrameworks>
         <BuildPackage>true</BuildPackage>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>

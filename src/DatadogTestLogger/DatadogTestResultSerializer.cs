@@ -2,6 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
+using System.Collections;
 using System.Text;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -20,11 +21,11 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
         Environment.SetEnvironmentVariable("DD_CIVISIBILITY_ENABLED", "true");
         Environment.SetEnvironmentVariable("DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
-        Environment.SetEnvironmentVariable("DD_API_KEY", this.GetLoggerApiKey());
         Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "false");
         Environment.SetEnvironmentVariable("DD_PROFILING_ENABLED", "false");
         Environment.SetEnvironmentVariable("DD_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
         Environment.SetEnvironmentVariable("DD_APPSEC_ENABLED", "false");
+        SetEnvironmentVariablesFromPrefix();
         
         var runtimeName = string.Empty;
         var runtimeVersion = string.Empty;
@@ -327,14 +328,20 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         return output.ToString();
     }
 
-    private string? GetLoggerApiKey()
+    private void SetEnvironmentVariablesFromPrefix()
     {
-        var apiKey = Environment.GetEnvironmentVariable("DD_LOGGER_API_KEY");
-        if (string.IsNullOrEmpty(apiKey))
+        const string LoggerPrefix = "DD_LOGGER_";
+        foreach (DictionaryEntry? keyValue in Environment.GetEnvironmentVariables())
         {
-            apiKey = Environment.GetEnvironmentVariable("DD_API_KEY");
+            var key = keyValue?.Key?.ToString() ?? string.Empty;
+            if (key.StartsWith(LoggerPrefix, StringComparison.Ordinal))
+            {
+                var value = keyValue?.Value?.ToString();
+                if (!string.IsNullOrEmpty(value))
+                {
+                    Environment.SetEnvironmentVariable(key.Replace(LoggerPrefix, "DD_"), value);
+                }
+            }
         }
-
-        return apiKey;
     }
 }
