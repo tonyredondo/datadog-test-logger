@@ -23,7 +23,9 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         Environment.SetEnvironmentVariable("DD_API_KEY", this.GetLoggerApiKey());
         Environment.SetEnvironmentVariable("DD_CIVISIBILITY_LOGS_ENABLED", "false");
         Environment.SetEnvironmentVariable("DD_PROFILING_ENABLED", "false");
-
+        Environment.SetEnvironmentVariable("DD_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
+        Environment.SetEnvironmentVariable("DD_APPSEC_ENABLED", "false");
+        
         var runtimeName = string.Empty;
         var runtimeVersion = string.Empty;
         var runtimeNameAndVersionRegex = new Regex("([a-zA-Z.]*),Version=v([0-9.]*)");
