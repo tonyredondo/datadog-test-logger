@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.0.7</Version>
+        <Version>0.0.8</Version>
         <Title>Datadog Test Logger</Title>
         <Authors>tonyredondo</Authors>
         <Description>Datadog Test Logger</Description>

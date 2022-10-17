@@ -21,12 +21,12 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         builder.AppendLine($"CommandLine: {Environment.CommandLine}");
         builder.AppendLine();
         ShowEnvironmentVariables(builder, "ORIGINAL ENVIRONMENT VARIABLES");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}CIVISIBILITY_ENABLED", "true");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}CIVISIBILITY_AGENTLESS_ENABLED", "true");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}CIVISIBILITY_LOGS_ENABLED", "false");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}PROFILING_ENABLED", "false");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}INSTRUMENTATION_TELEMETRY_ENABLED", "false");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}APPSEC_ENABLED", "false");
+        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_ENABLED", "true");
+        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
+        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_LOGS_ENABLED", "false");
+        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_PROFILING_ENABLED", "false");
+        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
+        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_APPSEC_ENABLED", "false");
         using (var _ = new DatadogEnvironmentVariablesReplacer(LoggerPrefix))
         {
             ShowEnvironmentVariables(builder, "MODIFIED ENVIRONMENT VARIABLES");

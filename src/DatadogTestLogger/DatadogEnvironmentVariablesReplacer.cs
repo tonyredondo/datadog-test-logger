@@ -22,7 +22,7 @@ internal class DatadogEnvironmentVariablesReplacer : IDisposable
 
                 if (key.StartsWith(prefix, StringComparison.Ordinal))
                 {
-                    var newKey = "DD_" + key.Substring(prefix.Length);;
+                    var newKey = key.Substring(prefix.Length);;
                     if (Environment.GetEnvironmentVariable(newKey) is null)
                     {
                         _environmentVariables[newKey] = null;
