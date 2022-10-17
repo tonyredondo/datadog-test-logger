@@ -220,17 +220,29 @@ internal class TestSuiteSerializer
                                         Arguments = new Dictionary<string, object>()
                                     };
 
-                                    testParameters = testParameters.Substring(1, testParameters.Length - 2);
-                                    var paramsArray = testParameters.Split(new[] { ',' },
-                                        StringSplitOptions.RemoveEmptyEntries);
-                                    foreach (var pItem in paramsArray)
+                                    try
                                     {
-                                        var keyValue = pItem.Split(new[] { ':' },
+                                        testParameters = testParameters.Substring(1, testParameters.Length - 2);
+                                        var paramsArray = testParameters.Split(new[] { ',' },
                                             StringSplitOptions.RemoveEmptyEntries);
-                                        keyValue[0] = keyValue[0].Trim();
-                                        keyValue[1] = keyValue[1].Trim();
-                                        output.AppendLine($"          Param: {keyValue[0]} = {keyValue[1]}");
-                                        parameters.Arguments[keyValue[0]] = keyValue[1];
+                                        foreach (var pItem in paramsArray)
+                                        {
+                                            var keyValue = pItem.Split(new[] { ':' },
+                                                StringSplitOptions.RemoveEmptyEntries);
+                                            if (keyValue.Length != 2)
+                                            {
+                                                continue;
+                                            }
+
+                                            keyValue[0] = keyValue[0].Trim();
+                                            keyValue[1] = keyValue[1].Trim();
+                                            output.AppendLine($"          Param: {keyValue[0]} = {keyValue[1]}");
+                                            parameters.Arguments[keyValue[0]] = keyValue[1];
+                                        }
+                                    }
+                                    catch (Exception paramEx)
+                                    {
+                                        output.AppendLine($"Error parsing parameters: {paramEx}");
                                     }
 
                                     test.SetParameters(parameters);
@@ -249,16 +261,23 @@ internal class TestSuiteSerializer
                                         Arguments = new Dictionary<string, object>()
                                     };
 
-                                    testParameters = testParameters.Substring(1, testParameters.Length - 2);
-                                    var paramsArray = testParameters.Split(new[] { ',' },
-                                        StringSplitOptions.RemoveEmptyEntries);
-                                    var argIndex = 0;
-                                    foreach (var pItem in paramsArray)
+                                    try
                                     {
-                                        var key = "arg" + (argIndex++);
-                                        var value = pItem.Trim();
-                                        output.AppendLine($"          Param: {key} = {value}");
-                                        parameters.Arguments[key] = value;
+                                        testParameters = testParameters.Substring(1, testParameters.Length - 2);
+                                        var paramsArray = testParameters.Split(new[] { ',' },
+                                            StringSplitOptions.RemoveEmptyEntries);
+                                        var argIndex = 0;
+                                        foreach (var pItem in paramsArray)
+                                        {
+                                            var key = "arg" + (argIndex++);
+                                            var value = pItem.Trim();
+                                            output.AppendLine($"          Param: {key} = {value}");
+                                            parameters.Arguments[key] = value;
+                                        }
+                                    }
+                                    catch (Exception paramEx)
+                                    {
+                                        output.AppendLine($"Error parsing parameters: {paramEx}");
                                     }
 
                                     test.SetParameters(parameters);
