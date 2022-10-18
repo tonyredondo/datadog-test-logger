@@ -16,25 +16,39 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
     public string Serialize(LoggerConfiguration loggerConfiguration, TestRunConfiguration runConfiguration, List<TestResultInfo> results, List<TestMessageInfo> messages)
     {
-        var builder = new StringBuilder();
-        builder.AppendLine($"ProcessId: {Process.GetCurrentProcess().Id}");
-        builder.AppendLine($"CommandLine: {Environment.CommandLine}");
-        builder.AppendLine();
-        ShowEnvironmentVariables(builder, "ORIGINAL ENVIRONMENT VARIABLES");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_ENABLED", "true");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_LOGS_ENABLED", "false");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_PROFILING_ENABLED", "false");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
-        Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_APPSEC_ENABLED", "false");
-        using (var _ = new DatadogEnvironmentVariablesReplacer(LoggerPrefix))
+        try
         {
-            ShowEnvironmentVariables(builder, "MODIFIED ENVIRONMENT VARIABLES");
-            builder.AppendLine(new TestSuiteSerializer(runConfiguration).Serialize(results));
-        }
+            if (Environment.GetEnvironmentVariable($"{LoggerPrefix}ENABLED") == "false")
+            {
+                return "Logger disabled.";
+            }
 
-        ShowEnvironmentVariables(builder, "REVERTED ENVIRONMENT VARIABLES");
-        return builder.ToString();
+            var builder = new StringBuilder();
+            builder.AppendLine($"ProcessId: {Process.GetCurrentProcess().Id}");
+            builder.AppendLine($"CommandLine: {Environment.CommandLine}");
+            builder.AppendLine();
+            ShowEnvironmentVariables(builder, "ORIGINAL ENVIRONMENT VARIABLES");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_ENABLED", "true");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_AGENTLESS_ENABLED", "true");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_LOGS_ENABLED", "false");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_PROFILING_ENABLED", "false");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_INSTRUMENTATION_TELEMETRY_AGENT_PROXY_ENABLED", "false");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED", "false");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_APPSEC_ENABLED", "false");
+            using (var _ = new DatadogEnvironmentVariablesReplacer(LoggerPrefix))
+            {
+                ShowEnvironmentVariables(builder, "MODIFIED ENVIRONMENT VARIABLES");
+                builder.AppendLine(new TestSuiteSerializer(runConfiguration).Serialize(results));
+            }
+
+            ShowEnvironmentVariables(builder, "REVERTED ENVIRONMENT VARIABLES");
+            return builder.ToString();
+        }
+        catch (Exception ex)
+        {
+            return ex.ToString();
+        }
     }
 
     private void ShowEnvironmentVariables(StringBuilder builder, string title)
