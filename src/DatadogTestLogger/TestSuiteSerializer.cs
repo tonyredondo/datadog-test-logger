@@ -302,13 +302,27 @@ internal class TestSuiteSerializer
                             test.SetTraits(traits);
                         }
 
-                        // Set status
-                        var endTime = result.StartTime.Add(result.Duration);
+                        // Calculate duration (logger doesn't have a good duration precision, sometimes the minimum duration is 1ms)
+                        // Here we try to reduce the duration so traces doesn't get stack together in the flamegraph
+                        var duration = result.Duration;
+                        var otherDuration = result.EndTime.Subtract(result.StartTime);
+                        if (otherDuration > TimeSpan.Zero && otherDuration < duration)
+                        {
+                            duration = otherDuration;
+                        }
+
+                        if (duration.TotalMilliseconds >= 1d)
+                        {
+                            duration = duration.Subtract(TimeSpan.FromMilliseconds(0.6d));
+                        }
+
+                        var endTime = result.StartTime.Add(duration);
                         if (endTime > suiteEndTime)
                         {
                             suiteEndTime = endTime;
                         }
 
+                        // Set status
                         output.AppendLine("    result.Outcome: " + result.Outcome);
                         if (result.Outcome == TestOutcome.Passed)
                         {
