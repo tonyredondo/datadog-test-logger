@@ -18,9 +18,15 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
     {
         try
         {
-            if (Environment.GetEnvironmentVariable($"{LoggerPrefix}ENABLED") == "false")
+            if (string.Equals(Environment.GetEnvironmentVariable($"{LoggerPrefix}ENABLED"), "false", StringComparison.OrdinalIgnoreCase))
             {
                 return "Logger disabled.";
+            }
+
+            if (!string.Equals(Environment.GetEnvironmentVariable($"{LoggerPrefix}API_KEY_CHECKER_ENABLED"), "false", StringComparison.OrdinalIgnoreCase) &&
+                !IsApiKeyAvailable())
+            {
+                return "Api Key is not available, DD_API_KEY environment variable is missing or empty.";
             }
 
             var builder = new StringBuilder();
@@ -67,5 +73,10 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         }
 
         builder.AppendLine();
+    }
+
+    private bool IsApiKeyAvailable()
+    {
+        return Environment.GetEnvironmentVariable("DD_API_KEY") is { } ddApiKey && !string.IsNullOrEmpty(ddApiKey);
     }
 }
