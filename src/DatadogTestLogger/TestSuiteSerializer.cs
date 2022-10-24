@@ -20,7 +20,7 @@ internal class TestSuiteSerializer
         _runConfiguration = runConfiguration;
     }
 
-    public string Serialize(List<TestResultInfo> results)
+    public string Serialize(List<TestResultInfo> results, List<TestMessageInfo> messages)
     { 
         var output = new StringBuilder();
 
@@ -317,7 +317,7 @@ internal class TestSuiteSerializer
                         }
 
                         var endTime = result.StartTime.Add(duration);
-                        if (endTime > suiteEndTime)
+                        if (suiteEndTime < endTime)
                         {
                             suiteEndTime = endTime;
                         }
@@ -326,8 +326,8 @@ internal class TestSuiteSerializer
                         output.AppendLine("    result.Outcome: " + result.Outcome);
                         if (result.Outcome == TestOutcome.Passed)
                         {
-                            output.AppendLine("    Closing test: " + testName + $" [PASS] [{result.Duration}]");
-                            test.Close(TestStatus.Pass, result.Duration);
+                            output.AppendLine("    Closing test: " + testName + $" [PASS] [{duration}]");
+                            test.Close(TestStatus.Pass, duration);
                         }
                         else if (result.Outcome == TestOutcome.Skipped)
                         {
@@ -335,14 +335,14 @@ internal class TestSuiteSerializer
                             if (result.Messages.FirstOrDefault(m => m.Category == "StdOutMsgs") is { } xUnitSkipMessage)
                             {
                                 output.AppendLine("    Closing test: " + testName +
-                                                  $" [SKIP] [{result.Duration}, {xUnitSkipMessage.Text}]");
-                                test.Close(TestStatus.Skip, result.Duration, xUnitSkipMessage.Text);
+                                                  $" [SKIP] [{duration}, {xUnitSkipMessage.Text}]");
+                                test.Close(TestStatus.Skip, duration, xUnitSkipMessage.Text);
                             }
                             else
                             {
                                 output.AppendLine("    Closing test: " + testName +
-                                                  $" [SKIP] [{result.Duration}, {result.ErrorMessage}]");
-                                test.Close(TestStatus.Skip, result.Duration, result.ErrorMessage);
+                                                  $" [SKIP] [{duration}, {result.ErrorMessage}]");
+                                test.Close(TestStatus.Skip, duration, result.ErrorMessage);
                             }
                         }
                         else if (result.Outcome is TestOutcome.Failed or TestOutcome.NotFound)
@@ -363,15 +363,15 @@ internal class TestSuiteSerializer
                             }
                             
                             output.AppendLine("    Closing test: " + testName +
-                                              $" [FAIL] [{result.Duration}, {errorType}, {errorMessage}]");
+                                              $" [FAIL] [{duration}, {errorType}, {errorMessage}]");
                             test.SetErrorInfo(errorType, errorMessage, result.ErrorStackTrace);
-                            test.Close(TestStatus.Fail, result.Duration);
+                            test.Close(TestStatus.Fail, duration);
                         }
                         else if (result.Outcome is TestOutcome.None)
                         {
                             output.AppendLine("    Closing test: " + testName +
-                                              $" [SKIP] [{result.Duration}, {result.ErrorMessage}]");
-                            test.Close(TestStatus.Skip, result.Duration, result.ErrorMessage);
+                                              $" [SKIP] [{duration}, {result.ErrorMessage}]");
+                            test.Close(TestStatus.Skip, duration, result.ErrorMessage);
                         }
                     }
 
@@ -390,6 +390,18 @@ internal class TestSuiteSerializer
         catch (Exception ex)
         {
             output.AppendLine(ex.ToString());
+        }
+        
+        // Messages
+        if (messages is not null)
+        {
+            output.AppendLine();
+            output.AppendLine("Messages:");
+            foreach (var message in messages)
+            {
+                output.AppendLine($"    {message.Level} : {message.Message}");
+            }
+            output.AppendLine();
         }
 
         return output.ToString();

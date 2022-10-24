@@ -45,7 +45,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
             using (var _ = new DatadogEnvironmentVariablesReplacer(LoggerPrefix))
             {
                 ShowEnvironmentVariables(builder, "MODIFIED ENVIRONMENT VARIABLES");
-                builder.AppendLine(new TestSuiteSerializer(runConfiguration).Serialize(results));
+                builder.AppendLine(new TestSuiteSerializer(runConfiguration).Serialize(results, messages));
             }
 
             ShowEnvironmentVariables(builder, "REVERTED ENVIRONMENT VARIABLES");
