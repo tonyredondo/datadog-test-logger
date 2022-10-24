@@ -77,6 +77,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
     private bool IsApiKeyAvailable()
     {
-        return Environment.GetEnvironmentVariable("DD_API_KEY") is { } ddApiKey && !string.IsNullOrEmpty(ddApiKey);
+        return Environment.GetEnvironmentVariable("DD_API_KEY") is { } ddApiKey && !string.IsNullOrEmpty(ddApiKey) ||
+               Environment.GetEnvironmentVariable($"{LoggerPrefix}DD_API_KEY") is { } ddLoggerApiKey && !string.IsNullOrEmpty(ddLoggerApiKey);
     }
 }
