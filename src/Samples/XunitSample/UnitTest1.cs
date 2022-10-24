@@ -25,5 +25,8 @@ public class UnitTest1
     [Fact]
     public void Test5()
     {
+        var k = 0;
+        var y = 18;
+        var z = y / k;
     }
 }

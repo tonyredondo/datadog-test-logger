@@ -347,9 +347,24 @@ internal class TestSuiteSerializer
                         }
                         else if (result.Outcome is TestOutcome.Failed or TestOutcome.NotFound)
                         {
+                            var errorType = "Exception";
+                            var errorMessage = result.ErrorMessage?.Trim() ?? string.Empty;
+
+                            var sepIndex = errorMessage.IndexOf(":", StringComparison.Ordinal);
+                            if (sepIndex != -1)
+                            {
+                                var initialSentence = errorMessage.Substring(0, sepIndex).Trim();
+                                if (initialSentence.IndexOf(" ", StringComparison.Ordinal) == -1 && initialSentence.Contains("Exception"))
+                                {
+                                    // sentence before ":" doesn't have space and contains `Exception`
+                                    errorType = initialSentence;
+                                    errorMessage = errorMessage.Substring(sepIndex + 1).Trim();
+                                }
+                            }
+                            
                             output.AppendLine("    Closing test: " + testName +
-                                              $" [FAIL] [{result.Duration}, {result.ErrorMessage}]");
-                            test.SetErrorInfo("Exception", result.ErrorMessage, result.ErrorStackTrace);
+                                              $" [FAIL] [{result.Duration}, {errorType}, {errorMessage}]");
+                            test.SetErrorInfo(errorType, errorMessage, result.ErrorStackTrace);
                             test.Close(TestStatus.Fail, result.Duration);
                         }
                         else if (result.Outcome is TestOutcome.None)
