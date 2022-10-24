@@ -305,15 +305,9 @@ internal class TestSuiteSerializer
                         // Calculate duration (logger doesn't have a good duration precision, sometimes the minimum duration is 1ms)
                         // Here we try to reduce the duration so traces doesn't get stack together in the flamegraph
                         var duration = result.Duration;
-                        var otherDuration = result.EndTime.Subtract(result.StartTime);
-                        if (otherDuration > TimeSpan.Zero && otherDuration < duration)
-                        {
-                            duration = otherDuration;
-                        }
-
                         if (duration.TotalMilliseconds >= 1d)
                         {
-                            duration = duration.Subtract(TimeSpan.FromMilliseconds(0.6d));
+                            duration = duration.Subtract(TimeSpan.FromMilliseconds(0.5d));
                         }
 
                         var endTime = result.StartTime.Add(duration);
