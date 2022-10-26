@@ -10,7 +10,7 @@ using Vendor.Datadog.Trace.Ci;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Spekt.TestLogger.Core;
 
-namespace DatadogTestLogger;
+namespace Datadog.TestLogger;
 
 internal class TestSuiteSerializer
 {

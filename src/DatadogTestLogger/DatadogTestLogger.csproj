@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>preview</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.0.21</Version>
+        <Version>0.0.22</Version>
         <Title>Datadog Test Logger</Title>
         <Authors>tonyredondo</Authors>
         <Description>Datadog Test Logger</Description>
@@ -14,8 +14,7 @@
         <PackageTags>Datadog, Test, Logger</PackageTags>
         <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net48;net472;net461;netstandard2.0</TargetFrameworks>
         <BuildPackage>true</BuildPackage>
-        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <AssemblyName>Datadog.testlogger</AssemblyName>
+        <AssemblyName>Datadog.TestLogger</AssemblyName>
         <PackageId>DatadogTestLogger</PackageId>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -40,9 +39,102 @@
         <ProjectReference Include="Vendor\Datadog.Trace.SourceGenerators\Datadog.Trace.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AdoNet/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AdoNet/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AdoNet/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AdoNet/*/**/*.cs" />
+        
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Aerospike/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Aerospike/*.cs" />
+        
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AspNetCore/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AspNetCore/*.cs" />
+        
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AWS/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AWS/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AWS/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/AWS/*/**/*.cs" />
+        
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/CosmosDb/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/CosmosDb/*.cs" />
+        
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Couchbase/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Couchbase/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/CryptographyAlgorithm/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/CryptographyAlgorithm/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Elasticsearch/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Elasticsearch/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Elasticsearch/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Elasticsearch/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/GraphQL/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/GraphQL/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/GraphQL/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/GraphQL/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Grpc/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Grpc/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Grpc/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Grpc/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/HashAlgorithm/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/HashAlgorithm/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Http/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Http/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Kafka/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Kafka/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Logging/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Logging/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/MongoDb/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/MongoDb/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Msmq/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Msmq/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Process/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Process/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/RabbitMQ/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/RabbitMQ/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Redis/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Redis/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Redis/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Redis/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Testing/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Testing/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Testing/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Testing/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Wcf/*.cs" />
+        <None Include="Vendor/Datadog.Trace/ClrProfiler/AutoInstrumentation/Wcf/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/Debugger/*.cs" />
+        <None Include="Vendor/Datadog.Trace/Debugger/*.cs" />
+        <Compile Remove="Vendor/Datadog.Trace/Debugger/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/Debugger/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/DiagnosticListeners/*/**/*.cs" />
+        <None Include="Vendor/Datadog.Trace/DiagnosticListeners/*/**/*.cs" />
+
+        <Compile Remove="Vendor/Datadog.Trace/Configuration/ConfigurationKeys.Debugger.cs" />
+        <None Include="Vendor/Datadog.Trace/Configuration/ConfigurationKeys.Debugger.cs" />
+    </ItemGroup>
+    
+<!--    <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
+        <Reference Include="System.Configuration" />
+        <Reference Include="System.Web" />
+    </ItemGroup>-->
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
-        <Reference Include="System.Configuration" />
         <Reference Include="System.Web" />
     </ItemGroup>
 

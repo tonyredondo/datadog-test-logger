@@ -15,8 +15,8 @@ using Vendor.Datadog.Trace.AppSec;
 using Vendor.Datadog.Trace.Ci;
 using Vendor.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
 using Vendor.Datadog.Trace.Configuration;
-using Vendor.Datadog.Trace.Debugger;
-using Vendor.Datadog.Trace.Debugger.Helpers;
+/*using Vendor.Datadog.Trace.Debugger;
+using Vendor.Datadog.Trace.Debugger.Helpers;*/
 using Vendor.Datadog.Trace.DiagnosticListeners;
 using Vendor.Datadog.Trace.Logging;
 using Vendor.Datadog.Trace.RemoteConfigurationManagement;
@@ -170,14 +170,14 @@ namespace Vendor.Datadog.Trace.ClrProfiler
             }
             else
             {
-                try
+                /*try
                 {
                     InitRemoteConfigurationManagement(tracer);
                 }
                 catch (Exception e)
                 {
                     Log.Error(e, e.Message);
-                }
+                }*/
 
                 try
                 {
@@ -201,7 +201,7 @@ namespace Vendor.Datadog.Trace.ClrProfiler
                 // lived nature of our apps. This appears to be a bug in the runtime (although
                 // we haven't yet confirmed that). Calling the `ToUuid()` method uses an MD5
                 // hash which calls into the native library, triggering the load.
-                _ = string.Empty.ToUUID();
+                // _ = string.Empty.ToUUID();
             }
             catch (Exception ex)
             {
@@ -354,6 +354,7 @@ namespace Vendor.Datadog.Trace.ClrProfiler
         }
 #endif
 
+        /*
         private static void InitRemoteConfigurationManagement(Tracer tracer)
         {
             var serviceName = tracer.Settings.ServiceName ?? tracer.DefaultServiceName;
@@ -427,6 +428,6 @@ namespace Vendor.Datadog.Trace.ClrProfiler
             {
                 Log.Error(ex, "Failed to initialize Live Debugger");
             }
-        }
+        }*/
     }
 }
