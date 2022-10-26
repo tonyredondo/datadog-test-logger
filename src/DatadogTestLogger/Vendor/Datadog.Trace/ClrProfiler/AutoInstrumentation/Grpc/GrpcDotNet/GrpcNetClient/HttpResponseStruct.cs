@@ -5,7 +5,7 @@
 
 #nullable enable
 
-#if !NET461
+#if !NET461_OR_GREATER
 
 using System.Net.Http.Headers;
 using Vendor.Datadog.Trace.DuckTyping;

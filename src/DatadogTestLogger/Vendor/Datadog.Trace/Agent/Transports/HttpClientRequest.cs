@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Vendor.Datadog.Trace.AppSec;
 using Vendor.Datadog.Trace.Logging;
@@ -51,7 +52,11 @@ namespace Vendor.Datadog.Trace.Agent.Transports
         public async Task<IApiResponse> PostAsJsonAsync(IEvent events, JsonSerializer serializer)
         {
             var memoryStream = new MemoryStream();
+#if NETCOREAPP3_0_OR_GREATER
             var sw = new StreamWriter(memoryStream, leaveOpen: true);
+#else
+            var sw = new StreamWriter(memoryStream, Encoding.UTF8, 1024, true);
+#endif
             using (var content = new StreamContent(memoryStream))
             {
                 using (JsonWriter writer = new JsonTextWriter(sw) { CloseOutput = true })

@@ -153,7 +153,7 @@ namespace Vendor.Datadog.Trace.RuntimeMetrics
 
         private static IRuntimeMetricsListener InitializeListener(IDogStatsd statsd, TimeSpan delay)
         {
-#if NETCOREAPP
+#if NETCOREAPP3_0_OR_GREATER
             return new RuntimeEventListener(statsd, delay);
 #elif NETFRAMEWORK
             return AzureAppServices.Metadata.IsRelevant ? new AzureAppServicePerformanceCounters(statsd) : new PerformanceCountersListener(statsd);

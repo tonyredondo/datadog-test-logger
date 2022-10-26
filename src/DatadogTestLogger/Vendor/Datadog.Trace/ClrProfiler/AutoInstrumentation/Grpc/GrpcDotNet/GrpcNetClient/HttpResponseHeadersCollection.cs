@@ -5,7 +5,7 @@
 
 #nullable enable
 
-#if !NET461
+#if !NET461_OR_GREATER
 
 using System.Collections.Generic;
 using System.Linq;
