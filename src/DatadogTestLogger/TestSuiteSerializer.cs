@@ -1,11 +1,12 @@
 ﻿// <copyright file="TestSuiteSerializer.cs" company="PlaceholderCompany">
 // Copyright (c) Tony Redondo. All rights reserved.
 // </copyright>
+#nullable enable
 
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Ci;
+using Vendor.Datadog.Trace.Ci;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Spekt.TestLogger.Core;
 
