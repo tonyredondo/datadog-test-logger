@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>preview</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.0.20</Version>
+        <Version>0.0.21</Version>
         <Title>Datadog Test Logger</Title>
         <Authors>tonyredondo</Authors>
         <Description>Datadog Test Logger</Description>
@@ -51,8 +51,6 @@
         <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" PrivateAssets="All" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.0.0" PrivateAssets="All" />
         <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.0" PrivateAssets="All" />
-
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.4.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -63,6 +61,8 @@
         <!--DuckTyping-->
         <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
         <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.4.1" />
     </ItemGroup>
 
     <ItemGroup>
