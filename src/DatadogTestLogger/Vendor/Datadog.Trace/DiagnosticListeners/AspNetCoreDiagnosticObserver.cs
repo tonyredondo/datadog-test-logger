@@ -80,7 +80,7 @@ namespace Vendor.Datadog.Trace.DiagnosticListeners
 
         private IDatadogSecurity CurrentSecurity => _security ?? Security.Instance;
 
-#if NETCOREAPP3_0_OR_GREATER
+#if NETCOREAPP
         protected override void OnNext(string eventName, object arg)
         {
             var lastChar = eventName[^1];

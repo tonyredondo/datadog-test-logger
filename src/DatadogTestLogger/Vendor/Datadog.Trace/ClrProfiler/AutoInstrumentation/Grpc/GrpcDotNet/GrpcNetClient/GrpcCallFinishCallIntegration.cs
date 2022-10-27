@@ -4,7 +4,7 @@
 // </copyright>
 
 #nullable enable
-#if !NET461_OR_GREATER
+#if !NET461
 using System.ComponentModel;
 using Vendor.Datadog.Trace.ClrProfiler.CallTarget;
 
