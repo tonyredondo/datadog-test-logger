@@ -2,7 +2,7 @@
 // Copyright (c) Tony Redondo. All rights reserved.
 // </copyright>
 
-namespace Datadog.TestLogger;
+namespace DatadogTestLogger;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 

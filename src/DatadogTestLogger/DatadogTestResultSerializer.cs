@@ -6,7 +6,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
-namespace Datadog.TestLogger;
+namespace DatadogTestLogger;
 
 using Spekt.TestLogger.Core;
 

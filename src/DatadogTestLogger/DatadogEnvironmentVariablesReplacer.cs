@@ -5,7 +5,7 @@
 
 using System.Collections;
 
-namespace Datadog.TestLogger;
+namespace DatadogTestLogger;
 
 internal class DatadogEnvironmentVariablesReplacer : IDisposable
 {
