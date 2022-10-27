@@ -1,7 +1,6 @@
 ﻿// <copyright file="DatadogEnvironmentVariablesReplacer.cs" company="PlaceholderCompany">
 // Copyright (c) Tony Redondo. All rights reserved.
 // </copyright>
-#nullable enable
 
 using System.Collections;
 
