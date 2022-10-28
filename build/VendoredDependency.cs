@@ -18,11 +18,12 @@ public class VendoredDependency
         All.Add(new()
         {
             LibraryName = "Datadog.Trace",
-            Version = "2.18.0",
             DownloadUrl = "https://github.com/DataDog/dd-trace-dotnet/archive/refs/heads/master.zip",
             ZipFilePrefix = "dd-trace-dotnet-master",
             PathToSrc = new[] {"tracer", "src", "Datadog.Trace"},
-            Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace"),
+            RelativePathsToExclude = new[] {"tracer", "src", "Datadog.Trace"},
+            Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace", 
+                AddPreprocessorsToGeneratedCode),
         });
     }
 
@@ -45,6 +46,28 @@ public class VendoredDependency
     private static string AddIfNetcoreapp31OrGreater(string filePath, string content)
     {
         return "#if NETCOREAPP3_1_OR_GREATER" + Environment.NewLine + content + Environment.NewLine + "#endif";
+    }
+
+    private static string AddPreprocessorsToGeneratedCode(string filePath, string content)
+    {
+        var replacements = new[]
+        {
+            (tfm: "net461", condition: "NETFRAMEWORK"),
+            (tfm: "netstandard2.0", condition: "!NETFRAMEWORK && !NETCOREAPP3_1_OR_GREATER"),
+            (tfm: "netcoreapp3.1", condition: "NETCOREAPP3_1_OR_GREATER && !NET6_0_OR_GREATER"),
+            (tfm: "net6.0", condition: "NET6_0_OR_GREATER"),
+        };
+
+        foreach (var replacement in replacements)
+        {
+            var generatedPath = Path.Combine("tracer", "src", "Datadog.Trace", "Generated", replacement.tfm);
+            if (filePath.Contains(generatedPath))
+            {
+                return $"#if {replacement.condition}" + Environment.NewLine + content + Environment.NewLine + "#endif";
+            }
+        }
+
+        return content;
     }
 
     private static string AddNullableDirectiveTransform(string filePath, string content)
@@ -79,74 +102,55 @@ public class VendoredDependency
                     builder.AppendLine(GenerateWarningDisablePragma());
                     builder.Append(content);
 
-                    // Special Newtonsoft.Json processing
-                    if (originalNamespace.Equals("Newtonsoft.Json"))
-                    {
-                        builder.Replace($"using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs",
-                            "using ErrorEventArgs = Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs");
-
-                        if (content.Contains("using Newtonsoft.Json.Serialization;"))
-                        {
-                            builder.Replace($"Func<", $"System.Func<");
-                            builder.Replace($"Action<", $"System.Action<");
-                        }
-
-                        var filename = Path.GetFileName(filePath);
-                        if (filename == "JsonSerializerInternalReader.cs")
-                        {
-                            builder.Replace("#pragma warning restore CS8600, CS8602, CS8603, CS8604", string.Empty);
-                        }
-
-                        builder.Replace("#if !(PORTABLE40 || PORTABLE || DOTNET || NETSTANDARD2_0)",
-                            "#if NETFRAMEWORK");
-
-                        if (filename == "JsonPropertyCollection.cs")
-                        {
-                            // eww
-                            builder.Replace(
-                                @"        private bool TryGetValue(string key, [NotNullWhen(true)]out JsonProperty? item)",
-                                @"#if NETCOREAPP
-        private new bool TryGetValue(string key, [NotNullWhen(true)]out JsonProperty? item)
-#else
-        private bool TryGetValue(string key, [NotNullWhen(true)]out JsonProperty? item)
-#endif");
-                        }
-                    }
-
-
-                    if (originalNamespace.Equals("dnlib"))
-                    {
-                        // dnlib's only targets net461 and netstandard2.0.
-                        // For our needs, it's more correct to consider `NETSTANDARD` as 'everything not .NET Framework'
-                        builder.Replace("#if NETSTANDARD", "#if !NETFRAMEWORK");
-
-                        // Make certain classes partial so we can extend them.
-                        foreach (var className in new[] {"SymbolReaderImpl", "PdbReader", "PortablePdbReader"})
-                        {
-                            builder.Replace($"class {className}", $"partial class {className}");
-                        }
-                    }
+                    builder.Replace("#if !NET461", "#if !NETFRAMEWORK");
+                    builder.Replace("#if NET461", "#if NETFRAMEWORK");
 
                     // Debugger.Break() is a dangerous method that may crash the process. We don't
                     // want to take any risk of calling it, ever, so replace it with a noop.
                     builder.Replace("Debugger.Break();", "{}");
 
                     // Prevent namespace conflicts
-                    builder.Replace($"using {originalNamespace}", $"using Datadog.Trace.Vendors.{originalNamespace}");
+                    builder.Replace($"using {originalNamespace}", $"using DatadogTestLogger.Vendors.{originalNamespace}");
+                    builder.Replace($"using static {originalNamespace}", $"using static DatadogTestLogger.Vendors.{originalNamespace}");
                     builder.Replace($"namespace {originalNamespace}",
-                        $"namespace Datadog.Trace.Vendors.{originalNamespace}");
+                        $"namespace DatadogTestLogger.Vendors.{originalNamespace}");
                     builder.Replace($"[CLSCompliant(false)]", $"// [CLSCompliant(false)]");
+
+                    // HACKS
+                    builder.Replace("using Datadog;", "using DatadogTestLogger;");
+                    builder.Replace($"[assembly: {originalNamespace}", $"[assembly: DatadogTestLogger.Vendors.{originalNamespace}");
+                    builder.Replace("public EventHandler<ErrorEventArgs>? Error { get; set; }",
+                        @"public EventHandler<global::DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs>? Error { get; set; }");
+                    builder.Replace(
+                        "return new HttpResponse(statusCode, reasonPhrase, headers, new StreamContent(responseStream, length));",
+                        "return new HttpResponse(statusCode, reasonPhrase, headers, new global::DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams.HttpContent.StreamContent(responseStream, length));");
+                    var replacement = "            _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);";
+                    builder.Replace(replacement,
+                        "#if NETCOREAPP3_0_OR_GREATER" + Environment.NewLine + replacement + Environment.NewLine +
+                        "#endif");
+                    replacement = "                    _gcStart = eventData.TimeStamp;";
+                    builder.Replace(replacement,
+                        "#if NETCOREAPP2_2_OR_GREATER" + Environment.NewLine + replacement + Environment.NewLine +
+                        "#endif");
+                    replacement = "                        _statsd.Timer(MetricsNames.GcPauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);";
+                    builder.Replace(replacement,
+                        "#if NETCOREAPP2_2_OR_GREATER" + Environment.NewLine + replacement + Environment.NewLine +
+                        "#endif");
+                    builder.Replace("var lastChar = eventName[^1];", "var lastChar = eventName.Last();");
+                    builder.Replace("var sw = new StreamWriter(memoryStream, leaveOpen: true);", "var sw = new StreamWriter(memoryStream, encoding: global::DatadogTestLogger.EncodingCache.UTF8NoBOM, bufferSize: -1, leaveOpen: true);");
+                    builder.Replace("#if !NETCOREAPP3_1_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0", "#if !NETCOREAPP2_0_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0");
+                    builder.Replace("NET7_0_OR_GREATER", "NET8_0_OR_GREATER");
 
                     // Fix namespace conflicts in `using alias` directives. For example, transform:
                     //      using Foo = dnlib.A.B.C;
                     // To:
-                    //      using Foo = Datadog.Trace.Vendors.dnlib.A.B.C;
+                    //      using Foo = DatadogTestLogger.Vendors.dnlib.A.B.C;
                     string result =
                         Regex.Replace(
                             builder.ToString(),
                             @$"using\s+(\S+)\s+=\s+{Regex.Escape(originalNamespace)}.(.*);",
                             match =>
-                                $"using {match.Groups[1].Value} = Datadog.Trace.Vendors.{originalNamespace}.{match.Groups[2].Value};");
+                                $"using {match.Groups[1].Value} = DatadogTestLogger.Vendors.{originalNamespace}.{match.Groups[2].Value};");
 
 
                     // Don't expose anything we don't intend to

@@ -34,7 +34,7 @@ public static class UpdateVendorsTool
         var sourceUrlLocation = Path.Combine(vendorFinalPath, "_last_downloaded_source_url.txt");
 
         // Ensure the url has changed, or don't bother upgrading
-        if (File.Exists(sourceUrlLocation))
+        if (File.Exists(sourceUrlLocation) && !string.IsNullOrEmpty(dependency.Version))
         {
             var currentSource = File.ReadAllText(sourceUrlLocation);
             if (currentSource.Equals(downloadUrl, StringComparison.OrdinalIgnoreCase))
