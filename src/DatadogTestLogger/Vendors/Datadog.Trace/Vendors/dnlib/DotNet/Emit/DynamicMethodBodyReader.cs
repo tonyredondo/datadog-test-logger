@@ -15,10 +15,10 @@ using System.Collections.Generic;
 using SR = System.Reflection;
 using System.Reflection.Emit;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
 	/// <summary>
 	/// <see cref="DynamicMethodBodyReader"/> options
 	/// </summary>

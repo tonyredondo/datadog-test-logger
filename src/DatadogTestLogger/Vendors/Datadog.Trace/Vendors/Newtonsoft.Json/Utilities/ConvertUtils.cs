@@ -47,18 +47,18 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 #endif
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
 #if !HAVE_LINQ
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
 #endif
 #if HAVE_ADO_NET
 using System.Data.SqlTypes;
 
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal enum PrimitiveTypeCode
     {

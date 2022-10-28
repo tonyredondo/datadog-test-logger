@@ -11,9 +11,9 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.ProbeStatuses;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.ProbeStatuses;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.PInvoke
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke
 {
     internal static class DebuggerNativeMethods
     {

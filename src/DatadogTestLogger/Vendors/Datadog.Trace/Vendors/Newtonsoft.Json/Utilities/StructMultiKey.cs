@@ -37,7 +37,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal readonly struct StructMultiKey<T1, T2> : IEquatable<StructMultiKey<T1, T2>>
     {

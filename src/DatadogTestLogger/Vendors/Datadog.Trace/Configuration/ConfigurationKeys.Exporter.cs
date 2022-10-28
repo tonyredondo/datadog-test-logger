@@ -8,7 +8,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     /// <summary>
     /// String constants for standard Datadog configuration keys.

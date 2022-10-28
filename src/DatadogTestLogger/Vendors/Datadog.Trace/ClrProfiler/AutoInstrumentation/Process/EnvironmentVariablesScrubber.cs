@@ -13,9 +13,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Process
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Process
 {
     internal static class EnvironmentVariablesScrubber
     {

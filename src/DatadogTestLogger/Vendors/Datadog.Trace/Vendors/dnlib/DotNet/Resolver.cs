@@ -13,7 +13,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Resolves types, methods, fields
 	/// </summary>

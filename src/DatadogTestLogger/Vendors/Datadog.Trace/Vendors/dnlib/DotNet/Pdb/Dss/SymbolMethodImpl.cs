@@ -13,10 +13,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss {
 	sealed class SymbolMethodImpl : SymbolMethod {
 		readonly SymbolReaderImpl reader;
 		readonly ISymUnmanagedMethod method;

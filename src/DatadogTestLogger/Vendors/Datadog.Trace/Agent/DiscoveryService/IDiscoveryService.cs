@@ -13,7 +13,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService
 {
     /// <summary>
     /// Queries datadog-agent and discovers which version we are running against and what endpoints it supports.

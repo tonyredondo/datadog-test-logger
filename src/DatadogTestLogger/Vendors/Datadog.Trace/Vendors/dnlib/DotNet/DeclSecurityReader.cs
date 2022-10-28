@@ -12,9 +12,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Reads <c>DeclSecurity</c> blobs
 	/// </summary>

@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 {
     /// <summary>
     /// BasicProperties interface for ducktyping

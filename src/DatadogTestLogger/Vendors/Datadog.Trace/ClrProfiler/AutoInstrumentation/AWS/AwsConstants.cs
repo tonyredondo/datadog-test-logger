@@ -8,9 +8,9 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS
 {
     internal static class AwsConstants
     {

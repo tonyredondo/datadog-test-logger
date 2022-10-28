@@ -9,7 +9,7 @@
 // </copyright>
 
 #nullable enable
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 {
     internal readonly struct TelemetryValue
     {

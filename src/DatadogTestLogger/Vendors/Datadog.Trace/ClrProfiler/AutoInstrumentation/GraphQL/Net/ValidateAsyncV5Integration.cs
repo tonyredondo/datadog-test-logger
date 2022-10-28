@@ -9,9 +9,9 @@
 // </copyright>
 using System;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.Net
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.Net
 {
     /// <summary>
     /// GraphQL.Validation.DocumentValidator calltarget instrumentation for GraphQL 4

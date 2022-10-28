@@ -35,11 +35,11 @@
 #endregion
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
 
 #nullable disable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Bson
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Bson
 {
     /// <summary>
     /// Represents a BSON Oid (object id).

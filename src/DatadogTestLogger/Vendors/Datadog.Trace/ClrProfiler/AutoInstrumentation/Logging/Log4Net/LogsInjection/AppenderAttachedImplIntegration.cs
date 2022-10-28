@@ -10,9 +10,9 @@
 
 using System;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Log4Net
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Log4Net
 {
     /// <summary>
     /// LoggerFactoryScopeProvider.ForEach&lt;TState&gt; calltarget instrumentation

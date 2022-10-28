@@ -11,7 +11,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Instrumentation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
 {
     /// <summary>
     /// Live debugger return value

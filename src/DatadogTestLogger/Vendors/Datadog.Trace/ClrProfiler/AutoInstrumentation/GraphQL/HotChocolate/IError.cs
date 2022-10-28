@@ -10,7 +10,7 @@
 
 using System.Collections;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.HotChocolate
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.HotChocolate
 {
     /// <summary>
     /// HotChocolate.IError interface for ducktyping

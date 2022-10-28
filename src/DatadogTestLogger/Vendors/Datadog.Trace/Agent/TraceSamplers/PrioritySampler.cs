@@ -9,9 +9,9 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.TraceSamplers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.TraceSamplers
 {
     internal class PrioritySampler : ITraceChunkSampler
     {

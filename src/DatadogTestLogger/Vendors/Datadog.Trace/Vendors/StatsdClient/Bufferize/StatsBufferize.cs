@@ -9,10 +9,10 @@
 //------------------------------------------------------------------------------
 using System;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Statistic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Worker;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Statistic;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Worker;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Bufferize
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Bufferize
 {
     /// <summary>
     /// StatsBufferize bufferizes metrics before sending them.

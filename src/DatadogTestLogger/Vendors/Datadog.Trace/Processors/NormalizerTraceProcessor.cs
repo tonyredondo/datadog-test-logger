@@ -9,11 +9,11 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Processors
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Processors
 {
     internal class NormalizerTraceProcessor : ITraceProcessor
     {

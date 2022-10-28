@@ -11,10 +11,10 @@
 #nullable enable
 using System;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations
 {
     internal class ConfigurationUpdater
     {

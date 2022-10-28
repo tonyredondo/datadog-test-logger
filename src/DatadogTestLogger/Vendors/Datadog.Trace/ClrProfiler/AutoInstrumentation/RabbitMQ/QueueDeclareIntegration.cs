@@ -11,9 +11,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 {
     /// <summary>
     /// RabbitMQ.Client QueueDeclare calltarget instrumentation

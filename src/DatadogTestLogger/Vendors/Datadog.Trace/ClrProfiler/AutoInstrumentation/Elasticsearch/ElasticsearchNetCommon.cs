@@ -10,10 +10,10 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
 {
     internal static class ElasticsearchNetCommon
     {

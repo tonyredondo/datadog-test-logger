@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 #pragma warning disable 1591	// XML doc comments
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
 	/// <summary>
 	/// Equality comparer for all raw rows
 	/// </summary>

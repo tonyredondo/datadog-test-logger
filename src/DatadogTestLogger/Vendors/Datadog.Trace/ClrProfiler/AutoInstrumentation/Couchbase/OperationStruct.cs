@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.Net;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Couchbase
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Couchbase
 {
     /// <summary>
     /// Ducktyping of Couchbase.IO.Operations.IOperation and generic implementations

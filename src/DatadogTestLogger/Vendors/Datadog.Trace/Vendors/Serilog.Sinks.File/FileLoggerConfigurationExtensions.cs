@@ -24,18 +24,18 @@
 using System;
 using System.ComponentModel;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Display;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Json;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Display;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File;
 
 // ReSharper disable RedundantArgumentDefaultValue, MethodOverloadWithOptionalParameter
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog
 {
     /// <summary>Extends <see cref="LoggerConfiguration"/> with methods to add file sinks.</summary>
     internal static class FileLoggerConfigurationExtensions

@@ -19,7 +19,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     internal static class ReflectionHelper
     {

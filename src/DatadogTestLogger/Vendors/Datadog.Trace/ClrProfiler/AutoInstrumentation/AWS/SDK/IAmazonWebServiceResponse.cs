@@ -10,7 +10,7 @@
 
 using System.Net;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SDK
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SDK
 {
     /// <summary>
     /// AmazonWebServiceResponse interface for ducktyping

@@ -10,7 +10,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
     internal struct GuidBits

@@ -38,15 +38,15 @@
 using System;
 using System.Collections.Generic;
 #if !HAVE_LINQ
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
 #endif
 #if HAVE_CONCURRENT_DICTIONARY
 using System.Collections.Concurrent;
 #endif
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal class ThreadSafeStore<TKey, TValue>
     {

@@ -10,13 +10,13 @@
 
 using System;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SDK
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SDK
 {
     /// <summary>
     /// AWSSDK.Core InvokeSync calltarget instrumentation

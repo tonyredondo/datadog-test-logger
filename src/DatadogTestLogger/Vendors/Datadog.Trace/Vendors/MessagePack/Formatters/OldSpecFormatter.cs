@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
 {
     /// <summary>
     /// Serialize by .NET native DateTime binary format.

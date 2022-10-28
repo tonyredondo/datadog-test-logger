@@ -11,9 +11,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams.HttpContent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams.HttpContent
 {
     internal class BufferContent : IHttpContent
     {

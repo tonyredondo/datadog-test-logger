@@ -10,7 +10,7 @@
 
 using System.Net;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 {
     /// <summary>
     /// MongoDB.Driver.Core.IConnection interface for duck-typing

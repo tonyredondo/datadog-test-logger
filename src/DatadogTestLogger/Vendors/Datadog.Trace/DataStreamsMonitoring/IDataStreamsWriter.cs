@@ -10,9 +10,9 @@
 
 #nullable enable
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 
 internal interface IDataStreamsWriter
 {

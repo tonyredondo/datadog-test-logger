@@ -10,9 +10,9 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 
 /// <summary>
 /// PathwayContext is used to monitor how payloads are sent across different services.

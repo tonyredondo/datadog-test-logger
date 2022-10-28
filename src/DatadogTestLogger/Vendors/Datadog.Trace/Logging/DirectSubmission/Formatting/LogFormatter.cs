@@ -13,11 +13,11 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tags;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting
 {
     internal class LogFormatter
     {

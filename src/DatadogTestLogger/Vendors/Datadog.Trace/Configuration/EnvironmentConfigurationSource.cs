@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     /// <summary>
     /// Represents a configuration source that

@@ -13,7 +13,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// Thrown when the module writer encounters an unrecoverable error
 	/// </summary>

@@ -14,21 +14,21 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers;
-using Datadog.Trace.Vendors.Datadog.Trace.DiagnosticListeners;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport;
-using Datadog.Trace.Vendors.Datadog.Trace.ServiceFabric;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.DiagnosticListeners;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport;
+using DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 {
     /// <summary>
     /// Provides access to the profiler CLSID and whether it is attached to the process.

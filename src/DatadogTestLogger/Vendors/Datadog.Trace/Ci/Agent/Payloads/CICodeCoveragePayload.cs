@@ -10,13 +10,13 @@
 
 using System;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.Payloads
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
 {
     internal class CICodeCoveragePayload : MultipartPayload
     {

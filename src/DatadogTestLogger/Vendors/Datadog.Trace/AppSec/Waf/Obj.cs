@@ -10,9 +10,9 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf
 {
     // NOTE: this is referred to as ddwaf_object in the C++ code, we call it Obj to avoid a naming clash
     internal class Obj : IDisposable

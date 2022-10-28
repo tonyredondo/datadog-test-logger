@@ -11,7 +11,7 @@
 using System;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util
 {
     /// <summary>
     /// Provide a cached reusable instance of StringBuilder per thread.

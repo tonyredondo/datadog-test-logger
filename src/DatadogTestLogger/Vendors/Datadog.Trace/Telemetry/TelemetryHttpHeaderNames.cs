@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 {
     internal static class TelemetryHttpHeaderNames
     {

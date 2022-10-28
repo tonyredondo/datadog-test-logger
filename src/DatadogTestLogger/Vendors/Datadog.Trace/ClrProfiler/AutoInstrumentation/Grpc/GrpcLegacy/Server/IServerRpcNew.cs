@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcLegacy.Server
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcLegacy.Server
 {
     /// <summary>
     /// DuckType for ServerRpcNew

@@ -35,7 +35,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal delegate TResult MethodCall<T, TResult>(T target, params object?[] args);
 }

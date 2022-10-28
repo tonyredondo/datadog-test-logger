@@ -10,9 +10,9 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 internal class AsmFeaturesProduct : Product
 {
     public override string Name => "ASM_FEATURES";

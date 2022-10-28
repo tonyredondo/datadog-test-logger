@@ -15,7 +15,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports
 {
     internal class HttpClientResponse : IApiResponse
     {

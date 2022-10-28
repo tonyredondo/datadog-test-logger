@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics
 {
     internal readonly struct HeapStats
     {

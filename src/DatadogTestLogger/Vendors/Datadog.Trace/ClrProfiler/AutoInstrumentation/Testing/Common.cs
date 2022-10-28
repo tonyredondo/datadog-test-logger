@@ -11,11 +11,11 @@
 using System;
 using System.Reflection;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing
 {
     internal static class Common
     {

@@ -15,16 +15,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.W32Resources;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.W32Resources;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// A high-level representation of a row in the Module table
 	/// </summary>

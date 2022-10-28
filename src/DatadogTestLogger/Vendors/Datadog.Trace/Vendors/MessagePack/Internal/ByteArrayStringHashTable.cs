@@ -12,7 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
 {
     // like ArraySegment<byte> hashtable.
     // Add is safe for construction phase only and requires capacity(does not do rehash)

@@ -16,7 +16,7 @@
 
 using System.Globalization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>
     /// When a regular expression specifies the option <see cref="RegexOptions.IgnoreCase"/> then comparisons between the input and the

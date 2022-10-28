@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Activity.DuckTypes
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.DuckTypes
 {
     internal enum ActivityKind
     {

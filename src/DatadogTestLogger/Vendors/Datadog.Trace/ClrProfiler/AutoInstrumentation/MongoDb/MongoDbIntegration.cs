@@ -10,11 +10,11 @@
 
 using System;
 using System.Net;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 {
     /// <summary>
     /// Tracing integration for MongoDB.Driver.Core.

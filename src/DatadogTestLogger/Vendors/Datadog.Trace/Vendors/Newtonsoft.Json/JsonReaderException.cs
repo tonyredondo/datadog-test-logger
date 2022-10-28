@@ -38,9 +38,9 @@
 using System;
 using System.Globalization;
 using System.Runtime.Serialization;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// The exception thrown when an error occurs while reading JSON text.

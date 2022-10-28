@@ -12,7 +12,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
 	/// <summary>
 	/// Instruction utility methods
 	/// </summary>

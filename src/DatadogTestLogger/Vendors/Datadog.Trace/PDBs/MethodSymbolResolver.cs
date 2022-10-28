@@ -14,13 +14,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Pdb
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Pdb
 {
     internal class MethodSymbolResolver
     {

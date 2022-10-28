@@ -11,9 +11,9 @@
 using System;
 using System.ComponentModel;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V7
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V7
 {
     /// <summary>
     /// Elasticsearch.Net.RequestPipeline.CallElasticsearchAsync&lt;T&gt; calltarget instrumentation

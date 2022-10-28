@@ -14,7 +14,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Snapshots
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
 {
     internal class TaskSnapshotSerializerFieldsAndPropsSelector : SnapshotSerializerFieldsAndPropsSelector
     {

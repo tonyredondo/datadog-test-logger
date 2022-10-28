@@ -12,11 +12,11 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams.HttpContent;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams.HttpContent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams
+namespace DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams
 {
     internal class DatadogHttpClient
     {
@@ -233,7 +233,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams
 
             var length = long.TryParse(headers.GetValue(ContentLengthHeaderKey), out var headerValue) ? headerValue : (long?)null;
 
-            return new HttpResponse(statusCode, reasonPhrase, headers, new StreamContent(responseStream, length));
+            return new HttpResponse(statusCode, reasonPhrase, headers, new global::DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams.HttpContent.StreamContent(responseStream, length));
         }
     }
 }

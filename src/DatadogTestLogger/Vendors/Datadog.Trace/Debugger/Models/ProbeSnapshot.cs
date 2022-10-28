@@ -12,10 +12,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
 {
     internal record struct ProbeSnapshot
     {

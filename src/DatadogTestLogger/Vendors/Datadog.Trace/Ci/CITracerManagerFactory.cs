@@ -9,21 +9,21 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Sampling;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission;
-using Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics;
-using Datadog.Trace.Vendors.Datadog.Trace.Sampling;
-using Datadog.Trace.Vendors.Datadog.Trace.Telemetry;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 {
     internal class CITracerManagerFactory : TracerManagerFactory
     {

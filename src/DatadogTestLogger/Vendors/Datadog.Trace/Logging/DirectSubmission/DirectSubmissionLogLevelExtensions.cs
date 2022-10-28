@@ -9,7 +9,7 @@
 // </copyright>
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission
 {
     internal static class DirectSubmissionLogLevelExtensions
     {

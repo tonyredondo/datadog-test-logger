@@ -9,11 +9,11 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Tagging
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     internal abstract partial class InstrumentationTags : CommonTags
     {

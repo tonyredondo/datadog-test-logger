@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DuckTyping
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
 {
     /// <summary>
     /// Duck attribute where the underlying member is a field

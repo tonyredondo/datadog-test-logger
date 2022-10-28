@@ -12,9 +12,9 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
 {
     internal interface IApiResponse : IDisposable
     {

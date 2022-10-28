@@ -13,7 +13,7 @@
 using System;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO {
 	sealed class DataReaderStream : Stream {
 		public override bool CanRead => true;
 		public override bool CanSeek => true;

@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mono.Unix;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
 {
     internal class UnixDomainSocketTransport : ITransport
     {

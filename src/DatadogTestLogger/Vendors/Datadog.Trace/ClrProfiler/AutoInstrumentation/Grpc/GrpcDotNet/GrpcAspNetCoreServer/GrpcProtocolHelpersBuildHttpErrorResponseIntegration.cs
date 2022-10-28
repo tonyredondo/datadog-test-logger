@@ -7,19 +7,19 @@
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
-#if !NET461
+#if !NETFRAMEWORK
 
 #nullable enable
 
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 using Microsoft.AspNetCore.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcAspNetCoreServer
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcAspNetCoreServer
 {
     /// <summary>
     /// Grpc.Net.Client.Internal.GrpcCall calltarget instrumentation

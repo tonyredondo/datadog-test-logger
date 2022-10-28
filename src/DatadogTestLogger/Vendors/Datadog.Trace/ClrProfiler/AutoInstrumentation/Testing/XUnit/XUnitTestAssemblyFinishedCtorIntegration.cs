@@ -9,10 +9,10 @@
 // </copyright>
 
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.XUnit;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.XUnit;
 
 /// <summary>
 /// Xunit.Sdk.TestAssemblyFinished..ctor calltarget instrumentation

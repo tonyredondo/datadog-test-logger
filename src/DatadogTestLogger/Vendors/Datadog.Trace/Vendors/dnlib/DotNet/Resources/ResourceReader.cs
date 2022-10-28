@@ -15,9 +15,9 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Resources {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Resources {
 	/// <summary>
 	/// Thrown by <see cref="ResourceReader"/>
 	/// </summary>

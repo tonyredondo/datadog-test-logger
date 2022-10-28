@@ -17,7 +17,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>Classifies characters as their corresponding minterm IDs.</summary>
     /// <remarks>

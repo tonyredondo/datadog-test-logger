@@ -15,9 +15,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Resolves assemblies
 	/// </summary>

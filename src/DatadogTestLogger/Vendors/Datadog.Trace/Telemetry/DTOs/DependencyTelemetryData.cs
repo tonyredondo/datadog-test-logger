@@ -9,7 +9,7 @@
 // </copyright>
 
 #nullable enable
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 {
     /// <summary>
     /// Using a record as used as dictionary key so getting equality comparison for free

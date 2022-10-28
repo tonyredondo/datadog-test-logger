@@ -12,7 +12,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers.Continuations
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers.Continuations
 {
     internal class ValueTaskContinuationGenerator<TIntegration, TTarget, TReturn> : ContinuationGenerator<TTarget, TReturn>
     {

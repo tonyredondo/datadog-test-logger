@@ -38,14 +38,14 @@
 using System;
 using System.Collections.Generic;
 #if !HAVE_LINQ
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
 #else
 using System.Linq;
 #endif
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
 using System.Collections;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq
 {
     /// <summary>
     /// Represents a collection of <see cref="JToken"/> objects.

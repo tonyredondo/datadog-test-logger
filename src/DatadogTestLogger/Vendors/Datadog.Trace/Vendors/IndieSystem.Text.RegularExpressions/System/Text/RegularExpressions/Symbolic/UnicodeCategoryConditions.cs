@@ -19,7 +19,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>Utility class providing singleton <see cref="BDD"/>s for evaluating whether a character is part of a particular Unicode category.</summary>
     internal static class UnicodeCategoryConditions

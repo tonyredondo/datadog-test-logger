@@ -22,9 +22,9 @@
 // limitations under the License.
 
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting
 {
     /// <summary>
     /// Formats log events in a textual representation.

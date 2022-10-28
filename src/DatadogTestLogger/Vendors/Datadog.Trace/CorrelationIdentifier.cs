@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     /// <summary>
     /// An API to access identifying values of the service and the active span

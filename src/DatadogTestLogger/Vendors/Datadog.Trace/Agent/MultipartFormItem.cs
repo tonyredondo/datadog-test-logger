@@ -13,7 +13,7 @@
 using System;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
 {
     internal readonly struct MultipartFormItem
     {

@@ -11,7 +11,7 @@
 #if NETFRAMEWORK
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
 {
     /// <summary>
     /// IHttpRouteData interface for ducktyping

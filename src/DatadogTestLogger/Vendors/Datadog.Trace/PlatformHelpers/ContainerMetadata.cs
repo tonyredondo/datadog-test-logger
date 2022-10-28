@@ -14,9 +14,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers
 {
     /// <summary>
     /// Utility class with methods to interact with container hosts.

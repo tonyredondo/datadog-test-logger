@@ -12,14 +12,14 @@ using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport
 {
     internal class RemoteConfigurationApi : IRemoteConfigurationApi
     {

@@ -10,7 +10,7 @@
 
 using System.Collections;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
 {
     /// <summary>
     /// SendMessageBatchRequest interface for ducktyping

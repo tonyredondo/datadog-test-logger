@@ -12,9 +12,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
 	/// <summary>
 	/// A CIL instruction (opcode + operand)
 	/// </summary>

@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models
 {
     internal struct Sampling : IEquatable<Sampling>
     {

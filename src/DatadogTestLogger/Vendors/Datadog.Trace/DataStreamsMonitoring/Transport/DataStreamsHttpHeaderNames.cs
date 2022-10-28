@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Transport
 {
     internal static class DataStreamsHttpHeaderNames
     {

@@ -27,7 +27,7 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
 {
     class PathRoller
     {

@@ -13,9 +13,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// All native vtables
 	/// </summary>

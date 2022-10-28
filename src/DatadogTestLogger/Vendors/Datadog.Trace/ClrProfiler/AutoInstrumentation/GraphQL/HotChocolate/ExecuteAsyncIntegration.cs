@@ -12,9 +12,9 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.HotChocolate
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.HotChocolate
 {
     /// <summary>
     /// HotChocolate.Execution.RequestExecutor calltarget instrumentation

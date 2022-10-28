@@ -12,11 +12,11 @@
 
 using System.Collections.Generic;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// <see cref="MetadataHeader"/> options
 	/// </summary>

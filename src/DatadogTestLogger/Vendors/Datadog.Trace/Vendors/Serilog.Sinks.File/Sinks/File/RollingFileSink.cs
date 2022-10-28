@@ -25,12 +25,12 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
 {
     sealed class RollingFileSink : ILogEventSink, IFlushableFileSink, IDisposable
     {

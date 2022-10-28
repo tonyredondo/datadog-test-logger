@@ -12,12 +12,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf
 {
     internal class Encoder
     {

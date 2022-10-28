@@ -13,9 +13,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Tagging
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     internal partial class RabbitMQTags : InstrumentationTags
     {

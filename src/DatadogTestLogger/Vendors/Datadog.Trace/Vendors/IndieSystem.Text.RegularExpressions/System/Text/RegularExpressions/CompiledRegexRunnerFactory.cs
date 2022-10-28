@@ -17,7 +17,7 @@
 using System.Globalization;
 using System.Reflection.Emit;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     internal sealed class CompiledRegexRunnerFactory : RegexRunnerFactory
     {

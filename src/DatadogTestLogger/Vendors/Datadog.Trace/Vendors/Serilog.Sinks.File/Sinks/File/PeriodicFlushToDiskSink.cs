@@ -23,11 +23,11 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
 {
     /// <summary>
     /// A sink wrapper that periodically flushes the wrapped sink to disk.

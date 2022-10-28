@@ -13,13 +13,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission;
-using Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     /// <summary>
     /// Contains Tracer settings.

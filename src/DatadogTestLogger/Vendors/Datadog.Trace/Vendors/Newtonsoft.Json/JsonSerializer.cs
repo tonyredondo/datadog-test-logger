@@ -42,15 +42,15 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization.Formatters;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Converters;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Converters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
 using System.Runtime.Serialization;
-using ErrorEventArgs = Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs;
+using ErrorEventArgs = DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Serializes and deserializes objects into and from the JSON format.

@@ -10,9 +10,9 @@
 
 #nullable enable
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry.Transports;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Transports;
 
 internal class AgentTelemetryTransport : JsonTelemetryTransport
 {

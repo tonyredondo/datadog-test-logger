@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
 {
     // Safe for multiple-read, single-write.
     internal class ThreadsafeTypeKeyHashTable<TValue>

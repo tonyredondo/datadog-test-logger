@@ -11,10 +11,10 @@
 // dnlib: See LICENSE.txt for more info
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb {
 	readonly struct PdbReaderContext {
 		readonly IPEImage peImage;
 		readonly ImageDebugDirectory codeViewDebugDir;

@@ -39,14 +39,14 @@
 using System;
 using System.Collections.Generic;
 #if !HAVE_LINQ
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
 #endif
 using System.Reflection;
 using System.Reflection.Emit;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
 using System.Globalization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal class DynamicReflectionDelegateFactory : ReflectionDelegateFactory
     {

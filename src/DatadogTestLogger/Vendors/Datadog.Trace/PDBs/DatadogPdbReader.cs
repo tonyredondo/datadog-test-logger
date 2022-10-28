@@ -13,17 +13,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Managed;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Portable;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
-using SymbolReaderFactory = Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.SymbolReaderFactory;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Managed;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Portable;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using SymbolReaderFactory = DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.SymbolReaderFactory;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Pdb
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Pdb
 {
     /// <summary>
     /// Reads both Windows and Portable PDBs.

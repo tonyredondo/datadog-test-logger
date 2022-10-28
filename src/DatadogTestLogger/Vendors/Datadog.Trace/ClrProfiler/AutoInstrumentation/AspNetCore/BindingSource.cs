@@ -9,7 +9,7 @@
 // </copyright>
 #if !NETFRAMEWORK
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNetCore
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNetCore
 {
     /// <summary>
     /// duck copy of bindingsource

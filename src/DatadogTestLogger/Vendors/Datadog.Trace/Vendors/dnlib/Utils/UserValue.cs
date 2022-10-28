@@ -12,9 +12,9 @@
 
 using System;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
 	/// <summary>
 	/// Lazily returns the original value if the user hasn't overwritten the value
 	/// </summary>

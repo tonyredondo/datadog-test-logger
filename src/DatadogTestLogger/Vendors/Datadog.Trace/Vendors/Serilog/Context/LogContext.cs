@@ -23,9 +23,9 @@
 
 using System;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Enrichers;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Enrichers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
 #if ASYNCLOCAL
 using System.Threading;
@@ -35,7 +35,7 @@ using System.Runtime.Remoting.Lifetime;
 using System.Runtime.Remoting.Messaging;
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Context
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Context
 {
     /// <summary>
     /// Holds ambient properties that can be attached to log events. To

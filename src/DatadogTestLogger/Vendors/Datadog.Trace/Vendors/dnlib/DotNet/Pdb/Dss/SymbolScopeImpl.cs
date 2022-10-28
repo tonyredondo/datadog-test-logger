@@ -13,9 +13,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss {
 	sealed class SymbolScopeImpl : SymbolScope {
 		readonly ISymUnmanagedScope scope;
 		readonly SymbolMethod method;

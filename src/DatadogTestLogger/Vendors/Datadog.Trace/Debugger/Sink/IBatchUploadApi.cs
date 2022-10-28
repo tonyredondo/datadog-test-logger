@@ -11,7 +11,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink
 {
     internal interface IBatchUploadApi
     {

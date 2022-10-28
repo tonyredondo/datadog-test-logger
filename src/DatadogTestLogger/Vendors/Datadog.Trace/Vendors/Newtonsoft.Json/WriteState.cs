@@ -37,7 +37,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Specifies the state of the <see cref="JsonWriter"/>.

@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Processors
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Processors
 {
     internal interface ITraceProcessor
     {

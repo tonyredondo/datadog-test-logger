@@ -39,7 +39,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Bson
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Bson
 {
     internal abstract class BsonToken
     {

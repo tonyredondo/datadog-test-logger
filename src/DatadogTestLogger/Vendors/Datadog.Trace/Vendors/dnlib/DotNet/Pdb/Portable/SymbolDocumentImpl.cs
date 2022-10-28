@@ -13,9 +13,9 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Portable {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Portable {
 	[DebuggerDisplay("{GetDebuggerString(),nq}")]
 	sealed class SymbolDocumentImpl : SymbolDocument {
 		readonly string url;

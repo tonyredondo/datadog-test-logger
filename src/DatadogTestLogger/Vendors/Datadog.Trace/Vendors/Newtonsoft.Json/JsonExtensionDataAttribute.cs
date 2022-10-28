@@ -12,7 +12,7 @@
 #nullable enable
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Instructs the <see cref="JsonSerializer"/> to deserialize properties with no matching class member into the specified collection

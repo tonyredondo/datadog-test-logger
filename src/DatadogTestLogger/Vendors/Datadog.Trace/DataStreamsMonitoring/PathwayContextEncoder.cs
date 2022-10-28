@@ -10,11 +10,11 @@
 
 #nullable enable
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Utils;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Utils;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 
 internal static class PathwayContextEncoder
 {

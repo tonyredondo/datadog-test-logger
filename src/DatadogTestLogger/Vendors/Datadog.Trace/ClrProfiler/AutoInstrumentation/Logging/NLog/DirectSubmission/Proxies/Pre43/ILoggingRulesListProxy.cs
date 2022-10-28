@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission.Proxies.Pre43
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission.Proxies.Pre43
 {
     /// <summary>
     /// Duck type for IList&lt;LoggingRule&gt;

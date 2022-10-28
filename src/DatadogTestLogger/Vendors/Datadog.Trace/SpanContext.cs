@@ -11,11 +11,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     /// <summary>
     /// The SpanContext contains all the information needed to express relationships between spans inside or outside the process boundaries.

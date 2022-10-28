@@ -13,11 +13,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Type of resource
 	/// </summary>

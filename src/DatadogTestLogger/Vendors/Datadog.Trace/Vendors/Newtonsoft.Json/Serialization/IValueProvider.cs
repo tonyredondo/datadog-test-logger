@@ -35,7 +35,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
 {
     /// <summary>
     /// Provides methods to get and set values.

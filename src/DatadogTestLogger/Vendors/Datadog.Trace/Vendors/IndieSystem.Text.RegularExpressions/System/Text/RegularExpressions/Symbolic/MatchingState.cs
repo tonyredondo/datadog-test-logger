@@ -20,7 +20,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Net;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>Captures a state explored during matching.</summary>
     internal sealed class MatchingState<TSet> where TSet : IComparable<TSet>, IEquatable<TSet>

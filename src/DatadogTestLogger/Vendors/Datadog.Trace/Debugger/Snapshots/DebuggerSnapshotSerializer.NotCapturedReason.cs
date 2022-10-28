@@ -10,7 +10,7 @@
 
 #pragma warning disable SA1300
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Snapshots
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
 {
     internal static partial class DebuggerSnapshotSerializer
     {

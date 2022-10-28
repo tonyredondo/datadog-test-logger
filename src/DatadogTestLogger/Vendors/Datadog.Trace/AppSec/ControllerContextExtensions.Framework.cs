@@ -14,10 +14,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Datadog.Trace.Vendors.Datadog.Trace.AspNet;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet;
+using DatadogTestLogger.Vendors.Datadog.Trace.AspNet;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec
 {
     internal static class ControllerContextExtensions
     {

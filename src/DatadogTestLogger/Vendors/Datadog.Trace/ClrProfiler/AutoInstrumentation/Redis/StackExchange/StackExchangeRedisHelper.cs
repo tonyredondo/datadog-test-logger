@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis.StackExchange
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis.StackExchange
 {
     /// <summary>
     /// Base class for redis integration.

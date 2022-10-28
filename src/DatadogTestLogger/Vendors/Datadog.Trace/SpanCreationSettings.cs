@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     /// <summary>
     /// Settings to use when creating a new <see cref="IScope"/> and <see cref="ISpan"/>.

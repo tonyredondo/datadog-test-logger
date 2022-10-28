@@ -17,7 +17,7 @@ using System.Linq;
 using System.Collections.Concurrent;
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
 {
     internal sealed class ArrayFormatter<T> : IMessagePackFormatter<T[]>
     {

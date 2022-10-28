@@ -11,11 +11,11 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.NUnit;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.NUnit;
 
 /// <summary>
 /// NUnit.Framework.Internal.Execution.CompositeWorkItem.SkipChildren() calltarget instrumentation

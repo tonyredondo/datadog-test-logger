@@ -12,7 +12,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 
 internal class NullDiscoveryService : IDiscoveryService
 {

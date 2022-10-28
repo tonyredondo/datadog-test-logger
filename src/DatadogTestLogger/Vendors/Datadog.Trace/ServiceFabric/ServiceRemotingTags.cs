@@ -10,10 +10,10 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.SourceGenerators;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ServiceFabric
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 {
     internal partial class ServiceRemotingTags : InstrumentationTags
     {

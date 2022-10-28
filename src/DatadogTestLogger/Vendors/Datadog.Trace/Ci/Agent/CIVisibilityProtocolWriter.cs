@@ -13,13 +13,13 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.Payloads;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.EventModel;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.EventModel;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent
 {
     /// <summary>
     /// CI Visibility Agentless Writer

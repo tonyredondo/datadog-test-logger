@@ -13,9 +13,9 @@
 using System;
 using System.Globalization;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ServiceFabric
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 {
     internal static class ServiceRemotingHelpers
     {

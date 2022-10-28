@@ -12,11 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.Initialization
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.Initialization
 {
     internal static class LibraryLoader
     {

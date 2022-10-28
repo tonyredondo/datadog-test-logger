@@ -13,7 +13,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 
 /// <summary>
 /// Coverage Reporter

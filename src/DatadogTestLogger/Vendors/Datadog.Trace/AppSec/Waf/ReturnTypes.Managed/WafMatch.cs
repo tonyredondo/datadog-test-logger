@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypes.Managed
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypes.Managed
 {
     internal class WafMatch
     {

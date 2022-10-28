@@ -14,27 +14,27 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.ContinuousProfiler;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring;
-using Datadog.Trace.Vendors.Datadog.Trace.DogStatsd;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission;
-using Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Vendors.Datadog.Trace.Processors;
-using Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics;
-using Datadog.Trace.Vendors.Datadog.Trace.Sampling;
-using Datadog.Trace.Vendors.Datadog.Trace.Telemetry;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
+using DatadogTestLogger.Vendors.Datadog.Trace.DogStatsd;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
+using DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     /// <summary>
     /// This class is responsible for managing the singleton objects associated with a Tracer.

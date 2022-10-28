@@ -36,12 +36,12 @@
 #endregion
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Converts an object to and from JSON.

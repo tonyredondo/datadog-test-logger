@@ -11,10 +11,10 @@
 using System;
 using System.ComponentModel;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient.CurlHandler
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient.CurlHandler
 {
     /// <summary>
     /// System.Net.Http.CurlHandler calltarget instrumentation

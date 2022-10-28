@@ -35,7 +35,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Specifies null value handling options for the <see cref="JsonSerializer"/>.

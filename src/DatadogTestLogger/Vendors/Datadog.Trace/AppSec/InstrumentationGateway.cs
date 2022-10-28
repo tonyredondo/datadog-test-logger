@@ -14,17 +14,17 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Routing;
 #endif
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports.Http;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 #if !NETFRAMEWORK
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec
 {
     internal partial class InstrumentationGateway
     {

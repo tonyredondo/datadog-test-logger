@@ -12,10 +12,10 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit {
 	/// <summary>
 	/// A collection of <see cref="Local"/>s
 	/// </summary>

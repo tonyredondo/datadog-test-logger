@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Sampling;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 
 /// <summary>
 ///     Represents a sampler for single span ingestion.

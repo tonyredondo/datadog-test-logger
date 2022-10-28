@@ -10,10 +10,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports
 {
     internal interface ITransport
     {

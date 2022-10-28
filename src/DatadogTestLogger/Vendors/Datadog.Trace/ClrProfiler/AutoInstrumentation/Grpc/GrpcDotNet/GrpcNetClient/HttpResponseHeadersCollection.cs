@@ -10,15 +10,15 @@
 
 #nullable enable
 
-#if !NET461
+#if !NETFRAMEWORK
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
 {
     internal readonly struct HttpResponseHeadersCollection : IHeadersCollection
     {

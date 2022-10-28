@@ -13,10 +13,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// #Blob heap
 	/// </summary>

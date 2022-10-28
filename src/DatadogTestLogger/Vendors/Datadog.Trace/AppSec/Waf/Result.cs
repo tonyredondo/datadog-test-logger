@@ -11,9 +11,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf
 {
     internal class Result : IResult
     {

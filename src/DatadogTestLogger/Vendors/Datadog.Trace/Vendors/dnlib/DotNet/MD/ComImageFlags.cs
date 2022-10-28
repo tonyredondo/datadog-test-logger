@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
 	/// <summary>
 	/// See COMIMAGE_FLAGS_XXX in CorHdr.h in the Windows SDK
 	/// </summary>

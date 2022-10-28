@@ -10,15 +10,15 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Propagators;
-using Datadog.Trace.Vendors.Datadog.Trace.Sampling;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
 {
     /// <summary>
     /// Extension methods for the <see cref="ISpan"/> class.

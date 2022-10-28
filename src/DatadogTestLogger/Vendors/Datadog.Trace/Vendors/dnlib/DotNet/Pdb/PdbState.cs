@@ -13,12 +13,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb {
 	/// <summary>
 	/// PDB state for a <see cref="ModuleDef"/>
 	/// </summary>

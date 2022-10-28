@@ -24,10 +24,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Parsing
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Parsing
 {
     /// <summary>
     /// Parses message template strings into sequences of text or property

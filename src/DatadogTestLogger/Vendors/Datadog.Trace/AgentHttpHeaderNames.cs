@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     /// <summary>
     /// Names of HTTP headers that can be used when sending traces to the Trace Agent.

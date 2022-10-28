@@ -10,11 +10,11 @@
 #nullable enable
 
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.Log4Net.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.Log4Net.DirectSubmission
 {
     /// <summary>
     /// Duck type for IAppender

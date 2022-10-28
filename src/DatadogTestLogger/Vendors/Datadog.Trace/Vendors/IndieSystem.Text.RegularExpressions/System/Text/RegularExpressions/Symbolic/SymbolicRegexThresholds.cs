@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>
     /// Contains configurations of various static threshold data related to symbolic regexes.

@@ -12,9 +12,9 @@
 
 using System;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO {
 	/// <summary>
 	/// Creates <see cref="DataStream"/>s
 	/// </summary>

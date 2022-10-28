@@ -10,7 +10,7 @@
 #pragma warning disable CS0618, CS0649, CS1574, CS1580, CS1581, CS1584, SYSLIB0011,SYSLIB0032
 // dnlib: See LICENSE.txt for more info
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Managed {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Managed {
 	enum NumericLeaf : ushort {
 		LF_NUMERIC			= 0x8000,
 		LF_CHAR				= 0x8000,

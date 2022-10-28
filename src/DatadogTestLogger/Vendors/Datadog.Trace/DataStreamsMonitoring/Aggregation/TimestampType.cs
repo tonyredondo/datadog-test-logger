@@ -9,7 +9,7 @@
 // </copyright>
 
 #nullable enable
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
 
 internal enum TimestampType
 {

@@ -11,9 +11,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     /// <summary>
     /// Contains exporter related settings.

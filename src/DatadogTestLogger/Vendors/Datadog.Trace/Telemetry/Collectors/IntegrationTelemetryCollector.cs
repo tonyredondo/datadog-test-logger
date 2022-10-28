@@ -12,9 +12,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 {
     internal class IntegrationTelemetryCollector
     {

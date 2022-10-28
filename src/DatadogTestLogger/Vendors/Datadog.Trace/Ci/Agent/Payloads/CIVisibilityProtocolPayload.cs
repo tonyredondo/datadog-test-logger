@@ -9,11 +9,11 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.MessagePack;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.Payloads
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
 {
     internal abstract class CIVisibilityProtocolPayload : EventPlatformPayload
     {

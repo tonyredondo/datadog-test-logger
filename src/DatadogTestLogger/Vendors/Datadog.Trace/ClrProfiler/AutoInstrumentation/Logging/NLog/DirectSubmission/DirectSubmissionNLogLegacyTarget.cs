@@ -11,14 +11,14 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission.Formatting;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission.Proxies;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission.Proxies;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission
 {
     /// <summary>
     /// NLog Target that sends logs directly to Datadog for NLog &lt;4.5

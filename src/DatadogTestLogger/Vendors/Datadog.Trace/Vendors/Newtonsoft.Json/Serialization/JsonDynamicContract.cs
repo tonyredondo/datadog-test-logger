@@ -39,9 +39,9 @@
 using System;
 using System.Dynamic;
 using System.Runtime.CompilerServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
 {
     /// <summary>
     /// Contract details for a <see cref="Type"/> used by the <see cref="JsonSerializer"/>.

@@ -17,7 +17,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>
     /// An exception as a result of a parse error in a regular expression <see cref="RegularExpressions"/>, with

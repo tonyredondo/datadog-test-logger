@@ -12,10 +12,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 {
     internal readonly struct KafkaHeadersCollectionAdapter : IHeadersCollection, IBinaryHeadersCollection
     {

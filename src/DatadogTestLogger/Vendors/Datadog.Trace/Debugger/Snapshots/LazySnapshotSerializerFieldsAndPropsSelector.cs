@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Snapshots
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
 {
     internal class LazySnapshotSerializerFieldsAndPropsSelector : SnapshotSerializerFieldsAndPropsSelector
     {

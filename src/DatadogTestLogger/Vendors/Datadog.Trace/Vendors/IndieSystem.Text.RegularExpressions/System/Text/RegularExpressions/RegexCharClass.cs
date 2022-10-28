@@ -23,7 +23,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     // The main function of RegexCharClass is as a builder to turn ranges, characters and
     // Unicode categories into a single string.  This string is used as a black box

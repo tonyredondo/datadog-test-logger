@@ -22,7 +22,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>Detects various forms of prefixes in the regular expression that can help FindFirstChars optimize its search.</summary>
     internal static class RegexPrefixAnalyzer

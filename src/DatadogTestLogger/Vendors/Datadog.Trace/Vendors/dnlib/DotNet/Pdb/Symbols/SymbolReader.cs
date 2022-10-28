@@ -13,7 +13,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols {
 	/// <summary>
 	/// Reads symbols from a PDB file
 	/// </summary>

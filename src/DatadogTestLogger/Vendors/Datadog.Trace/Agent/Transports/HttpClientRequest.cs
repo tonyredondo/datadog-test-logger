@@ -15,12 +15,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports
 {
     internal class HttpClientRequest : IApiRequest, IMultipartApiRequest
     {
@@ -56,7 +56,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports
         public async Task<IApiResponse> PostAsJsonAsync(IEvent events, JsonSerializer serializer)
         {
             var memoryStream = new MemoryStream();
-            var sw = new StreamWriter(memoryStream, leaveOpen: true);
+            var sw = new StreamWriter(memoryStream, encoding: global::DatadogTestLogger.EncodingCache.UTF8NoBOM, bufferSize: -1, leaveOpen: true);
             using (var content = new StreamContent(memoryStream))
             {
                 using (JsonWriter writer = new JsonTextWriter(sw) { CloseOutput = true })

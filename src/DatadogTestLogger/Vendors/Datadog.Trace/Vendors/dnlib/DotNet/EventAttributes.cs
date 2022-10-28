@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Event attributes, see CorHdr.h/CorEventAttr
 	/// </summary>

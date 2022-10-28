@@ -11,7 +11,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Interface)]
     sealed class CustomDefaultMethodImplementationAttribute : Attribute

@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement
 {
     internal class RemoteConfigurationCache
     {

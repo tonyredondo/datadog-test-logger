@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Activity.Handlers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
 {
     internal static class ActivityHandlersRegister
     {

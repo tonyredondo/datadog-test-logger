@@ -11,9 +11,9 @@
 // dnlib: See LICENSE.txt for more info
 
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// A PE section
 	/// </summary>

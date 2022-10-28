@@ -28,11 +28,11 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Parsing;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Parsing;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Json
 {
     /// <summary>
     /// Formats log events in a simple JSON structure. Instances of this class

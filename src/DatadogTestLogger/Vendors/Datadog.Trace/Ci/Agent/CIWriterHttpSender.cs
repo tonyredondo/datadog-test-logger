@@ -13,15 +13,15 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.Payloads;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent
 {
     internal sealed class CIWriterHttpSender : ICIVisibilityProtocolWriterSender
     {

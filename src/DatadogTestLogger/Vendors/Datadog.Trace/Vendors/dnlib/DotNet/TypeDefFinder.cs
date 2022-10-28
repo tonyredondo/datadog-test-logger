@@ -13,9 +13,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Finds <see cref="TypeDef"/>s
 	/// </summary>

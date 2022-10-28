@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec
 {
     internal class InstrumentationGatewaySecurityEventArgs : InstrumentationGatewayEventArgs
     {

@@ -13,10 +13,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Propagators
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
 {
     internal class ParseUtility
     {

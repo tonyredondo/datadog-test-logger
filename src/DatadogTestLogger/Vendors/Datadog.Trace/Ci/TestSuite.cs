@@ -11,12 +11,12 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tags;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
 /// <summary>
 /// CI Visibility test suite

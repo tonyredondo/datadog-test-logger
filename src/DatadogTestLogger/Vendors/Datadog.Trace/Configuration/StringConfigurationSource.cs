@@ -11,9 +11,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     /// <summary>
     /// A base <see cref="IConfigurationSource"/> implementation

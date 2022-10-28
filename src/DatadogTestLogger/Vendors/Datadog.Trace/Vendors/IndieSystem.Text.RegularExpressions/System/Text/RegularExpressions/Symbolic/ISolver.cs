@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>
     /// Provides support for operating over sets, including and/or/not operations, converting to/from

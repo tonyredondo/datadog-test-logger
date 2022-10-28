@@ -11,7 +11,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
 {
 
     internal sealed class TupleFormatter<T1> : IMessagePackFormatter<Tuple<T1>>

@@ -8,10 +8,10 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.EventModel;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.EventModel;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.MessagePack;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack;
 
 internal class CIVisibilityEventMessagePackFormatter<T> : EventMessagePackFormatter<CIVisibilityEvent<T>>
 {

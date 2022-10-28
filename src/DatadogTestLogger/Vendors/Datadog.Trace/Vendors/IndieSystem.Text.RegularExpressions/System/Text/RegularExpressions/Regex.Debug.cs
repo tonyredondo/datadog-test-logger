@@ -19,9 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     internal partial class Regex
     {
@@ -44,7 +44,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
         }
 
         /// <summary>
-        /// Generates UnicodeCategoryRanges.cs for the namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.Unicode
+        /// Generates UnicodeCategoryRanges.cs for the namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.Unicode
         /// in the given directory path. Only avaliable in DEBUG mode.
         /// </summary>
         [ExcludeFromCodeCoverage(

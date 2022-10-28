@@ -11,7 +11,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers.Continuations
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers.Continuations
 {
     internal class ContinuationGenerator<TTarget, TReturn>
     {

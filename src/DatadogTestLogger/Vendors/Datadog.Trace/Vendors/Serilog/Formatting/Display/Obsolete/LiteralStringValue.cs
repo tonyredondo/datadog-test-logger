@@ -23,10 +23,10 @@
 
 using System;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Display.Obsolete
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Display.Obsolete
 {
     // A special case (non-null) string value for use in output
     // templates. Does not apply "quoted" formatting by default.

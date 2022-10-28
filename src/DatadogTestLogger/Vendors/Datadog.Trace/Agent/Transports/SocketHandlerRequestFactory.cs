@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports
 {
     internal class SocketHandlerRequestFactory : HttpClientRequestFactory
     {

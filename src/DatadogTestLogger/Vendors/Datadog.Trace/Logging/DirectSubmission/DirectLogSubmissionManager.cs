@@ -11,10 +11,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission
 {
     internal class DirectLogSubmissionManager
     {

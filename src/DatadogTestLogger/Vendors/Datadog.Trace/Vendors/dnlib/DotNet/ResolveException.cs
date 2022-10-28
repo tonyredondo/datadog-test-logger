@@ -13,7 +13,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Resolve exception base class
 	/// </summary>

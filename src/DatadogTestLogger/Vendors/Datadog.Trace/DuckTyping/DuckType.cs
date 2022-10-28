@@ -19,9 +19,9 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DuckTyping
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
 {
     /// <summary>
     /// Create struct proxy instance delegate

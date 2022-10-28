@@ -11,10 +11,10 @@
 using System;
 using System.IO;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol.Tuf;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol.Tuf;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Json
 {
     internal class TufRootBase64Converter : JsonConverter<TufRoot>
     {

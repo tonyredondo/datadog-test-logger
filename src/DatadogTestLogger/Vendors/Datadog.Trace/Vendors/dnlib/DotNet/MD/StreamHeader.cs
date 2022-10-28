@@ -13,9 +13,9 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
 	/// <summary>
 	/// A metadata stream header
 	/// </summary>

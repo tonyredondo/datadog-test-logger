@@ -13,7 +13,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 // </copyright>
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
 
 /// <summary>
 /// CollapsingLowestDenseStore is a dynamically growing contiguous (non-sparse) store.

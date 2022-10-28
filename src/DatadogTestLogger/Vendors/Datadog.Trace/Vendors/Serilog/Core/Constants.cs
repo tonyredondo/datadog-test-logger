@@ -21,7 +21,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core
 {
     /// <summary>
     /// Constants used in the core logging pipeline and associated types.

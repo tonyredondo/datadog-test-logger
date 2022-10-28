@@ -11,7 +11,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.NUnit
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.NUnit
 {
     /// <summary>
     /// DuckTyping interface for NUnit.Framework.Interfaces.IPropertyBag

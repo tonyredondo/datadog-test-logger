@@ -11,9 +11,9 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
 
 internal class Data
 {

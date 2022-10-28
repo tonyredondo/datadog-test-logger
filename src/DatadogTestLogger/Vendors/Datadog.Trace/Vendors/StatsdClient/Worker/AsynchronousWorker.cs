@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Worker
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Worker
 {
     /// <summary>
     /// AsynchronousWorker performs tasks asynchronously.

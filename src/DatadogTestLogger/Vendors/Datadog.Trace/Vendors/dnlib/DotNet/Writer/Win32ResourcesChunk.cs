@@ -14,11 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.W32Resources;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.W32Resources;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// Writes Win32 resources
 	/// </summary>

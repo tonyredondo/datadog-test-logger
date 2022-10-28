@@ -8,9 +8,9 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
 internal class AsmDataProduct : Product
 {

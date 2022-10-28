@@ -14,9 +14,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
 	/// <summary>
 	/// Gets notified of list events
 	/// </summary>

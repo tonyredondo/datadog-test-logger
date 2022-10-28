@@ -18,7 +18,7 @@ using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Snapshots
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
 {
     internal static class SupportedTypesService
     {

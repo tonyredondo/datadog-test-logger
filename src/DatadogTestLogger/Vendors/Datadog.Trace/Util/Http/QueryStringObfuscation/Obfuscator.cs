@@ -15,12 +15,12 @@ using System;
 #if !NETCOREAPP3_1_OR_GREATER
 using System.Text.RegularExpressions;
 #endif
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 #if NETCOREAPP3_1_OR_GREATER
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions;
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation
 {
     internal class Obfuscator : ObfuscatorBase
     {

@@ -10,7 +10,7 @@
 
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ContinuousProfiler
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler
 {
     internal class Profiler
     {

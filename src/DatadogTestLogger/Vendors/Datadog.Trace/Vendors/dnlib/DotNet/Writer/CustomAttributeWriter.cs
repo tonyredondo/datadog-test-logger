@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// Helps <see cref="CustomAttributeWriter"/> write custom attributes
 	/// </summary>

@@ -23,10 +23,10 @@
 
 using System;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Policies
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Policies
 {
     class ReflectionTypesScalarDestructuringPolicy : IDestructuringPolicy
     {

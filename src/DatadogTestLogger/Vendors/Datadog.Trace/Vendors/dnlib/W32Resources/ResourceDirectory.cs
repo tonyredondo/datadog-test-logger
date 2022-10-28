@@ -12,11 +12,11 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.W32Resources {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.W32Resources {
 	/// <summary>
 	/// A Win32 resource directory (see IMAGE_RESOURCE_DIRECTORY in the Windows SDK)
 	/// </summary>

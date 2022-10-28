@@ -12,10 +12,10 @@
 using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
 {
     internal class LogsApi : ILogsApi
     {

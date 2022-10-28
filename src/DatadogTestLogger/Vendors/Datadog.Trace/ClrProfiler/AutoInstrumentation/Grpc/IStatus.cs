@@ -12,7 +12,7 @@ using System;
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc
 {
     /// <summary>
     /// Duck type for Grpc.Core.Status

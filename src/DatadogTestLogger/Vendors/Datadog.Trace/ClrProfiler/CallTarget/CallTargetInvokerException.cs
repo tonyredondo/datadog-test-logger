@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget
 {
     internal class CallTargetInvokerException : Exception
     {

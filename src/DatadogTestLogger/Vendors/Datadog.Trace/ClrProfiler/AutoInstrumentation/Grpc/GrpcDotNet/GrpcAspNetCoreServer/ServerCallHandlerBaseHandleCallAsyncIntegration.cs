@@ -10,13 +10,13 @@
 
 #nullable enable
 
-#if !NET461
+#if !NETFRAMEWORK
 using System;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 using Microsoft.AspNetCore.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcAspNetCoreServer
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcAspNetCoreServer
 {
     /// <summary>
     /// Grpc.Net.Client.Internal.GrpcCall calltarget instrumentation

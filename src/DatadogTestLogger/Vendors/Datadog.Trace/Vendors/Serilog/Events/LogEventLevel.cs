@@ -21,7 +21,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events
 {
     /// <summary>
     /// Specifies the meaning and relative importance of a log event.

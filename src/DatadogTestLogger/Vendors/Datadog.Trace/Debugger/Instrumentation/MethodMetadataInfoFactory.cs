@@ -11,12 +11,12 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Pdb;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Instrumentation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
 {
     /// <summary>
     /// Responsible to create <see cref="MethodMetadataInfo"/> structures.

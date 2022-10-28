@@ -14,15 +14,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tags;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Vendors.Datadog.Trace.Sampling;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
 /// <summary>
 /// CI Visibility test module

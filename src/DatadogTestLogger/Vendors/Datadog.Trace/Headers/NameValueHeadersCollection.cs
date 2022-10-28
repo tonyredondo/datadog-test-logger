@@ -12,9 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Headers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Headers
 {
     internal readonly struct NameValueHeadersCollection : IHeadersCollection
     {

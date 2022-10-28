@@ -16,7 +16,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
 {
     /// <summary>
     /// Represents a trace writer that writes to memory. When the trace message limit is

@@ -9,10 +9,10 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Sampling
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling
 {
     internal class TraceSampler : ITraceSampler
     {

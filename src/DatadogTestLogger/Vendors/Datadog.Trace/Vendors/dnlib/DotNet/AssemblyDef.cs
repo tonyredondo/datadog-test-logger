@@ -14,15 +14,15 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// A high-level representation of a row in the Assembly table
 	/// </summary>

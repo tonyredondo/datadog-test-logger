@@ -10,12 +10,12 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.MessagePack;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
 {
     internal class SpanBuffer
     {

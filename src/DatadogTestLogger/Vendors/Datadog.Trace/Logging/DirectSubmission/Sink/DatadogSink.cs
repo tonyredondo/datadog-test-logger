@@ -14,10 +14,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink.PeriodicBatching;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink.PeriodicBatching;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
 {
     internal class DatadogSink : BatchingSink, IDatadogSink
     {

@@ -12,16 +12,16 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 
 /// <summary>
 /// Manages all the data streams monitoring behaviour

@@ -43,7 +43,7 @@ using System.Text;
 using System.Collections;
 using System.Diagnostics;
 #if !HAVE_LINQ
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities.LinqBridge;
 #else
 using System.Linq;
 #endif
@@ -51,9 +51,9 @@ using System.Globalization;
 #if HAVE_METHOD_IMPL_ATTRIBUTE
 using System.Runtime.CompilerServices;
 #endif
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal static class CollectionUtils
     {

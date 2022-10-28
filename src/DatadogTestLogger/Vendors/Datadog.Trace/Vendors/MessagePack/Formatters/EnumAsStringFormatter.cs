@@ -10,7 +10,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
 {
     // Note:This implemenataion is 'not' fastest, should more improve.
     internal sealed class EnumAsStringFormatter<T> : IMessagePackFormatter<T>

@@ -11,7 +11,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage.Exceptions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Exceptions
 {
     /// <summary>
     /// Pdb not found

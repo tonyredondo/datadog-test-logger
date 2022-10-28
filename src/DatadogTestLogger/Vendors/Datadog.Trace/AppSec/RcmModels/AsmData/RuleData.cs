@@ -9,7 +9,7 @@
 // </copyright>
 
 #nullable enable
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
 
 internal class RuleData
 {

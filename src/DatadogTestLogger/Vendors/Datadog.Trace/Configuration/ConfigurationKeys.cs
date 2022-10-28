@@ -10,9 +10,9 @@
 #nullable enable
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     /// <summary>
     /// String constants for standard Datadog configuration keys.

@@ -21,13 +21,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Sinks
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Sinks
 {
     class DisposingAggregateSink : ILogEventSink, IDisposable
     {

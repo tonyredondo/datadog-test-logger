@@ -12,18 +12,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Propagators;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
 using Microsoft.AspNetCore.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers
 {
     internal sealed class AspNetCoreHttpRequestHandler
     {

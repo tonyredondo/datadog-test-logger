@@ -22,9 +22,9 @@
 // limitations under the License.
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Sinks
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Sinks
 {
     /// <summary>
     /// Forwards log events to another logging pipeline. Copies the events so

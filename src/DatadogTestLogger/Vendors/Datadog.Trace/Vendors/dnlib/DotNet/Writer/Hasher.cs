@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	static class Hasher {
 		static HashAlgorithm CreateHasher(ChecksumAlgorithm checksumAlgorithm) =>
 			checksumAlgorithm switch {

@@ -9,11 +9,11 @@
 // </copyright>
 
 #nullable enable
-#if !NET461
+#if !NETFRAMEWORK
 
 using System.Net.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
 {
     /// <summary>
     /// Duck type for Grpc.Net.Client.Internal.GrpcCall{TRequest, TResponse}

@@ -12,7 +12,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Activity.DuckTypes
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.DuckTypes
 {
     internal interface IActivity5 : IW3CActivity
     {

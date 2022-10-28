@@ -12,9 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 {
     internal readonly struct ContextPropagation : ICarrierGetter<IDictionary<string, object>>, ICarrierSetter<IDictionary<string, object>>
     {

@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 internal readonly struct Source
 {

@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     internal sealed partial class SymbolicRegexMatcher<TSet>
     {
@@ -41,7 +41,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
         /// </remarks>
         private const int SampleMatchesMaxInputLength = 100;
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         /// <inheritdoc cref="Regex.SampleMatches(int, int)"/>
         [ExcludeFromCodeCoverage(Justification = "Currently only used for testing")]
         public override IEnumerable<string> SampleMatches(int k, int randomseed)

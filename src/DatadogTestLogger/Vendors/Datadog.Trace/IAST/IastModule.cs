@@ -12,9 +12,9 @@
 
 using System;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 internal class IastModule
 {

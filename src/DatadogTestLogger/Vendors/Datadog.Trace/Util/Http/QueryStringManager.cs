@@ -8,10 +8,10 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util.Http
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http
 {
     internal class QueryStringManager
     {

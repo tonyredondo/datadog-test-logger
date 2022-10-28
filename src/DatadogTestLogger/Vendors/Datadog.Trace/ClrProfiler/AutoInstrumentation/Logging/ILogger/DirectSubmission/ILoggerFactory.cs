@@ -10,9 +10,9 @@
 
 using System.ComponentModel;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger.DirectSubmission
 {
     /// <summary>
     /// Duck type for ILogLevel

@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>Provides an <see cref="ISolver{Int64}"/> over bit vectors up to 64 bits in length.</summary>
     internal sealed class UInt64Solver : ISolver<ulong>

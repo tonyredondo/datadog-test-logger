@@ -10,9 +10,9 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink.Models;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.PInvoke
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct NativeProbeStatus

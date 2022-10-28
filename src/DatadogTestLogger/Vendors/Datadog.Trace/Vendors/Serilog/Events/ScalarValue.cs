@@ -25,7 +25,7 @@ using System;
 using System.Globalization;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events
 {
     /// <summary>
     /// A property value corresponding to a simple, scalar type.

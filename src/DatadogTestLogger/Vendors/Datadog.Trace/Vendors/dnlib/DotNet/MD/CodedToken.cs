@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
 	/// <summary>
 	/// Contains all possible coded token classes
 	/// </summary>

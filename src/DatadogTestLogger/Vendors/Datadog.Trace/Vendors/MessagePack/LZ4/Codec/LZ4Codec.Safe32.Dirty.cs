@@ -77,7 +77,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ReSharper disable JoinDeclarationAndInitializer
 // ReSharper disable RedundantIfElseBlock
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.LZ4
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.LZ4
 {
     internal static partial class LZ4Codec
     {

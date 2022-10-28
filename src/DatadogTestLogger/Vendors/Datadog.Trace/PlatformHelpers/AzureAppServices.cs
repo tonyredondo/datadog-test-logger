@@ -10,11 +10,11 @@
 
 using System;
 using System.Collections;
-using Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers
 {
     /// <summary>
     /// Helper class for gathering metadata about the execution context in Azure App Services.

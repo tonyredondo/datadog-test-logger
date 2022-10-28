@@ -10,7 +10,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util
 {
     /// <summary>
     /// Array slice.

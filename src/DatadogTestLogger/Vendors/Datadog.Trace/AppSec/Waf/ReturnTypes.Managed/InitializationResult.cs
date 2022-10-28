@@ -11,11 +11,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypesManaged
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypesManaged
 {
     internal class InitializationResult
     {

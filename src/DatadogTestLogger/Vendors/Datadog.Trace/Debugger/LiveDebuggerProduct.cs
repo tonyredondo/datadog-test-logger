@@ -8,10 +8,10 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger;
 
 internal class LiveDebuggerProduct : Product
 {

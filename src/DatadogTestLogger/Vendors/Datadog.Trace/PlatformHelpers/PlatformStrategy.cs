@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers
 {
     internal static class PlatformStrategy
     {

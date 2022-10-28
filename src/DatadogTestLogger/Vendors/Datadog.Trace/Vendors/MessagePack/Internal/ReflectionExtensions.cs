@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
 {
     internal static class ReflectionExtensions
     {

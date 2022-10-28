@@ -14,7 +14,7 @@ using System;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading {
 #if THREAD_SAFE
 	[Serializable]
 	class LockException : Exception {

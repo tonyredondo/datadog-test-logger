@@ -10,7 +10,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
 {
     internal class UDPTransport : ITransport
     {

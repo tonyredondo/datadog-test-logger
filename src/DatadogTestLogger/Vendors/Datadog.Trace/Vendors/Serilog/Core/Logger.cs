@@ -24,15 +24,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Capturing;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Enrichers;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Capturing;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Enrichers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
 #pragma warning disable Serilog004 // Constant MessageTemplate verifier
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core
 {
     /// <summary>
     /// The core Serilog logging pipeline. A <see cref="Logger"/> must

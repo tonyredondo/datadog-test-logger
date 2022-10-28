@@ -13,7 +13,7 @@
 using System;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Contains the name and ordinal of a method that gets exported to unmanaged code.
 	/// </summary>

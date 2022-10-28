@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 {
     [AttributeUsage(AttributeTargets.Field)]
     internal class DefinitionsIdAttribute : Attribute

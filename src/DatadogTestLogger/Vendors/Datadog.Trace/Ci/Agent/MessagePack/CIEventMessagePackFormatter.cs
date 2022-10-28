@@ -11,12 +11,12 @@
 #nullable enable
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.Payloads;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tags;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack
 {
     internal class CIEventMessagePackFormatter : EventMessagePackFormatter<CIVisibilityProtocolPayload>
     {

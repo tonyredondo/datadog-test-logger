@@ -11,7 +11,7 @@
 using System;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
 /// <summary>
 /// Contains global datadog configuration.

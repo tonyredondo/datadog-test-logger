@@ -15,7 +15,7 @@
 using System;
 using System.Reflection;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Allows users to control class loading and mandate what class to load.

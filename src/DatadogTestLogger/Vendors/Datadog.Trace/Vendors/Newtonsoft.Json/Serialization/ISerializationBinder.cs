@@ -39,7 +39,7 @@ using System;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
 {
     /// <summary>
     /// Allows users to control class loading and mandate what class to load.

@@ -16,7 +16,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Compares <see cref="UTF8String"/>s
 	/// </summary>

@@ -10,9 +10,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Pdb
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Pdb
 {
     internal static class SymbolMethodExtensions
     {

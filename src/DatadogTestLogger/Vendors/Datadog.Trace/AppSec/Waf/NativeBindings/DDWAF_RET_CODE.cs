@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings
 {
     internal enum DDWAF_RET_CODE
     {

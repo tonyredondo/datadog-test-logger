@@ -8,7 +8,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-namespace Datadog.Trace.Vendors.Datadog.Trace;
+namespace DatadogTestLogger.Vendors.Datadog.Trace;
 
 /// <summary>
 /// Error names used in `_dd.propagation_error` as trace-level tag.

@@ -11,9 +11,9 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
 {
     internal class CIVisibilitySettings
     {

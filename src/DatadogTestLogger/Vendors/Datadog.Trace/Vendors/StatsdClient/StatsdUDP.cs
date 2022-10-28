@@ -15,7 +15,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient
 {
     internal class StatsdUDP
     {

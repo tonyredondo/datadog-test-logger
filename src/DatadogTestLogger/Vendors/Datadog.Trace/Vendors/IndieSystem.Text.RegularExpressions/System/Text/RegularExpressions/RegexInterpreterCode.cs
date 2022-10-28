@@ -19,7 +19,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>Contains the code, written by <see cref="RegexWriter"/>, for <see cref="RegexInterpreter"/> to evaluate a regular expression.</summary>
     internal sealed class RegexInterpreterCode

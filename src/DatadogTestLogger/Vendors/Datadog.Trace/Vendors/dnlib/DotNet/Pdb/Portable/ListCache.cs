@@ -13,7 +13,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Portable {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Portable {
 	static class ListCache<T> {
 		static volatile List<T> cachedList;
 		public static List<T> AllocList() => Interlocked.Exchange(ref cachedList, null) ?? new List<T>();

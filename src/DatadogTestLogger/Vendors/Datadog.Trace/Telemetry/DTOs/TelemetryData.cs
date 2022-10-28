@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 {
     /// <summary>
     /// DTO that is serialized.

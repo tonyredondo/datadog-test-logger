@@ -15,9 +15,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
 
 internal struct ApplyDetails
 {

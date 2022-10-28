@@ -11,10 +11,10 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis.ServiceStack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis.ServiceStack
 {
     /// <summary>
     /// ServiceStack.Redis.RedisNativeClient.SendReceive[T] calltarget instrumentation (v6.2.0+)

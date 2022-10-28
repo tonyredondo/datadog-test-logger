@@ -13,9 +13,9 @@ using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.StreamFactories
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.StreamFactories
 {
     internal class NamedPipeClientStreamFactory : IStreamFactory
     {

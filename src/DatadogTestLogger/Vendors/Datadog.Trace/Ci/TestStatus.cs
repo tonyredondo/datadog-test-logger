@@ -9,7 +9,7 @@
 // </copyright>
 
 #nullable enable
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
 /// <summary>
 /// Test status

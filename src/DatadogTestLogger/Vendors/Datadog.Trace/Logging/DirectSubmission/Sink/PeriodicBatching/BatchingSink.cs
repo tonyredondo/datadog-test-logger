@@ -13,9 +13,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink.PeriodicBatching
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink.PeriodicBatching
 {
     internal abstract class BatchingSink
     {

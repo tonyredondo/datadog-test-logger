@@ -11,9 +11,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Snapshots
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
 {
     internal class SnapshotSummary
     {

@@ -10,7 +10,7 @@
 
 using System.Collections;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.Net
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.Net
 {
     /// <summary>
     /// GraphQL.ExecutionError interface for ducktyping

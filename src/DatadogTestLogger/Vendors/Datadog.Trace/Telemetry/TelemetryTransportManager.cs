@@ -13,10 +13,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 
 internal class TelemetryTransportManager
 {

@@ -40,11 +40,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Serialization.Formatters;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
 using System.Runtime.Serialization;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Specifies the settings on a <see cref="JsonSerializer"/> object.
@@ -308,7 +308,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
         /// Gets or sets the error handler called during serialization and deserialization.
         /// </summary>
         /// <value>The error handler called during serialization and deserialization.</value>
-        public EventHandler<ErrorEventArgs>? Error { get; set; }
+        public EventHandler<global::DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs>? Error { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="StreamingContext"/> used by the serializer when invoking serialization callback methods.

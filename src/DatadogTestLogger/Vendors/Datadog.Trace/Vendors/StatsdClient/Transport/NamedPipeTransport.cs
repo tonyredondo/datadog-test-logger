@@ -13,7 +13,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
 {
     internal class NamedPipeTransport : ITransport
     {

@@ -8,9 +8,9 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Tagging
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     internal abstract partial class AwsSdkTags : InstrumentationTags, IHasStatusCode
     {

@@ -9,7 +9,7 @@
 // </copyright>
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.EventModel;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.EventModel;
 
 internal class SpanEvent : CIVisibilityEvent<Span>
 {

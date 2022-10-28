@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core
 {
     /// <summary>
     /// Indicates that the marked method logs data using a message template and (optional) arguments.

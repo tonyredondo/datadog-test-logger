@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
 {
     internal static class LogsApiHeaderNames
     {

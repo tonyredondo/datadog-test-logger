@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
 {
     internal static class ArrayExtensions
     {

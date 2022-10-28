@@ -11,9 +11,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement
 {
     internal class ProductConfigChangedEventArgs : EventArgs
     {

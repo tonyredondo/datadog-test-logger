@@ -16,7 +16,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Thrown by <see cref="TypeNameParser"/> when it fails to parse a type name
 	/// </summary>

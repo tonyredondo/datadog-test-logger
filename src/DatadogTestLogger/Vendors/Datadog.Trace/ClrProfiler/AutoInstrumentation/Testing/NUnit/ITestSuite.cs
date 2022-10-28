@@ -10,7 +10,7 @@
 
 using System.Collections;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.NUnit
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.NUnit
 {
     /// <summary>
     /// DuckTyping interface for NUnit.Framework.Internal.TestSuite

@@ -22,7 +22,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     internal sealed partial class SymbolicRegexMatcher<TSet>
     {

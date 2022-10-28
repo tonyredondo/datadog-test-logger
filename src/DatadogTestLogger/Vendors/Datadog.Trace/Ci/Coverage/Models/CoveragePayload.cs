@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Models
 {
     /// <summary>
     /// Coverage payload

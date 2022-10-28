@@ -10,9 +10,9 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings
 {
     // reduced because we only need to read one value.
     // a one trick poney

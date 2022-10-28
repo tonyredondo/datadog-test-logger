@@ -11,7 +11,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.LogsInjection
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.LogsInjection
 {
     /// <summary>
     /// Duck type for MappedDiagnosticsLogicalContext in NLog 4.6+

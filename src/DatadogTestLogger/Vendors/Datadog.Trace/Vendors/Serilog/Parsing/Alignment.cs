@@ -21,7 +21,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Parsing
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Parsing
 {
     /// <summary>
     /// A structure representing the alignment settings to apply when rendering a property.

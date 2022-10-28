@@ -14,10 +14,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec
 {
     internal static class BodyExtractor
     {

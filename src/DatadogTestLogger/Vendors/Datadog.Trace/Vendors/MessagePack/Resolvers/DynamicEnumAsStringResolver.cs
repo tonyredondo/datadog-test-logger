@@ -9,12 +9,12 @@
 //------------------------------------------------------------------------------
 #if !UNITY_WSA
 
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal;
 using System;
 using System.Reflection;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers
 {
     internal sealed class DynamicEnumAsStringResolver : IFormatterResolver
     {

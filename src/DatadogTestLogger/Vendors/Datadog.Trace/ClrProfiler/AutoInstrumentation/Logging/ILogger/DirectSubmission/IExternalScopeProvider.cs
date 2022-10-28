@@ -11,7 +11,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger.DirectSubmission
 {
     /// <summary>
     /// A duck type for Microsoft.Extensions.Logging.IExternalScopeProvider

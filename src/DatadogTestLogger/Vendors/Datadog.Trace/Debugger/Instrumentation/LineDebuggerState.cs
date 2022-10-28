@@ -11,9 +11,9 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Snapshots;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Instrumentation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
 {
     /// <summary>
     /// Live debugger execution state

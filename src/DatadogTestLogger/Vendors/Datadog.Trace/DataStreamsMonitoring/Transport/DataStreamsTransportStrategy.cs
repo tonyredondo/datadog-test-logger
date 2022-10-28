@@ -9,10 +9,10 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Transport;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Transport;
 
 internal static class DataStreamsTransportStrategy
 {

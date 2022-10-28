@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DuckTyping
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
 {
     internal readonly struct TypesTuple : IEquatable<TypesTuple>
     {

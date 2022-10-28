@@ -9,11 +9,11 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack
 {
     internal abstract class EventMessagePackFormatter<T> : IMessagePackFormatter<T>
     {

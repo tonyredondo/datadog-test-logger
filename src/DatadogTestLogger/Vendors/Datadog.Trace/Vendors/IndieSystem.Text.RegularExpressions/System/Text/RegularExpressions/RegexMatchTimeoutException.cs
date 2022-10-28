@@ -17,7 +17,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>
     /// This is the exception that is thrown when a RegEx matching timeout occurs.

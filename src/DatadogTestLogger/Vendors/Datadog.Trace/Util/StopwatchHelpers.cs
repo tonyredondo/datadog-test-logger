@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util
 {
     internal class StopwatchHelpers
     {

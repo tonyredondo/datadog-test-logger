@@ -10,7 +10,7 @@
 
 using System.Reflection.Emit;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers
 {
     internal readonly struct CreateAsyncEndMethodResult
     {

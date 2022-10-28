@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Web;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AspNet
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AspNet
 {
     internal static class SharedItems
     {

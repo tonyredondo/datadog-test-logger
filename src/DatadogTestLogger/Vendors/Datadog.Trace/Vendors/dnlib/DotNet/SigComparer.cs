@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Compares types
 	/// </summary>

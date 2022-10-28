@@ -21,7 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     internal sealed partial class SymbolicRegexMatcher<TSet>
     {

@@ -13,10 +13,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Emit;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
 	class CollectionDebugView<TValue> {
 		readonly ICollection<TValue> list;
 		public CollectionDebugView(ICollection<TValue> list) => this.list = list ?? throw new ArgumentNullException(nameof(list));

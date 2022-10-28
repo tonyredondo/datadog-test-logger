@@ -24,7 +24,7 @@
 using System;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
 {
     sealed class WriteCountingStream : Stream
     {

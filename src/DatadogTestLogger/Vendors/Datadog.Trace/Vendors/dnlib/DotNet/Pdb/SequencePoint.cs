@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb {
 	/// <summary>
 	/// PDB sequence point
 	/// </summary>

@@ -13,7 +13,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols {
 	/// <summary>
 	/// Sequence point
 	/// </summary>

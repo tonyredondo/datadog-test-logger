@@ -20,7 +20,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>Provides a generic implementation for minterm generation over a given Boolean Algebra.</summary>
     /// <typeparam name="TSet">The type of set of elements (typically <see cref="BDD"/>, <see cref="BitVector"/> for more than 64 elements, or <see cref="ulong"/> for 64 or fewer elements).</typeparam>

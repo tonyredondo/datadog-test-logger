@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
     internal class MessagePackObjectAttribute : Attribute

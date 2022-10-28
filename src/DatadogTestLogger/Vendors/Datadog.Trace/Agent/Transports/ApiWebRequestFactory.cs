@@ -11,11 +11,11 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 #pragma warning disable CS0618 // WebRequest, HttpWebRequest, ServicePoint, and WebClient are obsolete. Use HttpClient instead.
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports
 {
     internal class ApiWebRequestFactory : IApiRequestFactory
     {

@@ -10,9 +10,9 @@
 
 using System;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Processors
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Processors
 {
     internal class RedisObfuscationUtil
     {

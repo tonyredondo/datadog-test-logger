@@ -13,7 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 {
     internal class DatadogLoggingScope : IReadOnlyList<KeyValuePair<string, object>>
     {

@@ -11,13 +11,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.Initialization;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypesManaged;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.Initialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypesManaged;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf
 {
     internal class Waf : IWaf
     {

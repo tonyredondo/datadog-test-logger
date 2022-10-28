@@ -9,14 +9,14 @@
 //------------------------------------------------------------------------------
 #if NETSTANDARD || NETFRAMEWORK || NETCOREAPP
 
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
 {
     internal sealed class DynamicObjectTypeFallbackFormatter : IMessagePackFormatter<object>
     {

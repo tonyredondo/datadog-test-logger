@@ -22,10 +22,10 @@
 // limitations under the License.
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Display
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Display
 {
     /// <summary>
     /// Implements the {Level} element.

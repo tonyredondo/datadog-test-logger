@@ -10,9 +10,9 @@
 
 using System;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink.Models;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink
 {
     internal interface IDebuggerSink : IDisposable
     {

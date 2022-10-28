@@ -11,7 +11,7 @@
 #nullable enable
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
 
 internal readonly struct SerializableStatsBucket
 {

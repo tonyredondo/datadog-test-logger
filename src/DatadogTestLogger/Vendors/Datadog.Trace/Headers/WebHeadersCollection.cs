@@ -14,9 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Headers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Headers
 {
     internal readonly struct WebHeadersCollection : IHeadersCollection
     {

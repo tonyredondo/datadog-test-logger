@@ -24,10 +24,10 @@
 using System;
 using System.Globalization;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Data;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Data;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting.Json
 {
     /// <summary>
     /// Converts Serilog's structured property value format into JSON.

@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>
     /// Converts sets of integers expressed as BDDs into non-overlapping and ordered arrays of ranges.

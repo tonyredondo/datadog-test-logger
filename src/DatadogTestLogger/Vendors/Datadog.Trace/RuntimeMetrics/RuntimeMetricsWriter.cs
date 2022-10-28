@@ -12,12 +12,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics
 {
     internal class RuntimeMetricsWriter : IDisposable
     {

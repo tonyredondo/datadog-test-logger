@@ -11,11 +11,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec
 {
     internal class SecuritySettings
     {

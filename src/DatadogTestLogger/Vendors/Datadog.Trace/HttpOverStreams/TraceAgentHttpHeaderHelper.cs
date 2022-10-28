@@ -12,7 +12,7 @@
 
 using System.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams
+namespace DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams
 {
     internal class TraceAgentHttpHeaderHelper : HttpHeaderHelperBase
     {

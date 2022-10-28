@@ -15,12 +15,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService
 {
     internal class DiscoveryService : IDiscoveryService
     {

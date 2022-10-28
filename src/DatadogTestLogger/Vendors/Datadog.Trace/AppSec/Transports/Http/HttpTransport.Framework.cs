@@ -16,11 +16,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports.Http
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports.Http
 {
     internal class HttpTransport : ITransport
     {

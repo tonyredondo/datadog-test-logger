@@ -9,7 +9,7 @@
 // </copyright>
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting
 {
     internal readonly struct LogPropertyRenderingDetails
     {

@@ -23,9 +23,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Data
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Data
 {
     /// <summary>
     /// A base class for visitors that rewrite the value with modifications. For example, implementations

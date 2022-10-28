@@ -21,12 +21,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Parsing;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Parsing;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Capturing
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Capturing
 {
     class MessageTemplateProcessor : ILogEventPropertyFactory
     {

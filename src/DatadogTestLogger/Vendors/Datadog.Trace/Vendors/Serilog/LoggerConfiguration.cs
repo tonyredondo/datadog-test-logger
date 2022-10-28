@@ -24,14 +24,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Capturing;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Enrichers;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Sinks;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Capturing;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Enrichers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Sinks;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog
 {
     /// <summary>
     /// Configuration object for creating <see cref="ILogger"/> instances.

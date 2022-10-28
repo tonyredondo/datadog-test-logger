@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Sampling
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling
 {
     internal interface ITraceSampler
     {

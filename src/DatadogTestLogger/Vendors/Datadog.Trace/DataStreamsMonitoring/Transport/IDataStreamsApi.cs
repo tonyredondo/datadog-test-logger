@@ -12,7 +12,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Transport;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Transport;
 
 internal interface IDataStreamsApi
 {

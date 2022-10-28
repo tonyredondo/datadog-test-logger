@@ -12,10 +12,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using Microsoft.AspNetCore.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNetCore
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNetCore
 {
     /// <summary>
     /// DefaultModelBindingContext

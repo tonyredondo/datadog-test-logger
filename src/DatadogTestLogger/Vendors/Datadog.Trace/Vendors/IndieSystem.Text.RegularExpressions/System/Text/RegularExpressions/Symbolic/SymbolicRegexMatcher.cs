@@ -24,7 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>Represents a regex matching engine that performs regex matching using symbolic derivatives.</summary>
     internal abstract class SymbolicRegexMatcher
@@ -45,7 +45,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
     /// <typeparam name="TSet">Character set type.</typeparam>
     internal sealed partial class SymbolicRegexMatcher<TSet> : SymbolicRegexMatcher where TSet : IComparable<TSet>, IEquatable<TSet>
     {
-#if !NET7_0_OR_GREATER
+#if !NET8_0_OR_GREATER
         private static readonly NfaStateHandler NfaStateHandlerInstance = new();
         private static readonly DfaStateHandler DfaStateHandlerInstance = new();
 
@@ -337,7 +337,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
             return minterms[mintermId];
         }
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private uint GetCharKind<TInputReader>(ReadOnlySpan<char> input, int i)
             where TInputReader : struct, IInputReader => !_pattern._info.ContainsSomeAnchor ?
@@ -366,7 +366,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
             }
         }
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         /// <summary>Find a match.</summary>
         /// <param name="mode">The mode of execution based on the regex operation being performed.</param>
         /// <param name="input">The input span</param>
@@ -573,7 +573,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
 #endif
 
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         /// <summary>Performs the initial Phase 1 match to find the end position of the match, or first final state if this is an isMatch call.</summary>
         /// <param name="input">The input text.</param>
         /// <param name="pos">The starting position in <paramref name="input"/>.</param>
@@ -1510,7 +1510,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
             public NfaMatchingState? NfaState;
         }
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         /// <summary>Represents a set of routines for operating over a <see cref="CurrentState"/>.</summary>
         private interface IStateHandler
         {
@@ -1811,7 +1811,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
                 return false;
             }
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
             /// <summary>Gets the preferred DFA state for nullability. In DFA mode this is just the state itself.</summary>
             public int ExtractNullableCoreStateId(SymbolicRegexMatcher<TSet> matcher, in CurrentState state, ReadOnlySpan<char> input, int pos)
             {
@@ -2005,7 +2005,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
         }
 #endif
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         /// <summary>
         /// Interface for mapping positions in the input to position IDs, which capture all the information necessary to
         /// both take transitions and decide nullability. For positions of valid characters that are handled normally,
@@ -2080,7 +2080,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
         }
 #endif
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         /// <summary>
         /// Interface for optimizations to accelerate search from initial states.
         /// </summary>
@@ -2175,7 +2175,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularEx
         }
 #endif
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
         /// <summary>
         /// Interface for evaluating nullability of states.
         /// </summary>

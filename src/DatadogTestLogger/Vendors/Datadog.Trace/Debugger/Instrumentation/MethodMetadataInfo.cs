@@ -10,9 +10,9 @@
 
 using System;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Instrumentation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
 {
     /// <summary>
     /// Holds data needed during Debugger instrumentation execution.

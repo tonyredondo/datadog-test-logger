@@ -24,11 +24,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog
 {
     /// <summary>
     /// An optional static entry point for logging that can be easily referenced

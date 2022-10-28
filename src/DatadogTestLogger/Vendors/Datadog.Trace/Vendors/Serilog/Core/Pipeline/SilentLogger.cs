@@ -23,9 +23,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline
 {
     class SilentLogger : ILogger
     {

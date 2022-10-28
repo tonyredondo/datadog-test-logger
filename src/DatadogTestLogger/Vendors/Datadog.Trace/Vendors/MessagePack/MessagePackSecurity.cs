@@ -17,10 +17,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack
 {
     /// <summary>
     /// Settings related to security, particularly relevant when deserializing data from untrusted sources.

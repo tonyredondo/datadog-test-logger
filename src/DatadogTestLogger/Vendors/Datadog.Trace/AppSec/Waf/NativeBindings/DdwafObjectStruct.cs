@@ -11,7 +11,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.NativeBindings
 {
     [StructLayout(LayoutKind.Explicit)]
     internal struct DdwafObjectStruct

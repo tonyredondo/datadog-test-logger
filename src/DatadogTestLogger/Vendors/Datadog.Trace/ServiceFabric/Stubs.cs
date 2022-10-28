@@ -14,7 +14,7 @@ using System;
 using System.ComponentModel;
 
 #pragma warning disable SA1649 // File name must match first type name
-namespace Datadog.Trace.Vendors.Datadog.Trace.ServiceFabric
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 {
     /// <summary>
     /// For internal use only.

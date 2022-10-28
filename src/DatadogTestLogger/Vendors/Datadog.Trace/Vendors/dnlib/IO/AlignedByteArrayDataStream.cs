@@ -14,7 +14,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO {
 	sealed unsafe class AlignedByteArrayDataStream : DataStream {
 		readonly byte[] data;
 

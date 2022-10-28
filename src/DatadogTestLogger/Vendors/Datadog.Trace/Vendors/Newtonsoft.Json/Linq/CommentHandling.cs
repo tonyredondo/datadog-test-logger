@@ -35,7 +35,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq
 {
     /// <summary>
     /// Specifies how JSON comments are handled when loading JSON.

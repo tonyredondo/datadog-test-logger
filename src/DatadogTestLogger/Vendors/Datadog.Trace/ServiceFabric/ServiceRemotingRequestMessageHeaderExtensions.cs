@@ -13,7 +13,7 @@
 using System;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ServiceFabric
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 {
     internal static class ServiceRemotingRequestMessageHeaderExtensions
     {

@@ -13,14 +13,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Pdb;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Symbols;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
 {
     internal class LineProbeResolver : ILineProbeResolver
     {

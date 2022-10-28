@@ -12,7 +12,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 
 internal class MethodValues
 {

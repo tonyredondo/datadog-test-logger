@@ -12,10 +12,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DiagnosticListeners
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DiagnosticListeners
 {
     internal abstract class DiagnosticObserver : IObserver<KeyValuePair<string, object>>
     {

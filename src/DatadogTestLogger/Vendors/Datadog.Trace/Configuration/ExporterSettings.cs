@@ -11,10 +11,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using MetricsTransportType = Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using MetricsTransportType = DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     /// <summary>
     /// Contains exporter settings.

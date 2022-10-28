@@ -10,9 +10,9 @@
 
 using System;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation
 {
     internal class NullObfuscator : ObfuscatorBase
     {

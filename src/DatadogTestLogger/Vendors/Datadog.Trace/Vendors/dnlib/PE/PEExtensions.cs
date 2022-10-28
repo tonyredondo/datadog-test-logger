@@ -13,7 +13,7 @@
 using System;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE {
 	/// <summary>
 	/// Extension methods
 	/// </summary>

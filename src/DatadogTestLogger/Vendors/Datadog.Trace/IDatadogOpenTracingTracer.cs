@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     /// <summary>
     /// Internal interface for keeping a consistent Tracer API between the Datadog.Trace.OpenTracing assembly and the Datadog.Trace assemblies

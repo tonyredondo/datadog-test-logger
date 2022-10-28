@@ -11,7 +11,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams
+namespace DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams
 {
     internal interface IHttpContent
     {

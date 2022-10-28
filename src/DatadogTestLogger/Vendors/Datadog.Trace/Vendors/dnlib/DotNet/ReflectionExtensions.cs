@@ -15,7 +15,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Extension methods for reflection types, methods, fields
 	/// </summary>

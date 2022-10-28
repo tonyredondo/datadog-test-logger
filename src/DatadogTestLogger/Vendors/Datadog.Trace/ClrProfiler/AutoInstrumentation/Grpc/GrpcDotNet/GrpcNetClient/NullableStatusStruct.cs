@@ -9,9 +9,9 @@
 // </copyright>
 
 #nullable enable
-#if !NET461
+#if !NETFRAMEWORK
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
 {
     /// <summary>
     /// Duck type for Nullable{IStatus} - required to use constraints

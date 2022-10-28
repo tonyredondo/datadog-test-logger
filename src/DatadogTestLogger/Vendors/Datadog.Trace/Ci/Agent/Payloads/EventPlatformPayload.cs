@@ -9,10 +9,10 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.Payloads
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
 {
     /// <summary>
     /// Event-platform payload

@@ -10,9 +10,9 @@
 using System;
 using System.Globalization;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Statistic;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Statistic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient
 {
     internal class ServiceCheckSerializer
     {

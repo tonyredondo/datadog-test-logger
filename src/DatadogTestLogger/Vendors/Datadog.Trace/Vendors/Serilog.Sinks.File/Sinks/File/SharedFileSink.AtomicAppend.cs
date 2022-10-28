@@ -27,10 +27,10 @@ using System;
 using System.IO;
 using System.Security.AccessControl;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Formatting;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
 {
     /// <summary>
     /// Write log events to a disk file.

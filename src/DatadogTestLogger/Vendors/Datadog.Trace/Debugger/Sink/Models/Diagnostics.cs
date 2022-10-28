@@ -9,10 +9,10 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Converters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Converters;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink.Models
 {
     internal record Diagnostics
     {

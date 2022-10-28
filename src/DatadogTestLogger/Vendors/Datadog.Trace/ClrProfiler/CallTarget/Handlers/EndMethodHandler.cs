@@ -12,7 +12,7 @@ using System;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers
 {
     internal static class EndMethodHandler<TIntegration, TTarget>
     {

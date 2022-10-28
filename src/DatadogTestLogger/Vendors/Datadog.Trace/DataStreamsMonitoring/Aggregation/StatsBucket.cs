@@ -9,10 +9,10 @@
 // </copyright>
 
 #nullable enable
-using Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches;
+using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Aggregation;
 
 internal readonly struct StatsBucket
 {

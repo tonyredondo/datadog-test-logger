@@ -12,7 +12,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
 {
     internal interface ILogsApi : IDisposable
     {

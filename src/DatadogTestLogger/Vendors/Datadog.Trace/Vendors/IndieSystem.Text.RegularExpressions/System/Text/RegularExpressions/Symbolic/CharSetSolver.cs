@@ -21,7 +21,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>
     /// Provides functionality to build character sets represented as <see cref="BDD"/>s

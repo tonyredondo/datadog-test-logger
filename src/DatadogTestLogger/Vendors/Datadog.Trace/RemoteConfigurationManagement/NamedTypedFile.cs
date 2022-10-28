@@ -16,7 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement
 {
     internal readonly struct NamedTypedFile<T>
     {

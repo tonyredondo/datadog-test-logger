@@ -9,7 +9,7 @@
 // </copyright>
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.XUnit;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.XUnit;
 
 internal interface ITestRunnerSkippable
 {

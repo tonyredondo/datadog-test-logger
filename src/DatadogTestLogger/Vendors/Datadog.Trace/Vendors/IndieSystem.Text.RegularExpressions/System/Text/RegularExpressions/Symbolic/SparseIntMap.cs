@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary>An insertion-ordered map that supports small int keys.</summary>
     /// <remarks>Uses a sparse array of the same size as the space of keys for efficient lookups.</remarks>

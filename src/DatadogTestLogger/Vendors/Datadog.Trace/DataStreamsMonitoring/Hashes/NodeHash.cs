@@ -9,7 +9,7 @@
 // </copyright>
 
 #nullable enable
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Hashes;
 
 internal readonly struct NodeHash
 {

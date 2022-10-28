@@ -10,7 +10,7 @@
 
 using System.ComponentModel;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 {
     /// <summary>
     /// Specifies a safe version range for an integration.

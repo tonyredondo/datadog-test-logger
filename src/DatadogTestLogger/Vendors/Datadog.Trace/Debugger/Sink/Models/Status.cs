@@ -8,10 +8,10 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Converters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Converters;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink.Models
 {
     [JsonConverter(typeof(StringEnumConverter))]
     internal enum Status

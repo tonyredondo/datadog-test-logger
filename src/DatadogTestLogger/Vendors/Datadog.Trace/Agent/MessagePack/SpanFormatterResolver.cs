@@ -9,11 +9,11 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
 {
     internal class SpanFormatterResolver : IFormatterResolver
     {

@@ -11,7 +11,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
 {
     internal interface IClientContext
     {

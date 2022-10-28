@@ -25,11 +25,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Parsing;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Debugging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Parsing;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Rendering;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events
 {
     /// <summary>
     /// Represents a message template passed to a log method. The template

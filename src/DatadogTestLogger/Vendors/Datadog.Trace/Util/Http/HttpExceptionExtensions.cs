@@ -13,7 +13,7 @@
 using System;
 using System.Net.Sockets;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util.Http;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
 
 internal static class HttpExceptionExtensions
 {

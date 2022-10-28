@@ -12,9 +12,9 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ServiceFabric
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 {
     /// <summary>
     /// Provides tracing of ServiceRemotingClientEvents.

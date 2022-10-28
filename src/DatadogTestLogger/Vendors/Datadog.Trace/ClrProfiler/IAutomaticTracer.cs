@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 {
     internal interface IAutomaticTracer : ICommonTracer
     {

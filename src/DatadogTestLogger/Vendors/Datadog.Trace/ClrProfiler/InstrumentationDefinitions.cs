@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 {
     internal static partial class InstrumentationDefinitions
     {

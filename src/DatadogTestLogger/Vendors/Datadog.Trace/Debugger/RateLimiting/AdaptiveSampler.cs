@@ -10,10 +10,10 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.RateLimiting
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting
 {
     /// <summary>
     /// An adaptive streaming (non-remembering) sampler.

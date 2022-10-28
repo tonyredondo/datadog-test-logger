@@ -11,9 +11,9 @@
 #nullable enable
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Transports
 {
     internal class TelemetryTransportFactory
     {

@@ -9,9 +9,9 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Utils;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Utils;
 
 internal static class BinaryPrimitivesHelper
 {

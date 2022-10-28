@@ -13,12 +13,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Tags;
-using Datadog.Trace.Vendors.Datadog.Trace.Pdb;
-using Datadog.Trace.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
 /// <summary>
 /// CI Visibility test

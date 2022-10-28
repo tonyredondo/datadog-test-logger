@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DuckTyping
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
 {
     /// <summary>
     /// Ignores the member when DuckTyping

@@ -13,10 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink.PeriodicBatching;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink.PeriodicBatching;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission
 {
     /// <summary>
     /// Contains direct-log-submission-specific settings

@@ -24,9 +24,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core
 {
     class LevelOverrideMap
     {

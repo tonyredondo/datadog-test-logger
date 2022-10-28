@@ -13,7 +13,7 @@
 using System;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// Helps <see cref="SignatureWriter"/> map <see cref="ITypeDefOrRef"/>s to tokens
 	/// </summary>

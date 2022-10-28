@@ -10,7 +10,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient
 {
     internal class MetricsTimer : IDisposable
     {

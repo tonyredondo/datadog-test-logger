@@ -25,9 +25,9 @@
 #nullable enable
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting
 {
     /// <summary>
     /// Hash functions for message templates. See <see cref="Compute"/>.

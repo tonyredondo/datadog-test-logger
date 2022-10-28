@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util
 {
     internal static class SamplingHelpers
     {

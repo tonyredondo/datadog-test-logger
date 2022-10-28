@@ -17,7 +17,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     [Obsolete(Obsoletions.RegexCompileToAssemblyMessage
 #if NET5_0_OR_GREATER

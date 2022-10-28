@@ -10,7 +10,7 @@
 using System;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Worker
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Worker
 {
     internal class Waiter : IWaiter
     {

@@ -13,10 +13,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.RateLimiting;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Instrumentation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
 {
     /// <summary>
     /// MethodDebuggerInvoker

@@ -13,7 +13,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Propagators
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
 {
     internal class W3CContextPropagator : IContextInjector, IContextExtractor
     {

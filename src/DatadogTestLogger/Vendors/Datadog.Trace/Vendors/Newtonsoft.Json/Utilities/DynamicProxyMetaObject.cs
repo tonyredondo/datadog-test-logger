@@ -42,7 +42,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal sealed class DynamicProxyMetaObject<T> : DynamicMetaObject
     {

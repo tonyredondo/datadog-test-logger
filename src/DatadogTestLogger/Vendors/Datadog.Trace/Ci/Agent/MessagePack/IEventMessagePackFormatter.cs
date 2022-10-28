@@ -9,12 +9,12 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.EventModel;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.EventModel;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack
 {
     internal class IEventMessagePackFormatter : IMessagePackFormatter<IEvent>
     {

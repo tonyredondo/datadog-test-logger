@@ -12,11 +12,11 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams;
-using Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams.HttpContent;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
+using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams.HttpContent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports
 {
     internal class HttpStreamRequest : IApiRequest
     {

@@ -20,7 +20,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>A <see cref="RegexRunnerFactory"/> for creating <see cref="RegexInterpreter"/>s.</summary>
     internal sealed class RegexInterpreterFactory : RegexRunnerFactory

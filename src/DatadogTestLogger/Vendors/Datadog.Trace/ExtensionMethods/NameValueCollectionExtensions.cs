@@ -10,10 +10,10 @@
 
 using System;
 using System.Collections.Specialized;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
 {
     /// <summary>
     /// Extension methods for <see cref="NameValueCollection"/> objects.

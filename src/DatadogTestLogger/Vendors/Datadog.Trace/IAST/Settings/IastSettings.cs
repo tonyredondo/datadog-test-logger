@@ -10,9 +10,9 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast.Settings;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast.Settings;
 
 internal class IastSettings
 {

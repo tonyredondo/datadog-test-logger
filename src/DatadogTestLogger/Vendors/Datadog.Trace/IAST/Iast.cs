@@ -10,11 +10,11 @@
 
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler;
-using Datadog.Trace.Vendors.Datadog.Trace.Iast.Settings;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.Iast.Settings;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 /// <summary>
 /// The class responsible for coordinating IAST

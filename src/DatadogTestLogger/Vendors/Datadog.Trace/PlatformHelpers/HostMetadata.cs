@@ -10,9 +10,9 @@
 
 using System;
 using System.IO;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.PlatformHelpers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers
 {
     internal class HostMetadata
     {

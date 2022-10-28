@@ -9,7 +9,7 @@
 // </copyright>
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 
 /// <summary>
 /// Instrumentation Loader

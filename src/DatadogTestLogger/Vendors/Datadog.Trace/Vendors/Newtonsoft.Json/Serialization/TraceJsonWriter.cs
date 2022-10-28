@@ -42,7 +42,7 @@ using System.IO;
 using System.Numerics;
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization
 {
     internal class TraceJsonWriter : JsonWriter
     {

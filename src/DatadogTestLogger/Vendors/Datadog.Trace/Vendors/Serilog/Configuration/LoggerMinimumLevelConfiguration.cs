@@ -22,10 +22,10 @@
 // limitations under the License.
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Configuration
 {
     /// <summary>
     /// Controls sink configuration.

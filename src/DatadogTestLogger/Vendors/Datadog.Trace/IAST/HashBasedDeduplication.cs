@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 internal class HashBasedDeduplication
 {

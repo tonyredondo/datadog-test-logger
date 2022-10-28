@@ -13,10 +13,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.MessagePack;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack;
 
 /// <summary>
 /// Contains one of more spans (a trace chunk) that belong to the same trace

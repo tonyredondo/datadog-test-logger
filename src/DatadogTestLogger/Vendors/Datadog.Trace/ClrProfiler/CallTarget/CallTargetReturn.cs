@@ -11,7 +11,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget
 {
     /// <summary>
     /// Call target return value

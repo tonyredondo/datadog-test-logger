@@ -10,17 +10,17 @@
 
 #nullable enable
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.ProbeStatuses;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink;
-using Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.ProbeStatuses;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink;
+using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger;
 
 internal class LiveDebuggerFactory
 {

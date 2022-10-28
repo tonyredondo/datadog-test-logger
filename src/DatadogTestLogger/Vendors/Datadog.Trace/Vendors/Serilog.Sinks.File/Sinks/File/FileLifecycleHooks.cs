@@ -24,7 +24,7 @@
 using System.IO;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Sinks.File
 {
     /// <summary>
     /// Enables hooking into log file lifecycle events.

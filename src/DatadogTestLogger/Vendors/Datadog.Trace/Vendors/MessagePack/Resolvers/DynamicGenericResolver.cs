@@ -9,9 +9,9 @@
 //------------------------------------------------------------------------------
 #if !UNITY_WSA
 
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -22,7 +22,7 @@ using System.Collections;
 using System.Threading.Tasks;
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers
 {
     internal sealed class DynamicGenericResolver : IFormatterResolver
     {
@@ -50,7 +50,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Resolvers
     }
 }
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
 {
     internal static class DynamicGenericResolverGetFormatterHelper
     {

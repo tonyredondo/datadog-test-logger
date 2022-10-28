@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.MessagePack;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack;
 
 /// <summary>
 /// Contains a reference to a <see cref="Span"/> and additional context needed for serialization.

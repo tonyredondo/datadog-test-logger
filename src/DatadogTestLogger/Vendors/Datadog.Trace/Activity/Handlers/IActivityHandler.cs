@@ -10,9 +10,9 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.Activity.DuckTypes;
+using DatadogTestLogger.Vendors.Datadog.Trace.Activity.DuckTypes;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Activity.Handlers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
 {
     internal interface IActivityHandler
     {

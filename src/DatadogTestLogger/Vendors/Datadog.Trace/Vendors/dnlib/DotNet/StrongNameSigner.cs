@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Strong name signs an assembly. It supports normal strong name signing and the new
 	/// (.NET Framework 4.5) enhanced strong name signing.

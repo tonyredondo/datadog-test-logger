@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 
 /// <summary>
 /// Coverage context container instance

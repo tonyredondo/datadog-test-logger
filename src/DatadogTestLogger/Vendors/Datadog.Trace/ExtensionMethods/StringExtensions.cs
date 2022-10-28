@@ -9,9 +9,9 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ExtensionMethods
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
 {
     internal static class StringExtensions
     {

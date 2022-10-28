@@ -9,7 +9,7 @@
 // </copyright>
 
 #if !NETFRAMEWORK
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions
 {
     /// <summary>
     /// Enum for ducktyping

@@ -13,7 +13,7 @@
 using System;
 using System.Collections;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 internal static class IastUtils
 {

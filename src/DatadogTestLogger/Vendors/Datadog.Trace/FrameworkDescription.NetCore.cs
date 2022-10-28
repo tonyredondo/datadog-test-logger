@@ -12,9 +12,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     internal partial class FrameworkDescription
     {

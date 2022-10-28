@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.TraceSamplers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.TraceSamplers
 {
     internal class ErrorSampler : ITraceChunkSampler
     {

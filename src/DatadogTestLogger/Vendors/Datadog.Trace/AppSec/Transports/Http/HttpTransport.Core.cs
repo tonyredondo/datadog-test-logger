@@ -14,12 +14,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports.Http
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports.Http
 {
     internal class HttpTransport : ITransport
     {

@@ -38,7 +38,7 @@ using System;
 
 #nullable disable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Bson
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Bson
 {
     internal enum BsonBinaryType : byte
     {

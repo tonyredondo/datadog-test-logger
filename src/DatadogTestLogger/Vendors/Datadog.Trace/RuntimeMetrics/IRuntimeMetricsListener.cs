@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics
 {
     internal interface IRuntimeMetricsListener : IDisposable
     {

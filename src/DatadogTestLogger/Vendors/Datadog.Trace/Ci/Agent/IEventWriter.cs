@@ -8,9 +8,9 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Agent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent
 {
     /// <summary>
     /// Event Writer interface

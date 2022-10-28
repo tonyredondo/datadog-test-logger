@@ -14,10 +14,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Tracing;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics
 {
     internal class RuntimeEventListener : EventListener, IRuntimeMetricsListener
     {
@@ -81,7 +81,9 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics
             _statsd.Gauge(MetricsNames.ContentionTime, _contentionTime.Clear());
             _statsd.Counter(MetricsNames.ContentionCount, Interlocked.Exchange(ref _contentionCount, 0));
 
+#if NETCOREAPP3_0_OR_GREATER
             _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);
+#endif
 
             Log.Debug("Sent the following metrics to the DD agent: {metrics}", ThreadStatsMetrics);
         }
@@ -105,7 +107,9 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics
                 }
                 else if (eventData.EventId == EventGcSuspendBegin)
                 {
+#if NETCOREAPP2_2_OR_GREATER
                     _gcStart = eventData.TimeStamp;
+#endif
                 }
                 else if (eventData.EventId == EventGcRestartEnd)
                 {
@@ -113,7 +117,9 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.RuntimeMetrics
 
                     if (start != null)
                     {
+#if NETCOREAPP2_2_OR_GREATER
                         _statsd.Timer(MetricsNames.GcPauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);
+#endif
                         Log.Debug("Sent the following metrics to the DD agent: {metrics}", MetricsNames.GcPauseTime);
                     }
                 }

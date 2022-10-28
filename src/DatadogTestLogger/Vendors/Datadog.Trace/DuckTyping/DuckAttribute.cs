@@ -12,7 +12,7 @@
 
 using System.Reflection;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DuckTyping
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
 {
     /// <summary>
     /// Duck kind

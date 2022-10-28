@@ -13,9 +13,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.Transports
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports
 {
     internal class HttpClientRequestFactory : IApiRequestFactory
     {

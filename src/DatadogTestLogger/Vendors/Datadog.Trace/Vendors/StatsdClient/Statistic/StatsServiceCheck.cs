@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Statistic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Statistic
 {
     /// <summary>
     /// Store the data for a service check.

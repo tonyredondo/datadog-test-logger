@@ -13,7 +13,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DuckTyping
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
 {
     /// <summary>
     /// Duck type interface

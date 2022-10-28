@@ -13,9 +13,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Dss {
 	sealed unsafe class ReaderMetaDataImport : MetaDataImport, IDisposable {
 		Metadata metadata;
 		byte* blobPtr;

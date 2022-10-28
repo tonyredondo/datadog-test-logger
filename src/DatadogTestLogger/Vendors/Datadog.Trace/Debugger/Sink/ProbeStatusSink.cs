@@ -11,10 +11,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink
 {
     internal class ProbeStatusSink
     {

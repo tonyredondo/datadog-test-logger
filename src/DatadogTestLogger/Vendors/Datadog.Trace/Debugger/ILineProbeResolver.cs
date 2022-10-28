@@ -8,10 +8,10 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Models;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
 {
     /// <summary>
     /// Matches a source file path with the assembly and pdb files that correlate to it,

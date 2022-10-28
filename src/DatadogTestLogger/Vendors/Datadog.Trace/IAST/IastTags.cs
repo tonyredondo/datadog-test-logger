@@ -10,11 +10,11 @@
 
 #nullable enable
 
-using Datadog;
-using Datadog.Trace.Vendors.Datadog.Trace.SourceGenerators;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 internal partial class IastTags : CommonTags
 {

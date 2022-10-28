@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models
 {
     internal class ProbeConfiguration
     {

@@ -10,9 +10,9 @@
 
 using System;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models
 {
     internal class Where : IEquatable<Where>
     {

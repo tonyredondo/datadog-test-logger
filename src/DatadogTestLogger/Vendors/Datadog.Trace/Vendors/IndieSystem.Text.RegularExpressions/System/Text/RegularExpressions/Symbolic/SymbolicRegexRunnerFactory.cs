@@ -18,7 +18,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic
 {
     /// <summary><see cref="RegexRunnerFactory"/> for symbolic regexes.</summary>
     internal sealed class SymbolicRegexRunnerFactory : RegexRunnerFactory

@@ -11,7 +11,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers
 {
     internal static class EnumerableExtensions
     {

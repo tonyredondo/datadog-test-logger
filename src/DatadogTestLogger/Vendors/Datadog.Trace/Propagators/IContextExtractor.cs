@@ -12,7 +12,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Propagators
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
 {
     internal interface IContextExtractor
     {

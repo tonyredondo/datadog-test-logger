@@ -15,7 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Telemetry
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 {
     internal class DependencyTelemetryCollector
     {

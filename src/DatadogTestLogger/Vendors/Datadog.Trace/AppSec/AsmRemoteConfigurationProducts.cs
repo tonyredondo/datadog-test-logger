@@ -10,9 +10,9 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 
 internal static class AsmRemoteConfigurationProducts
 {

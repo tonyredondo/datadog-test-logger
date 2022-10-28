@@ -9,7 +9,7 @@
 // </copyright>
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace;
+namespace DatadogTestLogger.Vendors.Datadog.Trace;
 
 /// <summary>
 /// AgentProcessManager Loader

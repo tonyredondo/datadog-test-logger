@@ -12,14 +12,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Tagging;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
 using Microsoft.AspNetCore.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util.Http
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http
 {
     internal static partial class HttpRequestExtensions
     {

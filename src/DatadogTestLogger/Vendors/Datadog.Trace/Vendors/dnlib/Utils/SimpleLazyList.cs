@@ -13,9 +13,9 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
 	/// <summary>
 	/// A readonly list that gets initialized lazily
 	/// </summary>

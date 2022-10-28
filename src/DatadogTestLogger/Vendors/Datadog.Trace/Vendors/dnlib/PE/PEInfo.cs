@@ -11,9 +11,9 @@
 // dnlib: See LICENSE.txt for more info
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE {
 	/// <summary>
 	/// Reads all PE sections from a PE stream, for more information see https://docs.microsoft.com/en-us/windows/win32/debug/pe-format
 	/// </summary>

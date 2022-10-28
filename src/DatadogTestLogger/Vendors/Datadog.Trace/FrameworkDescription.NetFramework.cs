@@ -11,10 +11,10 @@
 #if NETFRAMEWORK
 using System;
 using System.Linq;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using Microsoft.Win32;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     internal partial class FrameworkDescription
     {

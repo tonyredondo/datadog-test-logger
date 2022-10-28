@@ -13,11 +13,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.RateLimiting;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Instrumentation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
 {
     /// <summary>
     /// AsyncMethodDebuggerInvoker is responsible for the managed side of async method instrumentation,

@@ -9,11 +9,11 @@
 // </copyright>
 
 #nullable enable
-#if !NET461
+#if !NETFRAMEWORK
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
 {
     /// <summary>
     /// Grpc.Net.Client.Internal.GrpcCall calltarget instrumentation

@@ -13,11 +13,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Activity.DuckTypes;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Activity.DuckTypes;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Activity.Handlers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
 {
     /// <summary>
     /// The default handler catches an activity and creates a datadog span from it.

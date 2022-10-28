@@ -12,11 +12,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink.Models;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink
 {
     internal class DebuggerSink : IDebuggerSink
     {

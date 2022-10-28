@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport
 {
     internal enum TransportType
     {

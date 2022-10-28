@@ -21,7 +21,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog
 {
     /// <summary>
     /// Specifies the frequency at which the log file should roll.

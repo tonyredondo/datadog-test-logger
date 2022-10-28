@@ -11,9 +11,9 @@
 using System;
 using System.IO;
 
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation
 {
     internal static class Serverless
     {

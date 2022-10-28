@@ -10,7 +10,7 @@
 #pragma warning disable CS0618, CS0649, CS1574, CS1580, CS1581, CS1584, SYSLIB0011,SYSLIB0032
 // dnlib: See LICENSE.txt for more info
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.MD {
 #pragma warning disable 1591 // Missing XML comment for publicly visible type or member
 	/// <summary>
 	/// Raw contents of an uncompressed Module table row

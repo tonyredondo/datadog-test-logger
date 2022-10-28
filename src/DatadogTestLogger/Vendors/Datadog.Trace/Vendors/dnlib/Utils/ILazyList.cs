@@ -12,7 +12,7 @@
 
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Utils {
 	/// <summary>
 	/// Interface to access a lazily initialized list
 	/// </summary>

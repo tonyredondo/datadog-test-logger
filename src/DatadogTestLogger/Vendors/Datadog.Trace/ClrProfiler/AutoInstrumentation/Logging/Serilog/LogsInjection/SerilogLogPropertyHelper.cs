@@ -10,9 +10,9 @@
 
 using System;
 using System.Reflection.Emit;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.Serilog.LogsInjection
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.Serilog.LogsInjection
 {
     internal static class SerilogLogPropertyHelper<TMarkerType>
     {

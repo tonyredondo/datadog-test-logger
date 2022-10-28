@@ -9,10 +9,10 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Util.Http
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http
 {
     internal class HttpRequestUtils
     {

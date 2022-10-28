@@ -12,7 +12,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers
 {
     internal static class StringExtensions
     {

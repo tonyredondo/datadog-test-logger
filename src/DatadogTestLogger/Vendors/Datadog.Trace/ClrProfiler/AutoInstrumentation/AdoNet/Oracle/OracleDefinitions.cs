@@ -8,9 +8,9 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using static Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.AdoNetClientInstrumentMethodsAttribute;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.AdoNetClientInstrumentMethodsAttribute;
 
 #pragma warning disable SA1118 // parameter spans multiple lines
 [assembly: AdoNetClientInstrumentMethods(

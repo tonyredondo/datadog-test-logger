@@ -39,7 +39,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Utilities
 {
     internal static class MathUtils
     {

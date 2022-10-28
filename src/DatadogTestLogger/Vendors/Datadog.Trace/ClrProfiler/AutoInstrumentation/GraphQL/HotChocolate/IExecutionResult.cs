@@ -11,7 +11,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.HotChocolate
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL.HotChocolate
 {
     /// <summary>
     /// HotChocolate.Execution.IExecutionResult interface for ducktyping

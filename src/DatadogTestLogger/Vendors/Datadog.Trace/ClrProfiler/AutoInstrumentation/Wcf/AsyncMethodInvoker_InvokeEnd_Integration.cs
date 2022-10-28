@@ -11,9 +11,9 @@
 #if NETFRAMEWORK
 using System;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
 {
     /// <summary>
     /// System.ServiceModel.Dispatcher.AsyncMethodInvoker calltarget instrumentation

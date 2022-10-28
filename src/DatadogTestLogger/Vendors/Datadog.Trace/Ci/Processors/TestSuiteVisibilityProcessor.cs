@@ -10,10 +10,10 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Processors;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Processors;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Processors;
 
 internal class TestSuiteVisibilityProcessor : ITraceProcessor
 {

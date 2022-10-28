@@ -11,9 +11,9 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.CallTarget
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget
 {
     /// <summary>
     /// CallTarget Invoker

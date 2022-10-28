@@ -35,7 +35,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json
 {
     /// <summary>
     /// Indicating whether a property is required.

@@ -9,9 +9,9 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports.Http;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 #if NETFRAMEWORK
 using System.Web;
 using System.Web.Routing;
@@ -19,7 +19,7 @@ using System.Web.Routing;
 using Microsoft.AspNetCore.Http;
 #endif
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec
 {
     internal class InstrumentationGatewayBlockingEventArgs : EventArgs
     {

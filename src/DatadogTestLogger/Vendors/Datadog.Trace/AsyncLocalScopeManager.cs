@@ -9,11 +9,11 @@
 // </copyright>
 
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler;
-using Datadog.Trace.Vendors.Datadog.Trace.ContinuousProfiler;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace
+namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     internal class AsyncLocalScopeManager : IScopeManager, IScopeRawAccess
     {

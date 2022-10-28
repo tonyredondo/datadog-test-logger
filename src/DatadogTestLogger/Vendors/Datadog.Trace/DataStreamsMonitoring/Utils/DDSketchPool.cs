@@ -10,12 +10,12 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Mappings;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Mappings;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.DataStreamsMonitoring.Utils;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring.Utils;
 
 /// <summary>
 /// A simple pool for <see cref="DDSketch"/> to reduce the number of allocations

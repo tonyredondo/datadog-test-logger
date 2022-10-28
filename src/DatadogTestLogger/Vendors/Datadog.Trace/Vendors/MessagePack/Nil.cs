@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack
 {
     internal struct Nil : IEquatable<Nil>
     {
@@ -37,7 +37,7 @@ namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack
     }
 }
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Formatters
 {
     internal class NilFormatter : IMessagePackFormatter<Nil>
     {

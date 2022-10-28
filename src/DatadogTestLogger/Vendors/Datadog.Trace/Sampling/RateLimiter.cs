@@ -11,9 +11,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Sampling
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling
 {
     internal abstract class RateLimiter : IRateLimiter
     {

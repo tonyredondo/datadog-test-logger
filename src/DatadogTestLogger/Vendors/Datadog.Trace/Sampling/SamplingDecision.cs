@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Sampling;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 
 internal readonly struct SamplingDecision
 {

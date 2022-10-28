@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	/// <summary>
 	/// Writes <c>DeclSecurity</c> blobs
 	/// </summary>

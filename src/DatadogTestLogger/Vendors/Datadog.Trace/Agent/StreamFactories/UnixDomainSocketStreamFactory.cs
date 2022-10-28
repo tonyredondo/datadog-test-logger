@@ -14,10 +14,10 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent.StreamFactories
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.StreamFactories
 {
     internal class UnixDomainSocketStreamFactory : IStreamFactory
     {

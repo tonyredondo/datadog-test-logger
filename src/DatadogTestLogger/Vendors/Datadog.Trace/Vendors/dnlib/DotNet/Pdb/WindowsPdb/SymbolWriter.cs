@@ -12,9 +12,9 @@
 
 using System;
 using System.Diagnostics.SymbolStore;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.WindowsPdb {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.WindowsPdb {
 	abstract class SymbolWriter : IDisposable {
 		public abstract bool IsDeterministic { get; }
 		public abstract bool SupportsAsyncMethods { get; }

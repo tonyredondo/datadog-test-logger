@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf
 {
     internal interface IResult : IDisposable
     {

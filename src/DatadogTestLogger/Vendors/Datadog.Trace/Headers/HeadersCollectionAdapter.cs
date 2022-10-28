@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Headers
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Headers
 {
     internal readonly struct HeadersCollectionAdapter : IHeadersCollection
     {

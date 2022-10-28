@@ -15,7 +15,7 @@
 using System;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// <c>System.Runtime.InteropServices.TypeIdentifierAttribute</c> helper code used by <see cref="SigComparer"/>
 	/// </summary>

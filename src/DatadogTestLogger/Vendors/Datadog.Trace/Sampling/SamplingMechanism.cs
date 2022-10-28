@@ -8,7 +8,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Sampling;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 
 /// <summary>
 /// The mechanism used to make a trace sampling decision.

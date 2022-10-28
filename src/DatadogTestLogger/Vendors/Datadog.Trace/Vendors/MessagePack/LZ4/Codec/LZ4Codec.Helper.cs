@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.LZ4
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.LZ4
 {
     internal static partial class LZ4Codec
     {

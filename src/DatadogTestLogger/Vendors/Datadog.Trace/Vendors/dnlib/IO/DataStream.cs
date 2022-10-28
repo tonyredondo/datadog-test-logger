@@ -13,7 +13,7 @@
 using System;
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.IO {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.IO {
 	/// <summary>
 	/// This class is used by a <see cref="DataReader"/>. The <see cref="DataReader"/> instance
 	/// verifies that all input are valid before calling any methods in this class.

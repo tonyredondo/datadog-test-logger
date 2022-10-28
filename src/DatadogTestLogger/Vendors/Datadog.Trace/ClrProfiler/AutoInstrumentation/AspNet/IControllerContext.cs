@@ -9,7 +9,7 @@
 // </copyright>
 
 #if NETFRAMEWORK
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
 {
     /// <summary>
     /// HttpControllerContext interface for ducktyping

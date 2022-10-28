@@ -13,7 +13,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Managed {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb.Managed {
 	/// <summary>
 	/// Exception that is thrown when <see cref="PdbReader"/> encounters an error.
 	/// </summary>

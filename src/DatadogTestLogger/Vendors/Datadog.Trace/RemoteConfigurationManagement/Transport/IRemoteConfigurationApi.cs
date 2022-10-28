@@ -9,9 +9,9 @@
 // </copyright>
 
 using System.Threading.Tasks;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport
 {
     internal interface IRemoteConfigurationApi
     {

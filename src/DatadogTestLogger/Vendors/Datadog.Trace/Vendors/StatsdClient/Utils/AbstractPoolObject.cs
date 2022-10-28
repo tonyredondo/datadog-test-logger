@@ -10,7 +10,7 @@
 using System;
 using System.Diagnostics;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Utils
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Utils
 {
     internal abstract class AbstractPoolObject : IDisposable
     {

@@ -9,9 +9,9 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Configurations.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models
 {
     internal abstract class ProbeDefinition : IEquatable<ProbeDefinition>
     {

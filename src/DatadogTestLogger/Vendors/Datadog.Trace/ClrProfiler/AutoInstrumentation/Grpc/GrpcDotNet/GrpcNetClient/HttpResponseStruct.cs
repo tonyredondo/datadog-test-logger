@@ -10,12 +10,12 @@
 
 #nullable enable
 
-#if !NET461
+#if !NETFRAMEWORK
 
 using System.Net.Http.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcDotNet.GrpcNetClient
 {
     /// <summary>
     /// Duck type for HttpResponse. Required to access TrailingHeaders in .NET Core 3.0+

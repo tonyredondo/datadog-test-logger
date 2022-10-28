@@ -9,9 +9,9 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Tagging
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     internal partial class KafkaTags : InstrumentationTags
     {

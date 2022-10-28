@@ -12,9 +12,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Tagging
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     internal class TraceTagCollection
     {

@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Writer {
 	static class RoslynContentIdProvider {
 		public static void GetContentId(byte[] hash, out Guid guid, out uint timestamp) {
 			if (hash.Length < 20)

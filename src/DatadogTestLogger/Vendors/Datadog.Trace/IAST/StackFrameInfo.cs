@@ -11,9 +11,9 @@
 #nullable enable
 
 using System.Diagnostics;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack.Decoders;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Decoders;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Iast;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 internal readonly struct StackFrameInfo
 {

@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage.Attributes
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Attributes
 {
     /// <summary>
     /// Covered assembly attribute

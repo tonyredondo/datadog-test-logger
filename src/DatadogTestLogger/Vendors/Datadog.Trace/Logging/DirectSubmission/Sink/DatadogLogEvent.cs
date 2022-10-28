@@ -10,9 +10,9 @@
 #nullable enable
 
 using System.Text;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
 {
     internal abstract class DatadogLogEvent
     {

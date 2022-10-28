@@ -10,9 +10,9 @@
 
 #nullable enable
 
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 
 internal class AsmFeatures
 {

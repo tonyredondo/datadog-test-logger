@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams
+namespace DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams
 {
     internal class DatadogHttpRequestException : Exception
     {

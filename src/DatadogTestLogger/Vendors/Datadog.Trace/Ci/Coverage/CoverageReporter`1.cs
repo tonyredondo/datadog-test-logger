@@ -14,10 +14,10 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage.Metadata;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Metadata;
 #pragma warning disable SA1649 // File name must match first type name
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Coverage;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 
 /// <summary>
 /// Coverage Reporter by ModuleCoverageMetadata type

@@ -15,22 +15,22 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Transports.Http;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf;
-using Datadog.Trace.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypes.Managed;
-using Datadog.Trace.Vendors.Datadog.Trace.ClrProfiler;
-using Datadog.Trace.Vendors.Datadog.Trace.Headers;
-using Datadog.Trace.Vendors.Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Datadog.Trace.Propagators;
-using Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement;
-using Datadog.Trace.Vendors.Datadog.Trace.Sampling;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.RcmModels.AsmData;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Transports.Http;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec.Waf.ReturnTypes.Managed;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.AppSec
+namespace DatadogTestLogger.Vendors.Datadog.Trace.AppSec
 {
     /// <summary>
     /// The Secure is responsible coordinating ASM

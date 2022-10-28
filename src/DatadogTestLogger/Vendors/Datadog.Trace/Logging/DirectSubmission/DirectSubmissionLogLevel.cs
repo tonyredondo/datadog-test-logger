@@ -11,7 +11,7 @@
 
 using System.ComponentModel;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging.DirectSubmission
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission
 {
     /// <summary>
     /// The unified log levels to use with direct submission

@@ -11,11 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Mono.Unix;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Aggregator;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Bufferize;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Aggregator;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Bufferize;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.StatsdClient
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient
 {
     /// <summary>
     /// StatsdBuilder builds an instance of `Statsd` from StatsdConfig.

@@ -23,10 +23,10 @@
 
 using System;
 using System.Collections;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Policies;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Policies;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Configuration
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Configuration
 {
     /// <summary>
     /// Controls template parameter destructuring configuration.

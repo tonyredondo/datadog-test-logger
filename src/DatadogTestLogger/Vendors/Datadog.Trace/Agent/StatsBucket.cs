@@ -8,11 +8,11 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Mappings;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Mappings;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Agent
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
 {
     internal class StatsBucket
     {

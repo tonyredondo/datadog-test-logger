@@ -11,11 +11,11 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core.Pipeline;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Logging
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging
 {
     internal class DatadogSerilogLogger : IDatadogLogger
     {

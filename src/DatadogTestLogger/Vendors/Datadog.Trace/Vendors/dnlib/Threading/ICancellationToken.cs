@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.Threading {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.Threading {
 	/// <summary>
 	/// Cancellation token interface
 	/// </summary>

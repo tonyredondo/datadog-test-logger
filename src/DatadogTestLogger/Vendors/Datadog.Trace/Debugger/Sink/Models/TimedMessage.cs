@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger.Sink.Models
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink.Models
 {
     internal class TimedMessage
     {

@@ -25,7 +25,7 @@ using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>
     /// RegexCompiler translates a block of RegexCode to MSIL, and creates a subclass of the RegexRunner type.

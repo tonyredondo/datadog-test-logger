@@ -10,7 +10,7 @@
 
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Headers;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Headers;
 
 /// <summary>
 /// Specified a common interface that can be used to manipulate collections of binary headers.

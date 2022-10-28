@@ -25,11 +25,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Events;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Serilog.Settings.KeyValuePairs
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Settings.KeyValuePairs
 {
     /// <summary>
     /// Contains "fake extension" methods for the Serilog configuration API.

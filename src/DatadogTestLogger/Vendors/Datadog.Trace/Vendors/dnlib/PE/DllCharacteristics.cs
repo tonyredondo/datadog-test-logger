@@ -12,7 +12,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.PE {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.PE {
 	/// <summary>
 	/// IMAGE_OPTIONAL_HEADER.DllCharacteristics
 	/// </summary>

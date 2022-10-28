@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 using System.Text;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.MessagePack
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack
 {
     internal static class StringEncoding
     {

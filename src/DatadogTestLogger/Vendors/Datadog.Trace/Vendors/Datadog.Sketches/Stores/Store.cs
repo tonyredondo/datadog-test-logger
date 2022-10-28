@@ -17,7 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
 
 /// <summary>
 /// An object that maps integers to counters. It can be seen as a collection of Bin, which are pairs of indices and counters.

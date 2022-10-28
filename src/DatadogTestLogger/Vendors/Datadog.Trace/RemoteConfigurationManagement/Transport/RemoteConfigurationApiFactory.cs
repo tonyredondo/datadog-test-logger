@@ -10,12 +10,12 @@
 #nullable enable
 
 using System;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent;
-using Datadog.Trace.Vendors.Datadog.Trace.Agent.DiscoveryService;
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Datadog.Trace.HttpOverStreams;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport
+namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Transport
 {
     internal class RemoteConfigurationApiFactory
     {

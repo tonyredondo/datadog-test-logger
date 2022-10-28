@@ -9,7 +9,7 @@
 // </copyright>
 #nullable enable
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Ci.Tags;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 
 internal static class TestSuiteVisibilityTags
 {

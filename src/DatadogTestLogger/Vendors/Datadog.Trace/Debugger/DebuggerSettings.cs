@@ -9,9 +9,9 @@
 // </copyright>
 
 #nullable enable
-using Datadog.Trace.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Debugger
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
 {
     internal class DebuggerSettings
     {

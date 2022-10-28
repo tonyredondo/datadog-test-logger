@@ -17,9 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Serialization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Serialization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Datadog.Sketches.Stores;
 
 /// <summary>
 /// DenseStore is a dynamically growing contiguous (non-sparse) store.

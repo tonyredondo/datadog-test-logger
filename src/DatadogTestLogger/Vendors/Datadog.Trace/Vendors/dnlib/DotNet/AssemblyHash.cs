@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet {
 	/// <summary>
 	/// Hashes some data according to a <see cref="AssemblyHashAlgorithm"/>
 	/// </summary>

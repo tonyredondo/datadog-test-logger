@@ -18,7 +18,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace Datadog.Trace.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions
 {
     /// <summary>
     /// Provides the core data describing a parsed <see cref="RegexNode"/> tree, along with necessary
