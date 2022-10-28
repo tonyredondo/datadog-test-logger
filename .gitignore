@@ -134,3 +134,4 @@ _NCrunch*
 
 .idea
 artifacts
+.nuke/temp
