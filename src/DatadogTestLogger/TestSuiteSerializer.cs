@@ -5,7 +5,7 @@
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Spekt.TestLogger.Core;
 

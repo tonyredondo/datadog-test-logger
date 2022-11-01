@@ -79,7 +79,8 @@
               "Clean",
               "Compile",
               "Pack",
-              "Restore"
+              "Restore",
+              "VendorDatadogTrace"
             ]
           }
         },
@@ -96,7 +97,8 @@
               "Clean",
               "Compile",
               "Pack",
-              "Restore"
+              "Restore",
+              "VendorDatadogTrace"
             ]
           }
         },

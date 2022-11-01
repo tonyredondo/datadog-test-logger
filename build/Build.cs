@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
@@ -29,7 +28,7 @@ class Build : NukeBuild
     [Parameter("Where the NuGet package should be published")]
     readonly AbsolutePath ArtifactsDirectory = RootDirectory / "artifacts";
 
-    [Parameter] public string Version = "0.0.23"; 
+    [Parameter] public string Version = "0.0.25"; 
 
     Target Clean => _ => _
         .Executes(() =>
@@ -78,5 +77,12 @@ class Build : NukeBuild
                 .SetVersion(Version)
                 .SetOutputDirectory(ArtifactsDirectory)
             );
+        });
+
+    Target VendorDatadogTrace => _ => _
+        .Executes(async () =>
+        {
+            var vendors = RootDirectory / "src" / "DatadogTestLogger" / "Vendors";
+            await UpdateVendorsTool.UpdateVendors(TemporaryDirectory, vendors);
         });
 }
