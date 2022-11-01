@@ -322,17 +322,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         private static bool TryLoadAspNetSiteName(out string siteName)
         {
-#if NETFRAMEWORK
-            // System.Web.dll is only available on .NET Framework
-            if (System.Web.Hosting.HostingEnvironment.IsHosted)
-            {
-                // if this app is an ASP.NET application, return "SiteName/ApplicationVirtualPath".
-                // note that ApplicationVirtualPath includes a leading slash.
-                siteName = (System.Web.Hosting.HostingEnvironment.SiteName + System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath).TrimEnd('/');
-                return true;
-            }
 
-#endif
             siteName = default;
             return false;
         }
