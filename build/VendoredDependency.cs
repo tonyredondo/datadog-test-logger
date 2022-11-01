@@ -21,9 +21,23 @@ public class VendoredDependency
             DownloadUrl = "https://github.com/DataDog/dd-trace-dotnet/archive/refs/heads/master.zip",
             ZipFilePrefix = "dd-trace-dotnet-master",
             PathToSrc = new[] {"tracer", "src", "Datadog.Trace"},
-            RelativePathsToExclude = new[] {"tracer", "src", "Datadog.Trace"},
-            Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace", 
-                AddPreprocessorsToGeneratedCode),
+            RelativeGlobsToExclude = new[]
+            {
+                "AppSec/**/*.*",
+                "AspNet/**/*.*",
+                "ClrProfiler/AutoInstrumentation/AspNet/**/*.*",
+                "ClrProfiler/AutoInstrumentation/AspNetCore/**/*.*",
+                "ClrProfiler/AutoInstrumentation/Azure/**/*.*",
+                "ClrProfiler/AutoInstrumentation/Grpc/GrpcDotNet/**/*.*",
+                "DiagnosticListeners/AspNetCoreDiagnosticObserver.cs",
+                "Headers/HeadersCollectionAdapter.cs",
+                "PlatformHelpers/AspNetCoreHttpRequestHandler.cs",
+                "Util/Http/HttpRequestExtensions.Core.cs",
+                "Util/Http/HttpRequestExtensions.Core.cs",
+                "Util/Http/HttpRequestExtensions.Framework.cs",
+            },
+            Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
+                AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack),
         });
     }
 
@@ -41,7 +55,7 @@ public class VendoredDependency
 
     public Action<string> Transform { get; set; }
 
-    public string[] RelativePathsToExclude { get; set; } = Array.Empty<string>();
+    public string[] RelativeGlobsToExclude { get; set; } = Array.Empty<string>();
 
     private static string AddIfNetcoreapp31OrGreater(string filePath, string content)
     {
@@ -68,6 +82,34 @@ public class VendoredDependency
         }
 
         return content;
+    }
+
+    private static string AddTracerManagerFactoryHack(string filePath, string content)
+    {
+        if (Path.GetFileName(filePath) != "TracerManagerFactory.cs")
+        {
+            return content;
+        }
+
+        var lines = new[]
+        {
+            @"#if NETFRAMEWORK",
+            @"            // System.Web.dll is only available on .NET Framework",
+            @"            if (System.Web.Hosting.HostingEnvironment.IsHosted)",
+            @"            {",
+            @"                // if this app is an ASP.NET application, return ""SiteName/ApplicationVirtualPath"".",
+            @"                // note that ApplicationVirtualPath includes a leading slash.",
+            @"                siteName = (System.Web.Hosting.HostingEnvironment.SiteName + System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath).TrimEnd('/');",
+            @"                return true;",
+            @"            }",
+            "",
+            @"#endif",
+        };
+
+        // only one of these work, but play it safe
+        return content
+            .Replace(string.Join("\n", lines), string.Empty)
+            .Replace(string.Join("\r\n", lines), string.Empty);
     }
 
     private static string AddNullableDirectiveTransform(string filePath, string content)
@@ -110,21 +152,25 @@ public class VendoredDependency
                     builder.Replace("Debugger.Break();", "{}");
 
                     // Prevent namespace conflicts
-                    builder.Replace($"using {originalNamespace}", $"using DatadogTestLogger.Vendors.{originalNamespace}");
-                    builder.Replace($"using static {originalNamespace}", $"using static DatadogTestLogger.Vendors.{originalNamespace}");
+                    builder.Replace($"using {originalNamespace}",
+                        $"using DatadogTestLogger.Vendors.{originalNamespace}");
+                    builder.Replace($"using static {originalNamespace}",
+                        $"using static DatadogTestLogger.Vendors.{originalNamespace}");
                     builder.Replace($"namespace {originalNamespace}",
                         $"namespace DatadogTestLogger.Vendors.{originalNamespace}");
                     builder.Replace($"[CLSCompliant(false)]", $"// [CLSCompliant(false)]");
 
                     // HACKS
                     builder.Replace("using Datadog;", "using DatadogTestLogger;");
-                    builder.Replace($"[assembly: {originalNamespace}", $"[assembly: DatadogTestLogger.Vendors.{originalNamespace}");
+                    builder.Replace($"[assembly: {originalNamespace}",
+                        $"[assembly: DatadogTestLogger.Vendors.{originalNamespace}");
                     builder.Replace("public EventHandler<ErrorEventArgs>? Error { get; set; }",
                         @"public EventHandler<global::DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs>? Error { get; set; }");
                     builder.Replace(
                         "return new HttpResponse(statusCode, reasonPhrase, headers, new StreamContent(responseStream, length));",
                         "return new HttpResponse(statusCode, reasonPhrase, headers, new global::DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams.HttpContent.StreamContent(responseStream, length));");
-                    var replacement = "            _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);";
+                    var replacement =
+                        "            _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);";
                     builder.Replace(replacement,
                         "#if NETCOREAPP3_0_OR_GREATER" + Environment.NewLine + replacement + Environment.NewLine +
                         "#endif");
@@ -132,13 +178,16 @@ public class VendoredDependency
                     builder.Replace(replacement,
                         "#if NETCOREAPP2_2_OR_GREATER" + Environment.NewLine + replacement + Environment.NewLine +
                         "#endif");
-                    replacement = "                        _statsd.Timer(MetricsNames.GcPauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);";
+                    replacement =
+                        "                        _statsd.Timer(MetricsNames.GcPauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);";
                     builder.Replace(replacement,
                         "#if NETCOREAPP2_2_OR_GREATER" + Environment.NewLine + replacement + Environment.NewLine +
                         "#endif");
                     builder.Replace("var lastChar = eventName[^1];", "var lastChar = eventName.Last();");
-                    builder.Replace("var sw = new StreamWriter(memoryStream, leaveOpen: true);", "var sw = new StreamWriter(memoryStream, encoding: global::DatadogTestLogger.EncodingCache.UTF8NoBOM, bufferSize: -1, leaveOpen: true);");
-                    builder.Replace("#if !NETCOREAPP3_1_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0", "#if !NETCOREAPP2_0_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0");
+                    builder.Replace("var sw = new StreamWriter(memoryStream, leaveOpen: true);",
+                        "var sw = new StreamWriter(memoryStream, encoding: global::DatadogTestLogger.EncodingCache.UTF8NoBOM, bufferSize: -1, leaveOpen: true);");
+                    builder.Replace("#if !NETCOREAPP3_1_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0",
+                        "#if !NETCOREAPP2_0_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0");
                     builder.Replace("NET7_0_OR_GREATER", "NET8_0_OR_GREATER");
 
                     // Fix namespace conflicts in `using alias` directives. For example, transform:

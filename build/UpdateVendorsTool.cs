@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Nuke.Common;
 using Nuke.Common.IO;
+using Nuke.Common.Utilities.Collections;
 using Serilog;
 
 public static class UpdateVendorsTool
@@ -83,6 +84,10 @@ public static class UpdateVendorsTool
 
         Log.Information($"Running transforms on files for {libraryName}.");
 
+        dependency.RelativeGlobsToExclude
+            .SelectMany(x => ((AbsolutePath) sourceLocation).GlobFiles(x))
+            .ForEach(FileSystemTasks.DeleteFile);
+
         var files = Directory.GetFiles(
             sourceLocation,
             "*.*",
@@ -90,14 +95,7 @@ public static class UpdateVendorsTool
 
         foreach (var file in files)
         {
-            if (ShouldDropFile(dependency, sourceLocation, file))
-            {
-                File.Delete(file);
-            }
-            else
-            {
-                dependency.Transform(file);
-            }
+            dependency.Transform(file);
         }
 
         Log.Information($"Finished transforms on files for {libraryName}.");
@@ -109,20 +107,5 @@ public static class UpdateVendorsTool
         FileSystemTasks.MoveDirectory(sourceLocation, vendorFinalPath, DirectoryExistsPolicy.Merge);
         File.WriteAllText(sourceUrlLocation, downloadUrl);
         Log.Information($"Finished {libraryName} upgrade.");
-    }
-
-    private static bool ShouldDropFile(VendoredDependency dependency, string basePath, string filePath)
-    {
-        var normalizedFilePath = filePath.Replace('/', '\\');
-        foreach (var relativeFileToDrop in dependency.RelativePathsToExclude)
-        {
-            var absolutePath = Path.Combine(basePath, relativeFileToDrop).Replace('/', '\\');
-            if (normalizedFilePath.Equals(absolutePath, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

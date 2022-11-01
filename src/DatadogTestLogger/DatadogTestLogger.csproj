@@ -12,7 +12,7 @@
         <PackageProjectUrl>https://github.com/tonyredondo/datadog-test-logger</PackageProjectUrl>
         <RepositoryUrl>https://github.com/tonyredondo/datadog-test-logger</RepositoryUrl>
         <PackageTags>Datadog, Test, Logger</PackageTags>
-        <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net48;net472;net461;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net48;net472;net461;</TargetFrameworks>
         <BuildPackage>true</BuildPackage>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <AssemblyName>Datadog.testlogger</AssemblyName>
@@ -27,25 +27,6 @@
         <AnalysisLevel>latest</AnalysisLevel>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
-
-    <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
-        <Reference Include="System.Configuration" />
-        <Reference Include="System.Web" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">
-        <!-- Instrumented libraries -->
-        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.0.0" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.0" PrivateAssets="All" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.4.1" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-        <!--DuckTyping-->
-        <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-        <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
-    </ItemGroup>
 
     <!--Newtonsoft.Json-->
     <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
