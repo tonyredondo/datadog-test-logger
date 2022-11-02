@@ -9,6 +9,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Logging.DirectSubmission;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Spekt.TestLogger.Core;
 
 namespace DatadogTestLogger;
@@ -394,7 +395,14 @@ internal class TestSuiteSerializer
                             foreach (var message in messages)
                             {
                                 output.AppendLine($"    {message.Level} : {message.Message}");
-                                var logEvent = new CIVisibilityLogEvent("xunit", message.Level.ToString(), message.Message, span);
+                                var level = message.Level switch
+                                {
+                                    TestMessageLevel.Error => "error",
+                                    TestMessageLevel.Warning => "warn",
+                                    _ => "info"
+                                };
+
+                                var logEvent = new CIVisibilityLogEvent("xunit", level, message.Message, span);
                                 Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
                             }
 
