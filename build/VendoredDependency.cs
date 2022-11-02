@@ -37,7 +37,7 @@ public class VendoredDependency
                 "Util/Http/HttpRequestExtensions.Framework.cs",
             },
             Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
-                AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack),
+                AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile),
         });
     }
 
@@ -110,6 +110,18 @@ public class VendoredDependency
         return content
             .Replace(string.Join("\n", lines), string.Empty)
             .Replace(string.Join("\r\n", lines), string.Empty);
+    }
+
+    private static string RenameLogFile(string filePath, string content)
+    {
+        if (Path.GetFileName(filePath) != "DatadogLogging.cs")
+        {
+            return content;
+        }
+
+        return content.Replace(
+            @$"var managedLogPath = Path.Combine(logDirectory, $""dotnet-tracer-managed-",
+            @$"var managedLogPath = Path.Combine(logDirectory, $""datadogtestlogger-");
     }
 
     private static string AddNullableDirectiveTransform(string filePath, string content)
