@@ -390,10 +390,9 @@ internal class TestSuiteSerializer
                         {
                             var span = (ISpan)spanField.GetValue(module);
                             output.AppendLine();
-                            output.AppendLine("Messages:");
+                            output.AppendLine("Module contains messages.");
                             foreach (var message in messages)
                             {
-                                output.AppendLine($"    {message.Level} : {message.Message}");
                                 var level = message.Level switch
                                 {
                                     TestMessageLevel.Error => "error",
