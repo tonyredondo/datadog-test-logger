@@ -5,7 +5,9 @@
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using DatadogTestLogger.Vendors.Datadog.Trace;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Logging.DirectSubmission;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Spekt.TestLogger.Core;
 
@@ -377,6 +379,40 @@ internal class TestSuiteSerializer
                     }
                 }
 
+                // Messages
+                try
+                {
+                    if (messages is not null)
+                    {
+                        var spanField = typeof(TestModule).GetField("_span", BindingFlags.Instance | BindingFlags.NonPublic);
+                        if (spanField is not null)
+                        {
+                            var span = (ISpan)spanField.GetValue(module);
+                        
+                            output.AppendLine();
+                            output.AppendLine("Messages:");
+                            foreach (var message in messages)
+                            {
+                                output.AppendLine($"    {message.Level} : {message.Message}");
+                                var logEvent = new CIVisibilityLogEvent("xunit", message.Level.ToString(), message.Message, span);
+                                Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+                            }
+
+                            output.AppendLine();
+                        }
+                        else
+                        {
+                            output.AppendLine();
+                            output.AppendLine(":( _span cannot be found inside the TestModule.");
+                            output.AppendLine();
+                        }
+                    }
+                }
+                catch (Exception innerEx)
+                {
+                    output.AppendLine(innerEx.ToString());
+                }
+                
                 output.AppendLine("Closing module: " + testModuleName);
                 module?.Close(moduleTime.Subtract(moduleStartTime));
             }
@@ -384,18 +420,6 @@ internal class TestSuiteSerializer
         catch (Exception ex)
         {
             output.AppendLine(ex.ToString());
-        }
-        
-        // Messages
-        if (messages is not null)
-        {
-            output.AppendLine();
-            output.AppendLine("Messages:");
-            foreach (var message in messages)
-            {
-                output.AppendLine($"    {message.Level} : {message.Message}");
-            }
-            output.AppendLine();
         }
 
         return output.ToString();
