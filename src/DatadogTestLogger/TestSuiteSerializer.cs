@@ -389,7 +389,6 @@ internal class TestSuiteSerializer
                         if (spanField is not null)
                         {
                             var span = (ISpan)spanField.GetValue(module);
-                        
                             output.AppendLine();
                             output.AppendLine("Messages:");
                             foreach (var message in messages)
@@ -402,7 +401,7 @@ internal class TestSuiteSerializer
                                     _ => "info"
                                 };
 
-                                var logEvent = new CIVisibilityLogEvent("xunit", level, message.Message, span);
+                                var logEvent = new CIVisibilityLogEvent("xunit", level, message.Message, new InternalISpan(span));
                                 Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
                             }
 
@@ -431,5 +430,102 @@ internal class TestSuiteSerializer
         }
 
         return output.ToString();
+    }
+
+    // *****************************************************
+    // TraceID inside a TestModule instance is not being sent to the backend
+    // The backend automatically uses the SpanId as a TraceId on Modules and Suites.
+    // That's why we have to decorate the ISpan to return TraceId = SpanId
+    // *****************************************************
+    private class InternalISpan : ISpan
+    {
+        private readonly ISpan _span;
+        
+        public InternalISpan(ISpan span)
+        {
+            _span = span;
+        }
+
+        public void Dispose()
+        {
+            _span.Dispose();
+        }
+
+        public string OperationName
+        {
+            get => _span.OperationName;
+            set => _span.OperationName = value;
+        }
+
+        public string ResourceName
+        {
+            get => _span.ResourceName; 
+            set => _span.ResourceName = value;
+        }
+
+        public string Type
+        {
+            get => _span.Type; 
+            set => _span.Type = value;
+        }
+
+        public bool Error
+        {
+            get => _span.Error; 
+            set => _span.Error = value;
+        }
+
+        public string ServiceName
+        {
+            get => _span.ServiceName; 
+            set => _span.ServiceName = value;
+        }
+
+        public ulong TraceId => _span.SpanId;
+
+        public ulong SpanId => _span.SpanId;
+
+        public ISpanContext Context => new InternalISpanContext(_span.Context);
+
+        public ISpan SetTag(string key, string value)
+        {
+            return _span.SetTag(key, value);
+        }
+
+        public void Finish()
+        {
+            _span.Finish();
+        }
+
+        public void Finish(DateTimeOffset finishTimestamp)
+        {
+            _span.Finish(finishTimestamp);
+        }
+
+        public void SetException(Exception exception)
+        {
+            _span.SetException(exception);
+        }
+
+        public string GetTag(string key)
+        {
+            return _span.GetTag(key);
+        }
+    }
+
+    private class InternalISpanContext : ISpanContext
+    {
+        private readonly ISpanContext _context;
+
+        public InternalISpanContext(ISpanContext context)
+        {
+            _context = context;
+        }
+
+        public ulong TraceId => _context.SpanId;
+
+        public ulong SpanId => _context.SpanId;
+
+        public string ServiceName => _context.ServiceName;
     }
 }
