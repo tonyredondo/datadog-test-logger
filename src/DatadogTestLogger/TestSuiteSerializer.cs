@@ -304,6 +304,34 @@ internal class TestSuiteSerializer
                                 .ToDictionary(k => k.Key, v => v.Select(i => i.Value).ToList());
                             test.SetTraits(traits);
                         }
+                        
+                        // Messages
+                        try
+                        {
+                            if (result.Messages?.Count > 0)
+                            {
+                                var scopeField = typeof(Test).GetField("_scope", BindingFlags.Instance | BindingFlags.NonPublic);
+                                if (scopeField?.GetValue(test) is Scope scope)
+                                {
+                                    output.AppendLine("      Including test messages.");
+                                    foreach (var message in result.Messages)
+                                    {
+                                        var logEvent = new CIVisibilityLogEvent("xunit", "info", message.Text, scope.Span);
+                                        Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+                                    }
+                                }
+                                else
+                                {
+                                    output.AppendLine();
+                                    output.AppendLine(":( _scope cannot be found inside the Test.");
+                                    output.AppendLine();
+                                }
+                            }
+                        }
+                        catch (Exception innerEx)
+                        {
+                            output.AppendLine(innerEx.ToString());
+                        }
 
                         // Calculate duration (logger doesn't have a good duration precision, sometimes the minimum duration is 1ms)
                         // Here we try to reduce the duration so traces doesn't get stack together in the flamegraph
@@ -320,7 +348,7 @@ internal class TestSuiteSerializer
                         }
 
                         // Set status
-                        output.AppendLine("    result.Outcome: " + result.Outcome);
+                        output.AppendLine("      result.Outcome: " + result.Outcome);
                         if (result.Outcome == TestOutcome.Passed)
                         {
                             output.AppendLine("    Closing test: " + testName + $" [PASS] [{duration}]");
