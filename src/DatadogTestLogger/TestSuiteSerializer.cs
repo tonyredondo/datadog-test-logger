@@ -316,8 +316,23 @@ internal class TestSuiteSerializer
                                     output.AppendLine("      Including test messages.");
                                     foreach (var message in result.Messages)
                                     {
-                                        var logEvent = new CIVisibilityLogEvent("xunit", "info", message.Text, scope.Span);
-                                        Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+                                        if (message?.Text is { } messageText)
+                                        {
+                                            var messageArray = messageText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                                            if (messageArray.Length > 2)
+                                            {
+                                                foreach (var messageItem in messageArray)
+                                                {
+                                                    var logEvent = new CIVisibilityLogEvent("xunit", "info", messageItem, scope.Span);
+                                                    Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var logEvent = new CIVisibilityLogEvent("xunit", "info", messageText, scope.Span);
+                                                Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+                                            }
+                                        }
                                     }
                                 }
                                 else
