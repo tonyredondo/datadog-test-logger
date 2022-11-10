@@ -29,6 +29,7 @@ public class VendoredDependency
                 "ClrProfiler/AutoInstrumentation/AspNetCore/**/*.*",
                 "ClrProfiler/AutoInstrumentation/Azure/**/*.*",
                 "ClrProfiler/AutoInstrumentation/Grpc/GrpcDotNet/**/*.*",
+                "DiagnosticListeners/AspNetCoreResourceNameHelper.cs",
                 "DiagnosticListeners/AspNetCoreDiagnosticObserver.cs",
                 "Headers/HeadersCollectionAdapter.cs",
                 "PlatformHelpers/AspNetCoreHttpRequestHandler.cs",
