@@ -42,6 +42,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "aws.queue.url": 
                     QueueUrl = value;
                     break;
+                case "span.kind": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(AwsSqsTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

@@ -75,6 +75,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "http.status_code": 
                     HttpStatusCode = value;
                     break;
+                case "component": 
+                case "aws.agent": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(AwsSdkTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

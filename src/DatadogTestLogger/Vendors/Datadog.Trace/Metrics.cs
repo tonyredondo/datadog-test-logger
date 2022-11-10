@@ -53,6 +53,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         internal const string TracesKeepRate = "_dd.tracer_kr";
 
         /// <summary>
+        /// Span classified by the RareSampler
+        /// </summary>
+        internal const string RareSpan = "_dd.rare";
+
+        /// <summary>
         /// The process id.
         /// </summary>
         internal const string ProcessId = "process_id";

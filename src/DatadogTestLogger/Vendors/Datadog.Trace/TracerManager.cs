@@ -58,7 +58,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
             ITraceSampler sampler,
-            ISpanSampler spanSampler,
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetricsWriter,
@@ -72,7 +71,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             Settings = settings;
             AgentWriter = agentWriter;
             Sampler = sampler;
-            SpanSampler = spanSampler;
             ScopeManager = scopeManager;
             Statsd = statsd;
             RuntimeMetrics = runtimeMetricsWriter;
@@ -131,11 +129,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Gets the <see cref="ITraceSampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
         public ITraceSampler Sampler { get; }
-
-        /// <summary>
-        /// Gets the <see cref="ISpanSampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
-        /// </summary>
-        public ISpanSampler SpanSampler { get; }
 
         public DirectLogSubmissionManager DirectLogSubmission { get; }
 
@@ -490,6 +483,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     writer.WritePropertyName("span_sampling_rules");
                     writer.WriteValue(instanceSettings.SpanSamplingRules);
 
+                    writer.WritePropertyName("stats_computation_enabled");
+                    writer.WriteValue(instanceSettings.StatsComputationEnabled);
+
                     writer.WriteEndObject();
                     // ReSharper restore MethodHasAsyncOverload
                 }
@@ -588,6 +584,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
                     Log.Debug("Waiting for disposals.");
                     await Task.WhenAll(flushTracesTask, logSubmissionTask, telemetryTask, discoveryService, dataStreamsTask).ConfigureAwait(false);
+
+                    instance.RuntimeMetrics?.Dispose();
+
                     Log.Debug("Finished waiting for disposals.");
                 }
             }

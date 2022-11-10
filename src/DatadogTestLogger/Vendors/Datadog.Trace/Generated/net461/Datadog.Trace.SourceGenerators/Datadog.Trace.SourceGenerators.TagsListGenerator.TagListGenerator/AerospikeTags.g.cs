@@ -57,6 +57,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "aerospike.userkey": 
                     UserKey = value;
                     break;
+                case "span.kind": 
+                case "component": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(AerospikeTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

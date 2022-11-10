@@ -72,6 +72,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack
         public int Serialize(ref byte[] bytes, int offset, Span value, IFormatterResolver formatterResolver)
         {
             var context = value.Context;
+            var testSessionTags = value.Tags as TestSessionSpanTags;
             var testModuleTags = value.Tags as TestModuleSpanTags;
             var testSuiteTags = value.Tags as TestSuiteSpanTags;
 
@@ -81,6 +82,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack
 
             if (context.ParentId is not null)
             {
+                len++;
+            }
+
+            if (testSessionTags is not null && testSessionTags.SessionId != 0)
+            {
+                // we need to add TestSessionId value to the root
                 len++;
             }
 
@@ -152,6 +159,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack
             {
                 offset += MessagePackBinary.WriteString(ref bytes, offset, TestSuiteVisibilityTags.TestModuleId);
                 offset += MessagePackBinary.WriteUInt64(ref bytes, offset, testModuleTags.ModuleId);
+            }
+
+            if (testSessionTags is not null && testSessionTags.SessionId != 0)
+            {
+                offset += MessagePackBinary.WriteString(ref bytes, offset, TestSuiteVisibilityTags.TestSessionId);
+                offset += MessagePackBinary.WriteUInt64(ref bytes, offset, testSessionTags.SessionId);
             }
 
             offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _errorBytes);
