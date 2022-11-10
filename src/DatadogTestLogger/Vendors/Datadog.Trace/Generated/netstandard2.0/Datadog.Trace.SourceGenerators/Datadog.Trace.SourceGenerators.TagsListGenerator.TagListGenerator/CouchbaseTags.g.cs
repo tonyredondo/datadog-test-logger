@@ -63,6 +63,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "out.port": 
                     Port = value;
                     break;
+                case "span.kind": 
+                case "component": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(CouchbaseTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

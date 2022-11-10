@@ -19,7 +19,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// </summary>
         public const ulong MaxTraceId = 9_223_372_036_854_775_807;
 
-        public const string AssemblyVersion = "2.19.0.0";
-        public const string ThreePartVersion = "2.19.0";
+        public const string AssemblyVersion = "2.20.0.0";
+        public const string ThreePartVersion = "2.20.0";
     }
 }

@@ -81,8 +81,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Note that this API does NOT replace the global Tracer instance.
         /// The <see cref="TracerManager"/> created will be scoped specifically to this instance.
         /// </summary>
-        internal Tracer(TracerSettings settings, IAgentWriter agentWriter, ITraceSampler sampler, IScopeManager scopeManager, IDogStatsd statsd, ITelemetryController telemetry = null, IDiscoveryService discoveryService = null, ISpanSampler spanSampler = null)
-            : this(TracerManagerFactory.Instance.CreateTracerManager(settings?.Build(), agentWriter, sampler, scopeManager, statsd, runtimeMetrics: null, logSubmissionManager: null, telemetry: telemetry ?? NullTelemetryController.Instance, discoveryService ?? NullDiscoveryService.Instance, dataStreamsManager: null, spanSampler))
+        internal Tracer(TracerSettings settings, IAgentWriter agentWriter, ITraceSampler sampler, IScopeManager scopeManager, IDogStatsd statsd, ITelemetryController telemetry = null, IDiscoveryService discoveryService = null)
+            : this(TracerManagerFactory.Instance.CreateTracerManager(settings?.Build(), agentWriter, sampler, scopeManager, statsd, runtimeMetrics: null, logSubmissionManager: null, telemetry: telemetry ?? NullTelemetryController.Instance, discoveryService ?? NullDiscoveryService.Instance, dataStreamsManager: null))
         {
         }
 
@@ -223,11 +223,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Gets the <see cref="ITraceSampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
         ITraceSampler IDatadogTracer.Sampler => TracerManager.Sampler;
-
-        /// <summary>
-        /// Gets the <see cref="ISpanSampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
-        /// </summary>
-        ISpanSampler IDatadogTracer.SpanSampler => TracerManager.SpanSampler;
 
         internal static string RuntimeId => DistributedTracer.Instance.GetRuntimeId();
 

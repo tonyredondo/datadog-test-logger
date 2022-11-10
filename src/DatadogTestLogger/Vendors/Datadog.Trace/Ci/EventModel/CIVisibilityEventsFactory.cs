@@ -9,19 +9,24 @@
 // </copyright>
 #nullable enable
 
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.EventModel;
 
 internal static class CIVisibilityEventsFactory
 {
     public static IEvent FromSpan(Span span)
-        => span.Type switch
+    {
+        return span.Type switch
         {
-            SpanTypes.Test => new TestEvent(span),
-            SpanTypes.TestSuite => new TestSuiteEvent(span),
-            SpanTypes.TestModule => new TestModuleEvent(span),
+            SpanTypes.Test => span.Tags is TestSpanTags ? new TestEvent(span) : new TestEvent(span, 1),
+            SpanTypes.TestSuite when span.Tags is TestSuiteSpanTags => new TestSuiteEvent(span),
+            SpanTypes.TestModule when span.Tags is TestModuleSpanTags => new TestModuleEvent(span),
             SpanTypes.TestSession => new TestSessionEvent(span),
             _ => new SpanEvent(span)
         };
+    }
 
     public static Span? GetSpan(IEvent @event)
     {

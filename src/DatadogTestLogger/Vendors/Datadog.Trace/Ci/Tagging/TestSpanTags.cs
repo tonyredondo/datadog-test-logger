@@ -35,8 +35,8 @@ internal partial class TestSpanTags : TestSuiteSpanTags
         GitCommit = suiteTags.GitCommit;
         GitRepository = suiteTags.GitRepository;
         GitTag = suiteTags.GitTag;
-        LibraryVersion = suiteTags.LibraryVersion;
         ModuleId = suiteTags.ModuleId;
+        SessionId = suiteTags.SessionId;
         RuntimeArchitecture = suiteTags.RuntimeArchitecture;
         RuntimeName = suiteTags.RuntimeName;
         RuntimeVersion = suiteTags.RuntimeVersion;
@@ -64,6 +64,8 @@ internal partial class TestSpanTags : TestSuiteSpanTags
         GitCommitCommitterDate = suiteTags.GitCommitCommitterDate;
         GitCommitCommitterEmail = suiteTags.GitCommitCommitterEmail;
         GitCommitCommitterName = suiteTags.GitCommitCommitterName;
+        Command = suiteTags.Command;
+        WorkingDirectory = suiteTags.WorkingDirectory;
     }
 
     [Tag(TestTags.Name)]

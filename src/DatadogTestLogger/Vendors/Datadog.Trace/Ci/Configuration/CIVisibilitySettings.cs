@@ -48,6 +48,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
 
             // Git upload
             GitUploadEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.GitUploadEnabled) ?? false;
+
+            // Force evp proxy
+            ForceAgentsEvpProxy = source?.GetBool(ConfigurationKeys.CIVisibility.ForceAgentsEvpProxy) ?? false;
         }
 
         /// <summary>
@@ -124,6 +127,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
         /// Gets a value indicating whether the Intelligent Test Runner is enabled.
         /// </summary>
         public bool IntelligentTestRunnerEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether EVP Proxy must be used.
+        /// </summary>
+        public bool ForceAgentsEvpProxy { get; }
 
         /// <summary>
         /// Gets the tracer settings

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack;
 using DatadogTestLogger.Vendors.Datadog.Trace.DogStatsd;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
 
@@ -46,6 +47,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
 
         private readonly IStatsAggregator _statsAggregator;
 
+        private readonly ISpanSampler _spanSampler;
+
         /// <summary>
         /// The currently active buffer.
         /// Note: Thread-safetiness in this class relies on the fact that only the serialization thread can change the active buffer
@@ -70,12 +73,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
             EmptyPayload = new ArraySegment<byte>(data);
         }
 
-        public AgentWriter(IApi api, IStatsAggregator statsAggregator, IDogStatsd statsd, bool automaticFlush = true, int maxBufferSize = 1024 * 1024 * 10, int batchInterval = 100)
-        : this(api, statsAggregator, statsd, MovingAverageKeepRateCalculator.CreateDefaultKeepRateCalculator(), automaticFlush, maxBufferSize, batchInterval)
+        public AgentWriter(IApi api, IStatsAggregator statsAggregator, IDogStatsd statsd, ISpanSampler spanSampler, bool automaticFlush = true, int maxBufferSize = 1024 * 1024 * 10, int batchInterval = 100)
+        : this(api, statsAggregator, statsd, spanSampler, MovingAverageKeepRateCalculator.CreateDefaultKeepRateCalculator(), automaticFlush, maxBufferSize, batchInterval)
         {
         }
 
-        internal AgentWriter(IApi api, IStatsAggregator statsAggregator, IDogStatsd statsd, IKeepRateCalculator traceKeepRateCalculator, bool automaticFlush, int maxBufferSize, int batchInterval)
+        internal AgentWriter(IApi api, IStatsAggregator statsAggregator, IDogStatsd statsd, ISpanSampler spanSampler, IKeepRateCalculator traceKeepRateCalculator, bool automaticFlush, int maxBufferSize, int batchInterval)
         {
             _statsAggregator = statsAggregator;
 
@@ -83,6 +86,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
             _statsd = statsd;
             _batchInterval = batchInterval;
             _traceKeepRateCalculator = traceKeepRateCalculator;
+
+            _spanSampler = spanSampler;
 
             var formatterResolver = SpanFormatterResolver.Instance;
 
@@ -395,6 +400,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
                 return;
             }
 
+            RunSpanSampler(spans);
+
             if (CanComputeStats)
             {
                 spans = _statsAggregator?.ProcessTrace(spans) ?? spans;
@@ -461,6 +468,22 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
             {
                 _statsd.Increment(TracerMetricNames.Queue.DroppedTraces);
                 _statsd.Increment(TracerMetricNames.Queue.DroppedSpans, spans.Count);
+            }
+        }
+
+        private void RunSpanSampler(ArraySegment<Span> spans)
+        {
+            if (_spanSampler is null)
+            {
+                return;
+            }
+
+            if (spans.Array![spans.Offset].Context.TraceContext?.SamplingPriority <= 0)
+            {
+                for (int i = 0; i < spans.Count; i++)
+                {
+                    _spanSampler.MakeSamplingDecision(spans.Array[i + spans.Offset]);
+                }
             }
         }
 

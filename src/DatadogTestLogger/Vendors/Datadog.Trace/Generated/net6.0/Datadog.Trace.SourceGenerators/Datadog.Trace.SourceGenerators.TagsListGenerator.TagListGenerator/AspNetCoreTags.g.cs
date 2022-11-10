@@ -33,6 +33,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
         {
             switch(key)
             {
+                case "component": 
+                    InstrumentationName = value;
+                    break;
                 case "aspnet_core.route": 
                     AspNetCoreRoute = value;
                     break;

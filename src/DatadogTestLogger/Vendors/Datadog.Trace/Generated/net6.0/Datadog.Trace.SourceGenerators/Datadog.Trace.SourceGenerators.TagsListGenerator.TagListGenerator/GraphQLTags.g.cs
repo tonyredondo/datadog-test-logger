@@ -51,6 +51,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 case "graphql.operation.type": 
                     OperationType = value;
                     break;
+                case "span.kind": 
+                case "component": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(GraphQLTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

@@ -61,8 +61,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                 logSubmissionManager: previous?.DirectLogSubmission,
                 telemetry: null,
                 discoveryService: null,
-                dataStreamsManager: null,
-                spanSampler: null);
+                dataStreamsManager: null);
 
             try
             {
@@ -84,7 +83,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         /// <summary>
         /// Internal for use in tests that create "standalone" <see cref="TracerManager"/> by
-        /// <see cref="Tracer(TracerSettings, IAgentWriter, ITraceSampler, IScopeManager, IDogStatsd, ITelemetryController, IDiscoveryService, ISpanSampler)"/>
+        /// <see cref="Tracer(TracerSettings, IAgentWriter, ITraceSampler, IScopeManager, IDogStatsd, ITelemetryController, IDiscoveryService)"/>
         /// </summary>
         internal TracerManager CreateTracerManager(
             ImmutableTracerSettings settings,
@@ -96,8 +95,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             DirectLogSubmissionManager logSubmissionManager,
             ITelemetryController telemetry,
             IDiscoveryService discoveryService,
-            DataStreamsManager dataStreamsManager,
-            ISpanSampler spanSampler)
+            DataStreamsManager dataStreamsManager)
         {
             settings ??= ImmutableTracerSettings.FromDefaultSources();
 
@@ -111,7 +109,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                          ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName))
                          : null;
             sampler ??= GetSampler(settings);
-            spanSampler ??= GetSpanSampler(settings);
             agentWriter ??= GetAgentWriter(settings, statsd, sampler, discoveryService);
             scopeManager ??= new AsyncLocalScopeManager();
 
@@ -137,7 +134,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
             dataStreamsManager ??= DataStreamsManager.Create(settings, discoveryService, defaultServiceName);
 
-            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, spanSampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName);
+            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName);
             return tracerManager;
         }
 
@@ -148,7 +145,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
             ITraceSampler sampler,
-            ISpanSampler spanSampler,
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
@@ -157,7 +153,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             IDiscoveryService discoveryService,
             DataStreamsManager dataStreamsManager,
             string defaultServiceName)
-            => new TracerManager(settings, agentWriter, sampler, spanSampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName);
+            => new TracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName);
 
         protected virtual ITraceSampler GetSampler(ImmutableTracerSettings settings)
         {
@@ -205,7 +201,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
             var statsAggregator = StatsAggregator.Create(api, settings, discoveryService);
 
-            return new AgentWriter(api, statsAggregator, statsd, maxBufferSize: settings.TraceBufferSize);
+            var spanSampler = GetSpanSampler(settings);
+
+            return new AgentWriter(api, statsAggregator, statsd, spanSampler, maxBufferSize: settings.TraceBufferSize);
         }
 
         protected virtual IDiscoveryService GetDiscoveryService(ImmutableTracerSettings settings)

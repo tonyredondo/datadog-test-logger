@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Globalization;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
@@ -28,6 +29,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         private readonly DateTimeOffset _utcStart = DateTimeOffset.UtcNow;
         private readonly long _timestamp = Stopwatch.GetTimestamp();
         private readonly object _syncRoot = new();
+        private IastRequestContext _iastRequestContext;
 
         private ArrayBuilder<Span> _spans;
         private int _openSpans;
@@ -56,6 +58,25 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         public int? SamplingPriority
         {
             get => _samplingPriority;
+        }
+
+        /// <summary>
+        /// Gets the iast context.
+        /// </summary>
+        internal IastRequestContext IastRequestContext
+        {
+            get
+            {
+                if (_iastRequestContext == null && Iast.Iast.Instance.Settings.Enabled)
+                {
+                    lock (_syncRoot)
+                    {
+                        _iastRequestContext ??= new();
+                    }
+                }
+
+                return _iastRequestContext;
+            }
         }
 
         private TimeSpan Elapsed => StopwatchHelpers.GetElapsed(Stopwatch.GetTimestamp() - _timestamp);
@@ -101,12 +122,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             if (span.IsRootSpan && span.Type == SpanTypes.Web)
             {
                 Profiler.Instance.ContextTracker.SetEndpoint(span.RootSpanId, span.ResourceName);
-            }
 
-            // Determine whether we will sample a dropped span with single span sampling rules
-            if (_samplingPriority <= 0)
-            {
-                Tracer.SpanSampler?.MakeSamplingDecision(span);
+                if (Iast.Iast.Instance.Settings.Enabled)
+                {
+                    IastRequestContext.AddsIastTagsToSpan(span, _iastRequestContext);
+                }
             }
 
             lock (_syncRoot)

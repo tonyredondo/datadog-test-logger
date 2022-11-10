@@ -21,10 +21,12 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
 using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 {
@@ -72,8 +74,26 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             var eventPlatformProxyEnabled = false;
             if (!_settings.Agentless)
             {
-                discoveryService = DiscoveryService.Create(new ImmutableExporterSettings(_settings.TracerSettings.Exporter));
-                eventPlatformProxyEnabled = IsEventPlatformProxySupportedByAgent(discoveryService);
+                if (!_settings.ForceAgentsEvpProxy)
+                {
+                    discoveryService = new DiscoveryService(
+                        AgentTransportStrategy.Get(
+                            new ImmutableExporterSettings(_settings.TracerSettings.Exporter),
+                            productName: "discovery",
+                            tcpTimeout: TimeSpan.FromSeconds(5),
+                            AgentHttpHeaderNames.MinimalHeaders,
+                            () => new MinimalAgentHeaderHelper(),
+                            uri => uri),
+                        10,
+                        1000,
+                        int.MaxValue);
+                }
+                else
+                {
+                    Log.Information("Using the Event platform proxy through the agent.");
+                }
+
+                eventPlatformProxyEnabled = _settings.ForceAgentsEvpProxy || IsEventPlatformProxySupportedByAgent(discoveryService);
             }
 
             LifetimeManager.Instance.AddAsyncShutdownTask(ShutdownAsync);
@@ -299,6 +319,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                         }
 
                         var osxVersion = ProcessHelpers.RunCommandAsync(new ProcessHelpers.Command("uname", "-r")).GetAwaiter().GetResult();
+                        osxVersion = osxVersion?.Trim(' ', '\n');
                         if (!string.IsNullOrEmpty(osxVersion))
                         {
                             return osxVersion!;

@@ -72,6 +72,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "http.client_ip": 
                     HttpClientIp = value;
                     break;
+                case "span.kind": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(WebTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

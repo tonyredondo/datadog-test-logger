@@ -219,6 +219,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
             IpHeader = source?.GetString(ConfigurationKeys.IpHeader) ?? source?.GetString(ConfigurationKeys.AppSec.CustomIpHeader);
 
+            IpHeaderEnabled = source?.GetBool(ConfigurationKeys.IpHeaderEnabled) ?? false;
+
             if (IsActivityListenerEnabled)
             {
                 // If the activities support is activated, we must enable W3C propagators
@@ -236,6 +238,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             IsDataStreamsMonitoringEnabled = source?.GetBool(ConfigurationKeys.DataStreamsMonitoring.Enabled) ??
                                         // default value
                                         false;
+
+            IsRareSamplerEnabled = source?.GetBool(ConfigurationKeys.RareSamplerEnabled) ?? false;
         }
 
         /// <summary>
@@ -342,6 +346,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// Gets or sets a custom request header configured to read the ip from. For backward compatibility, it fallbacks on DD_APPSEC_IPHEADER
         /// </summary>
         internal string IpHeader { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the ip header should not be collected. The default is false.
+        /// </summary>
+        internal bool IpHeaderEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets the map of metadata keys to tag names, which are applied to the root <see cref="Span"/>
@@ -512,6 +521,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// Gets a value indicating whether data streams monitoring is enabled or not.
         /// </summary>
         internal bool IsDataStreamsMonitoringEnabled { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the rare sampler is enabled or not.
+        /// </summary>
+        internal bool IsRareSamplerEnabled { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

@@ -69,6 +69,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "grpc.status.code": 
                     StatusCode = value;
                     break;
+                case "span.kind": 
+                case "component": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(GrpcTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

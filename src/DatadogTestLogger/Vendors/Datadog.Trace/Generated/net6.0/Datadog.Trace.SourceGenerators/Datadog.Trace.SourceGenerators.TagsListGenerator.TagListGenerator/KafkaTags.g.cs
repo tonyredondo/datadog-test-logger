@@ -59,6 +59,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "kafka.group": 
                     ConsumerGroup = value;
                     break;
+                case "span.kind": 
+                case "component": 
+                    Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(KafkaTags));
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;

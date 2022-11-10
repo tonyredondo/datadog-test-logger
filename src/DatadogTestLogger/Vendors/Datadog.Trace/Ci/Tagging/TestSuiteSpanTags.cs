@@ -33,8 +33,8 @@ internal partial class TestSuiteSpanTags : TestModuleSpanTags
         GitCommit = moduleTags.GitCommit;
         GitRepository = moduleTags.GitRepository;
         GitTag = moduleTags.GitTag;
-        LibraryVersion = moduleTags.LibraryVersion;
         ModuleId = moduleTags.ModuleId;
+        SessionId = moduleTags.SessionId;
         RuntimeArchitecture = moduleTags.RuntimeArchitecture;
         RuntimeName = moduleTags.RuntimeName;
         RuntimeVersion = moduleTags.RuntimeVersion;
@@ -62,6 +62,8 @@ internal partial class TestSuiteSpanTags : TestModuleSpanTags
         GitCommitCommitterDate = moduleTags.GitCommitCommitterDate;
         GitCommitCommitterEmail = moduleTags.GitCommitCommitterEmail;
         GitCommitCommitterName = moduleTags.GitCommitCommitterName;
+        Command = moduleTags.Command;
+        WorkingDirectory = moduleTags.WorkingDirectory;
     }
 
     public ulong SuiteId { get; set; }
