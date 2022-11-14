@@ -401,7 +401,23 @@ internal class TestSuiteSerializer
                                     errorMessage = errorMessage.Substring(sepIndex + 1).Trim();
                                 }
                             }
-                            
+
+                            // If we couldn't extract the type we try further (more allocations)
+                            if (errorType == "Exception")
+                            {
+                                foreach (var errorMessagePart in errorMessage.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    var phrase = errorMessagePart.Trim();
+
+                                    if (phrase.EndsWith("Exception"))
+                                    {
+                                        var spaceIndex = phrase.IndexOf(" ", StringComparison.Ordinal);
+                                        errorType = phrase.Substring(spaceIndex + 1);
+                                        break;
+                                    }
+                                }
+                            }
+
                             output.AppendLine("    Closing test: " + testName +
                                               $" [FAIL] [{duration}, {errorType}, {errorMessage}]");
                             test.SetErrorInfo(errorType, errorMessage, result.ErrorStackTrace);
