@@ -22,5 +22,5 @@ public class DatadogTestLogger : Spekt.TestLogger.TestLogger
     }
 
     /// <inheritdoc/>
-    protected override string DefaultTestResultFile => "Datadog.TestResult.txt";
+    protected override string DefaultTestResultFile => $"Datadog_TestResult_{DateTime.Now:yyyy-MM-dd_HH_mm_ss}.txt";
 }

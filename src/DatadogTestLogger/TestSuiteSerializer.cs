@@ -31,6 +31,7 @@ internal class TestSuiteSerializer
         {
             output.AppendLine("**************************************************");
             output.AppendLine("Serializing test session results.");
+            output.AppendLine($"\tDate = {DateTimeOffset.Now}");
             output.AppendLine($"\tResults count = {results?.Count ?? 0}");
             output.AppendLine($"\tMessages count = {messages?.Count ?? 0}");
             
