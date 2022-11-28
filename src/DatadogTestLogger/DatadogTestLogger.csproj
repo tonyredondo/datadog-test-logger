@@ -12,7 +12,7 @@
         <PackageProjectUrl>https://github.com/tonyredondo/datadog-test-logger</PackageProjectUrl>
         <RepositoryUrl>https://github.com/tonyredondo/datadog-test-logger</RepositoryUrl>
         <PackageTags>Datadog, Test, Logger</PackageTags>
-        <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net48;net472;net461;</TargetFrameworks>
+        <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;net48;net472;net462;</TargetFrameworks>
         <BuildPackage>true</BuildPackage>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <AssemblyName>Datadog.testlogger</AssemblyName>
@@ -88,11 +88,18 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.3.2" />
         <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.4.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
+        <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.3.2" />
     </ItemGroup>
 
     <ItemGroup>
