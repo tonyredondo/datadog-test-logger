@@ -36,6 +36,8 @@ public class VendoredDependency
                 "Util/Http/HttpRequestExtensions.Core.cs",
                 "Util/Http/HttpRequestExtensions.Core.cs",
                 "Util/Http/HttpRequestExtensions.Framework.cs",
+                "SpanExtensions.Core.cs",
+                "SpanExtensions.Framework.cs",
             },
             Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
                 AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile),
