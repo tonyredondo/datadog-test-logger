@@ -24,6 +24,7 @@ public class VendoredDependency
             RelativeGlobsToExclude = new[]
             {
                 "AppSec/**/*.*",
+                "IAST/**/*.*",
                 "AspNet/**/*.*",
                 "ClrProfiler/AutoInstrumentation/AspNet/**/*.*",
                 "ClrProfiler/AutoInstrumentation/AspNetCore/**/*.*",
@@ -36,6 +37,7 @@ public class VendoredDependency
                 "Util/Http/HttpRequestExtensions.Core.cs",
                 "Util/Http/HttpRequestExtensions.Core.cs",
                 "Util/Http/HttpRequestExtensions.Framework.cs",
+                "SpanExtensions.cs",
                 "SpanExtensions.Core.cs",
                 "SpanExtensions.Framework.cs",
             },
