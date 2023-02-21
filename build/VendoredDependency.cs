@@ -162,6 +162,7 @@ public class VendoredDependency
 
                     // Debugger.Break() is a dangerous method that may crash the process. We don't
                     // want to take any risk of calling it, ever, so replace it with a noop.
+                    builder.Replace("System.Diagnostics.Debugger.Break();", "{}");
                     builder.Replace("Debugger.Break();", "{}");
 
                     // Prevent namespace conflicts
