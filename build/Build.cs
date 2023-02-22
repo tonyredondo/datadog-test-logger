@@ -75,7 +75,7 @@ class Build : NukeBuild
                 .EnableNoRestore()
                 .EnableNoBuild()
                 .SetVersion(Version)
-                .SetOutputDirectory(ArtifactsDirectory)
+                .SetProperty("PackageOutputPath", ArtifactsDirectory)
             );
         });
 
