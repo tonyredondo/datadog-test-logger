@@ -45,8 +45,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast.Settings
         public bool DeduplicationEnabled { get; set; }
         
         public bool WeakHashAlgorithms { get; set; }
-        
-        public string WeakCipherAlgorithms { get; set; }
+
+        public string WeakCipherAlgorithms { get; set; } = string.Empty;
     }
 }
 
