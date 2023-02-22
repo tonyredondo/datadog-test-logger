@@ -37,7 +37,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
             ProxyNoProxy = proxyNoProxy.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             // Intelligent Test Runner
-            IntelligentTestRunnerEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.IntelligentTestRunnerEnabled) ?? false;
+            IntelligentTestRunnerEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.IntelligentTestRunnerEnabled) ?? true;
 
             // Tests skipping
             TestsSkippingEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.TestsSkippingEnabled);
@@ -45,9 +45,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
             // Code coverage
             CodeCoverageEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.CodeCoverage);
             CodeCoverageSnkFilePath = source?.GetString(ConfigurationKeys.CIVisibility.CodeCoverageSnkFile);
+            CodeCoveragePath = source?.GetString(ConfigurationKeys.CIVisibility.CodeCoveragePath);
+            CodeCoverageEnableJitOptimizations = source?.GetBool(ConfigurationKeys.CIVisibility.CodeCoverageEnableJitOptimizations) ?? true;
 
             // Git upload
-            GitUploadEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.GitUploadEnabled) ?? false;
+            GitUploadEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.GitUploadEnabled);
 
             // Force evp proxy
             ForceAgentsEvpProxy = source?.GetBool(ConfigurationKeys.CIVisibility.ForceAgentsEvpProxy) ?? false;
@@ -61,22 +63,22 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
         /// <summary>
         /// Gets a value indicating whether the Agentless writer is going to be used.
         /// </summary>
-        public bool Agentless { get; }
+        public bool Agentless { get; private set; }
 
         /// <summary>
         /// Gets the Agentless url.
         /// </summary>
-        public string? AgentlessUrl { get; }
+        public string? AgentlessUrl { get; private set; }
 
         /// <summary>
         /// Gets the Api Key to use in Agentless mode
         /// </summary>
-        public string? ApiKey { get; }
+        public string? ApiKey { get; private set; }
 
         /// <summary>
         /// Gets the Application Key to use in ITR
         /// </summary>
-        public string? ApplicationKey { get; }
+        public string? ApplicationKey { get; private set; }
 
         /// <summary>
         /// Gets the Datadog site
@@ -114,9 +116,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
         public string? CodeCoverageSnkFilePath { get; }
 
         /// <summary>
+        /// Gets the path to store the code coverage json files.
+        /// </summary>
+        public string? CodeCoveragePath { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the Code Coverage Jit Optimizations should be enabled
+        /// </summary>
+        public bool CodeCoverageEnableJitOptimizations { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the Git Upload metadata is going to be used.
         /// </summary>
-        public bool GitUploadEnabled { get; }
+        public bool? GitUploadEnabled { get; }
 
         /// <summary>
         /// Gets a value indicating whether the Intelligent Test Runner Tests skipping feature is enabled.
@@ -151,6 +163,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
         internal void SetTestsSkippingEnabled(bool value)
         {
             TestsSkippingEnabled = value;
+        }
+
+        internal void SetAgentlessConfiguration(bool enabled, string? apiKey, string? applicationKey, string? agentlessUrl)
+        {
+            Agentless = enabled;
+            ApiKey = apiKey;
+            ApplicationKey = applicationKey;
+            AgentlessUrl = agentlessUrl;
         }
 
         private TracerSettings InitializeTracerSettings()

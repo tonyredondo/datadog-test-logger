@@ -83,7 +83,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers
             }
             catch (Exception ex)
             {
-                Log.Warning("Error reading cgroup file. Will not report container id.", ex);
+                Log.Warning(ex, "Error reading cgroup file. Will not report container id.");
             }
 
             return null;

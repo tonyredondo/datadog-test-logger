@@ -19,6 +19,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
         public const string AgentUrl = "agent_url";
         public const string AgentTraceTransport = "agent_transport";
         public const string Debug = "debug";
+        public const string NativeTracerVersion = "native_tracer_version";
         public const string AnalyticsEnabled = "analytics_enabled";
         public const string SampleRate = "sample_rate";
         public const string SamplingRules = "sampling_rules";
@@ -44,7 +45,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
         public const string AasAppType = "aas_app_type";
         public const string AasFunctionsRuntimeVersion = "aas_functions_runtime_version";
 
-        public const string ActivityListenerEnabled = "activity_listener_enabled";
+        public const string OpenTelemetryEnabled = "otel_enabled";
 
         public const string ProfilerLoaded = "profiler_loaded";
         public const string CodeHotspotsEnabled = "code_hotspots_enabled";

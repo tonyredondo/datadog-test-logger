@@ -70,7 +70,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.ProbeStatuses
 
                 foreach (var probeStatus in probeStatuses)
                 {
-                    _probeStatusSink.AddProbeStatus(probeStatus.ProbeId, probeStatus.Status);
+                    _probeStatusSink.AddProbeStatus(probeStatus.ProbeId, probeStatus.Status, errorMessage: probeStatus.ErrorMessage);
                 }
             }
         }

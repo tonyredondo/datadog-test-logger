@@ -20,7 +20,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Transports;
 
 internal static class TelemetryTransportStrategy
 {
-    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<Tracer>();
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(TelemetryTransportStrategy));
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(15);
 
     public static IApiRequestFactory GetDirectIntakeFactory(Uri baseEndpoint, string apiKey)

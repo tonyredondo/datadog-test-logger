@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Models;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots

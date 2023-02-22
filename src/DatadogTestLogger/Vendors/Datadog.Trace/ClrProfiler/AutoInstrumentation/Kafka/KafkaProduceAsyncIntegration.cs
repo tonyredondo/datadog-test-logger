@@ -27,7 +27,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         ReturnTypeName = KafkaConstants.TaskDeliveryReportTypeName,
         ParameterTypeNames = new[] { KafkaConstants.TopicPartitionTypeName, KafkaConstants.MessageTypeName, ClrNames.CancellationToken },
         MinimumVersion = "1.4.0",
-        MaximumVersion = "1.*.*",
+        MaximumVersion = "2.*.*",
         IntegrationName = KafkaConstants.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -47,9 +47,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         internal static CallTargetState OnMethodBegin<TTarget, TTopicPartition, TMessage>(TTarget instance, TTopicPartition topicPartition, TMessage message, CancellationToken cancellationToken)
             where TMessage : IMessage
         {
+            var partition = topicPartition.DuckCast<ITopicPartition>();
             Scope scope = KafkaHelper.CreateProducerScope(
                 Tracer.Instance,
-                topicPartition.DuckCast<ITopicPartition>(),
+                partition,
                 isTombstone: message.Value is null,
                 finishOnClose: true);
 
@@ -58,6 +59,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 KafkaHelper.TryInjectHeaders<TTopicPartition, TMessage>(
                     scope.Span.Context,
                     Tracer.Instance.TracerManager.DataStreamsManager,
+                    partition?.Topic,
                     message);
                 return new CallTargetState(scope);
             }

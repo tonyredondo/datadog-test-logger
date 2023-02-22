@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
@@ -38,7 +39,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 Span parent = tracer.InternalActiveScope?.Span;
 
                 if (parent is { Type: SpanTypes.Sql } &&
-                    parent.GetTag(Tags.DbType) == dbType &&
+                    HasDbType(parent, dbType) &&
                     parent.ResourceName == command.CommandText)
                 {
                     // we are already instrumenting this,
@@ -62,6 +63,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 scope.Span.ResourceName = command.CommandText;
                 scope.Span.Type = SpanTypes.Sql;
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(integrationId);
+
+                if (Iast.Iast.Instance.Settings.Enabled)
+                {
+                    IastModule.OnSqlQuery(command.CommandText, integrationId);
+                }
             }
             catch (Exception ex)
             {
@@ -69,6 +75,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             }
 
             return scope;
+
+            static bool HasDbType(Span span, string dbType)
+            {
+                if (span.Tags is SqlTags sqlTags)
+                {
+                    return sqlTags.DbType == dbType;
+                }
+
+                return span.GetTag(Tags.DbType) == dbType;
+            }
         }
 
         public static bool TryGetIntegrationDetails(
@@ -229,7 +245,29 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             private static DbCommandCache.TagsCacheItem GetTagsFromConnectionString(IDbCommand command)
             {
-                var connectionString = command.Connection?.ConnectionString;
+                string connectionString = null;
+                try
+                {
+                    if (command.GetType().FullName == "System.Data.Common.DbDataSource.DbCommandWrapper")
+                    {
+                        return default;
+                    }
+
+                    connectionString = command.Connection?.ConnectionString;
+                }
+                catch (NotSupportedException nsException)
+                {
+                    Log.Debug(nsException, "ConnectionString cannot be retrieved from the command.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex, "Error trying to retrieve the ConnectionString from the command.");
+                }
+
+                if (connectionString is null)
+                {
+                    return default;
+                }
 
                 // Check if the connection string is the one in the cache
                 var tagsByConnectionString = _tagsByConnectionStringCache;

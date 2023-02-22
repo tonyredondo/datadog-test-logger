@@ -12,12 +12,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
-using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
@@ -60,8 +59,8 @@ internal sealed class TestSession
 
         span.Type = SpanTypes.TestSession;
         span.ResourceName = $"{span.OperationName}.{command}";
-        span.Context.TraceContext.SetSamplingPriority((int)SamplingPriority.AutoKeep, SamplingMechanism.Manual);
-        span.SetTag(Trace.Tags.Origin, TestTags.CIAppTestOriginName);
+        span.Context.TraceContext.SetSamplingPriority((int)SamplingPriority.AutoKeep);
+        span.Context.TraceContext.Origin = TestTags.CIAppTestOriginName;
 
         tags.SessionId = span.SpanId;
 
@@ -80,7 +79,7 @@ internal sealed class TestSession
         }
 
         Current = this;
-        CIVisibility.Log.Debug("### Test Session Created: {command}", command);
+        CIVisibility.Log.Debug("### Test Session Created: {Command}", command);
 
         if (startDate is null)
         {
@@ -268,9 +267,50 @@ internal sealed class TestSession
     /// <param name="duration">Duration of the test module</param>
     public void Close(TestStatus status, TimeSpan? duration)
     {
+        if (InternalClose(status, duration))
+        {
+            CIVisibility.Log.Debug("### Test Session Flushing after close: {Command}", Command);
+            CIVisibility.Flush();
+        }
+    }
+
+    /// <summary>
+    /// Close test module
+    /// </summary>
+    /// <param name="status">Test session status</param>
+    /// <returns>Task instance</returns>
+    public Task CloseAsync(TestStatus status)
+    {
+        return CloseAsync(status, null);
+    }
+
+    /// <summary>
+    /// Close test module
+    /// </summary>
+    /// <param name="status">Test session status</param>
+    /// <param name="duration">Duration of the test module</param>
+    /// <returns>Task instance</returns>
+    public Task CloseAsync(TestStatus status, TimeSpan? duration)
+    {
+        if (InternalClose(status, duration))
+        {
+            CIVisibility.Log.Debug("### Test Session Flushing after close: {Command}", Command);
+            return CIVisibility.FlushAsync();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Close test module
+    /// </summary>
+    /// <param name="status">Test session status</param>
+    /// <param name="duration">Duration of the test module</param>
+    internal bool InternalClose(TestStatus status, TimeSpan? duration)
+    {
         if (Interlocked.Exchange(ref _finished, 1) == 1)
         {
-            return;
+            return false;
         }
 
         var span = _span;
@@ -303,8 +343,8 @@ internal sealed class TestSession
         }
 
         Current = null;
-        CIVisibility.Log.Debug("### Test Session Closed: {command}", Command);
-        CIVisibility.FlushSpans();
+        CIVisibility.Log.Debug("### Test Session Closed: {Command} | {Status}", Command, Tags.Status);
+        return true;
     }
 
     /// <summary>

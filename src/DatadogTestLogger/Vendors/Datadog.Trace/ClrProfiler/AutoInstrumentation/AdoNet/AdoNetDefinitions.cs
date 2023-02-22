@@ -36,7 +36,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     AssemblyName = "System.Data.Common",
     TypeName = "System.Data.Common.DbCommand",
     MinimumVersion = "4.0.0",
-    MaximumVersion = "6.*.*",
+    MaximumVersion = "7.*.*",
     IntegrationName = nameof(IntegrationId.AdoNet),
     DataReaderType = TypeNames.DbDataReaderType,
     DataReaderTaskType = TypeNames.DbDataReaderTaskType,

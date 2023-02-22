@@ -33,7 +33,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
         {
         }
 
-        public void RecordTracerSettings(ImmutableTracerSettings settings, string defaultServiceName, AzureAppServices appServicesMetadata)
+        public void RecordTracerSettings(ImmutableTracerSettings settings, string defaultServiceName)
         {
         }
 

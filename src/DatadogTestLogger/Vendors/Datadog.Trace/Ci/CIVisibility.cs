@@ -19,22 +19,20 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
-using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
-using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
 using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
-using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 {
     internal class CIVisibility
     {
-        private static readonly CIVisibilitySettings _settings = CIVisibilitySettings.FromDefaultSources();
+        private static readonly Lazy<bool> _enabledLazy = new(InternalEnabled, true);
+        private static CIVisibilitySettings _settings = CIVisibilitySettings.FromDefaultSources();
         private static int _firstInitialization = 1;
-        private static Lazy<bool> _enabledLazy = new(() => InternalEnabled(), true);
         private static Task? _skippableTestsTask;
         private static Dictionary<string, Dictionary<string, IList<SkippableTest>>>? _skippableTestsBySuiteAndName;
 
@@ -63,7 +61,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
         {
             if (Interlocked.Exchange(ref _firstInitialization, 0) != 1)
             {
-                // Initialize() was already called before
+                // Initialize() or InitializeFromRunner() was already called before
                 return;
             }
 
@@ -76,17 +74,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             {
                 if (!_settings.ForceAgentsEvpProxy)
                 {
-                    discoveryService = new DiscoveryService(
-                        AgentTransportStrategy.Get(
-                            new ImmutableExporterSettings(_settings.TracerSettings.Exporter),
-                            productName: "discovery",
-                            tcpTimeout: TimeSpan.FromSeconds(5),
-                            AgentHttpHeaderNames.MinimalHeaders,
-                            () => new MinimalAgentHeaderHelper(),
-                            uri => uri),
-                        10,
-                        1000,
-                        int.MaxValue);
+                    discoveryService = DiscoveryService.Create(
+                        new ImmutableExporterSettings(_settings.TracerSettings.Exporter),
+                        tcpTimeout: TimeSpan.FromSeconds(5),
+                        initialRetryDelayMs: 10,
+                        maxRetryDelayMs: 1000,
+                        recheckIntervalMs: int.MaxValue);
                 }
                 else
                 {
@@ -98,7 +91,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 
             LifetimeManager.Instance.AddAsyncShutdownTask(ShutdownAsync);
 
-            TracerSettings tracerSettings = _settings.TracerSettings;
+            var tracerSettings = _settings.TracerSettings;
 
             // Set the service name if empty
             Log.Debug("Setting up the service name");
@@ -107,6 +100,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 // Extract repository name from the git url and use it as a default service name.
                 tracerSettings.ServiceName = GetServiceNameFromRepository(CIEnvironmentValues.Instance.Repository);
             }
+
+            // Normalize the service name
+            tracerSettings.ServiceName = NormalizerTraceProcessor.NormalizeService(tracerSettings.ServiceName);
 
             // Initialize Tracer
             Log.Information("Initialize Test Tracer instance");
@@ -130,7 +126,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                     _skippableTestsTask = GetIntelligentTestRunnerSkippableTestsAsync();
                     LifetimeManager.Instance.AddAsyncShutdownTask(() => _skippableTestsTask);
                 }
-                else if (_settings.GitUploadEnabled)
+                else if (_settings.GitUploadEnabled != false)
                 {
                     // Update and upload git tree metadata.
                     Log.Information("ITR: Update and uploading git tree metadata.");
@@ -142,26 +138,97 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             {
                 Log.Warning("ITR: Intelligent test runner cannot be activated. Agent doesn't support the event platform proxy endpoint.");
             }
-            else if (_settings.GitUploadEnabled)
+            else if (_settings.GitUploadEnabled != false)
             {
                 Log.Warning("ITR: Upload git metadata cannot be activated. Agent doesn't support the event platform proxy endpoint.");
             }
         }
 
-        internal static void FlushSpans()
+        internal static void InitializeFromRunner(CIVisibilitySettings settings, IDiscoveryService discoveryService, bool eventPlatformProxyEnabled)
+        {
+            if (Interlocked.Exchange(ref _firstInitialization, 0) != 1)
+            {
+                // Initialize() or InitializeFromRunner() was already called before
+                return;
+            }
+
+            Log.Information("Initializing CI Visibility from dd-trace / runner");
+            _settings = settings;
+            LifetimeManager.Instance.AddAsyncShutdownTask(ShutdownAsync);
+
+            var tracerSettings = settings.TracerSettings;
+
+            // Set the service name if empty
+            Log.Debug("Setting up the service name");
+            if (string.IsNullOrEmpty(tracerSettings.ServiceName))
+            {
+                // Extract repository name from the git url and use it as a default service name.
+                tracerSettings.ServiceName = GetServiceNameFromRepository(CIEnvironmentValues.Instance.Repository);
+            }
+
+            // Normalize the service name
+            tracerSettings.ServiceName = NormalizerTraceProcessor.NormalizeService(tracerSettings.ServiceName);
+
+            // Initialize Tracer
+            Log.Information("Initialize Test Tracer instance");
+            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory(_settings, discoveryService, eventPlatformProxyEnabled));
+            _ = Tracer.Instance;
+
+            // Initialize FrameworkDescription
+            _ = FrameworkDescription.Instance;
+
+            // Initialize CIEnvironment
+            _ = CIEnvironmentValues.Instance;
+        }
+
+        internal static void Flush()
         {
             var sContext = SynchronizationContext.Current;
+            using var cts = new CancellationTokenSource(30_000);
             try
             {
                 SynchronizationContext.SetSynchronizationContext(null);
-                if (!InternalFlushAsync().Wait(30_000))
+                AsyncUtil.RunSync(() => FlushAsync(), cts.Token);
+                if (cts.IsCancellationRequested)
                 {
-                    Log.Error("Timeout occurred when flushing spans.");
+                    Log.Error("Timeout occurred when flushing spans.{NewLine}{StackTrace}", Environment.NewLine, Environment.StackTrace);
                 }
+            }
+            catch (TaskCanceledException)
+            {
+                Log.Error("Timeout occurred when flushing spans.{NewLine}{StackTrace}", Environment.NewLine, Environment.StackTrace);
             }
             finally
             {
                 SynchronizationContext.SetSynchronizationContext(sContext);
+            }
+        }
+
+        internal static async Task FlushAsync()
+        {
+            try
+            {
+                // We have to ensure the flush of the buffer after we finish the tests of an assembly.
+                // For some reason, sometimes when all test are finished none of the callbacks to handling the tracer disposal is triggered.
+                // So the last spans in buffer aren't send to the agent.
+                Log.Debug("Integration flushing spans.");
+
+                if (_settings.Logs)
+                {
+                    await Task.WhenAll(
+                        Tracer.Instance.FlushAsync(),
+                        Tracer.Instance.TracerManager.DirectLogSubmission.Sink.FlushAsync()).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Tracer.Instance.FlushAsync().ConfigureAwait(false);
+                }
+
+                Log.Debug("Integration flushed.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred when flushing spans.");
             }
         }
 
@@ -173,7 +240,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 try
                 {
                     SynchronizationContext.SetSynchronizationContext(null);
-                    _skippableTestsTask.GetAwaiter().GetResult();
+                    AsyncUtil.RunSync(() => _skippableTestsTask);
                 }
                 finally
                 {
@@ -281,7 +348,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 if (proxyHttpsUriBuilder.Scheme == "https")
                 {
                     // HTTPS proxy is not supported by .NET BCL
-                    Log.Error($"HTTPS proxy is not supported. ({proxyHttpsUriBuilder})");
+                    Log.Error("HTTPS proxy is not supported. ({ProxyHttpsUriBuilder})", proxyHttpsUriBuilder);
                     return factory;
                 }
 
@@ -318,8 +385,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                             SynchronizationContext.SetSynchronizationContext(null);
                         }
 
-                        var osxVersion = ProcessHelpers.RunCommandAsync(new ProcessHelpers.Command("uname", "-r")).GetAwaiter().GetResult();
-                        osxVersion = osxVersion?.Trim(' ', '\n');
+                        var osxVersionCommand = AsyncUtil.RunSync(() => ProcessHelpers.RunCommandAsync(new ProcessHelpers.Command("uname", "-r")));
+                        var osxVersion = osxVersionCommand?.Output.Trim(' ', '\n');
                         if (!string.IsNullOrEmpty(osxVersion))
                         {
                             return osxVersion!;
@@ -327,7 +394,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                     }
                     catch (Exception ex)
                     {
-                        Log.Warning(ex, ex.Message);
+                        Log.Warning(ex, "Error getting OS version on macOS");
                     }
                     finally
                     {
@@ -343,37 +410,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             return Environment.OSVersion.VersionString;
         }
 
-        private static async Task InternalFlushAsync()
-        {
-            try
-            {
-                // We have to ensure the flush of the buffer after we finish the tests of an assembly.
-                // For some reason, sometimes when all test are finished none of the callbacks to handling the tracer disposal is triggered.
-                // So the last spans in buffer aren't send to the agent.
-                Log.Debug("Integration flushing spans.");
-
-                if (_settings.Logs)
-                {
-                    await Task.WhenAll(
-                        Tracer.Instance.FlushAsync(),
-                        Tracer.Instance.TracerManager.DirectLogSubmission.Sink.FlushAsync()).ConfigureAwait(false);
-                }
-                else
-                {
-                    await Tracer.Instance.FlushAsync().ConfigureAwait(false);
-                }
-
-                Log.Debug("Integration flushed.");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Exception occurred when flushing spans.");
-            }
-        }
-
         private static async Task ShutdownAsync()
         {
-            await InternalFlushAsync().ConfigureAwait(false);
+            await FlushAsync().ConfigureAwait(false);
             MethodSymbolResolver.Instance.Clear();
         }
 
@@ -387,7 +426,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             }
             catch (Exception exception)
             {
-                Log.Warning(exception, exception.Message);
+                Log.Warning(exception, "Error getting current process name when checking CI Visibility status");
             }
 
             // By configuration
@@ -396,7 +435,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 // When is enabled by configuration we only enable it to the testhost child process if the process name is dotnet.
                 if (processName.Equals("dotnet", StringComparison.OrdinalIgnoreCase) && Environment.CommandLine.IndexOf("testhost.dll", StringComparison.OrdinalIgnoreCase) == -1)
                 {
-                    Log.Information("CI Visibility disabled because the process name is 'dotnet' but the commandline doesn't contain 'testhost.dll': {cmdline}", Environment.CommandLine);
+                    Log.Information("CI Visibility disabled because the process name is 'dotnet' but the commandline doesn't contain 'testhost.dll': {Cmdline}", Environment.CommandLine);
                     return false;
                 }
 
@@ -457,38 +496,44 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
         {
             try
             {
-                var itrClient = new IntelligentTestRunnerClient(CIEnvironmentValues.Instance.WorkspacePath, _settings);
+                var lazyItrClient = new Lazy<IntelligentTestRunnerClient>(() => new(CIEnvironmentValues.Instance.WorkspacePath, _settings));
 
-                // Upload the git metadata
-                await itrClient.UploadRepositoryChangesAsync().ConfigureAwait(false);
-
-                // If any DD_CIVISIBILITY_CODE_COVERAGE_ENABLED or DD_CIVISIBILITY_TESTSSKIPPING_ENABLED has not been set
-                // We query the settings api for those
-                if (_settings.CodeCoverageEnabled == null || _settings.TestsSkippingEnabled == null)
+                if (_settings.GitUploadEnabled != false)
                 {
-                    var settings = await itrClient.GetSettingsAsync().ConfigureAwait(false);
+                    // Upload the git metadata
+                    await lazyItrClient.Value.UploadRepositoryChangesAsync().ConfigureAwait(false);
+                }
 
-                    if (_settings.CodeCoverageEnabled == null && settings.CodeCoverage.HasValue)
+                if (!_settings.Agentless || !string.IsNullOrEmpty(_settings.ApplicationKey))
+                {
+                    // If any DD_CIVISIBILITY_CODE_COVERAGE_ENABLED or DD_CIVISIBILITY_TESTSSKIPPING_ENABLED has not been set
+                    // We query the settings api for those
+                    if (_settings.CodeCoverageEnabled == null || _settings.TestsSkippingEnabled == null)
                     {
-                        Log.Information("ITR: Code Coverage has been changed to {value} by settings api.", settings.CodeCoverage.Value);
-                        _settings.SetCodeCoverageEnabled(settings.CodeCoverage.Value);
-                    }
+                        var settings = await lazyItrClient.Value.GetSettingsAsync().ConfigureAwait(false);
 
-                    if (_settings.TestsSkippingEnabled == null && settings.TestsSkipping.HasValue)
-                    {
-                        Log.Information("ITR: Tests Skipping has been changed to {value} by settings api.", settings.TestsSkipping.Value);
-                        _settings.SetTestsSkippingEnabled(settings.TestsSkipping.Value);
+                        if (_settings.CodeCoverageEnabled == null && settings.CodeCoverage.HasValue)
+                        {
+                            Log.Information("ITR: Code Coverage has been changed to {Value} by settings api.", settings.CodeCoverage.Value);
+                            _settings.SetCodeCoverageEnabled(settings.CodeCoverage.Value);
+                        }
+
+                        if (_settings.TestsSkippingEnabled == null && settings.TestsSkipping.HasValue)
+                        {
+                            Log.Information("ITR: Tests Skipping has been changed to {Value} by settings api.", settings.TestsSkipping.Value);
+                            _settings.SetTestsSkippingEnabled(settings.TestsSkipping.Value);
+                        }
                     }
                 }
 
                 // Log code coverage status
-                Log.Information(_settings.CodeCoverageEnabled == true ? "ITR: Tests code coverage is enabled." : "ITR: Tests code coverage is disabled.");
+                Log.Information("{V}", _settings.CodeCoverageEnabled == true ? "ITR: Tests code coverage is enabled." : "ITR: Tests code coverage is disabled.");
 
                 // If the tests skipping feature is enabled we query the api for the tests we have to skip
                 if (_settings.TestsSkippingEnabled == true)
                 {
-                    var skippeableTests = await itrClient.GetSkippableTestsAsync().ConfigureAwait(false);
-                    Log.Information<int>("ITR: SkippableTests = {length}.", skippeableTests.Length);
+                    var skippeableTests = await lazyItrClient.Value.GetSkippableTestsAsync().ConfigureAwait(false);
+                    Log.Information<int>("ITR: SkippableTests = {Length}.", skippeableTests.Length);
 
                     var skippableTestsBySuiteAndName = new Dictionary<string, Dictionary<string, IList<SkippableTest>>>();
                     foreach (var item in skippeableTests)
@@ -509,7 +554,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                     }
 
                     _skippableTestsBySuiteAndName = skippableTestsBySuiteAndName;
-                    Log.Debug<int>("ITR: SkippableTests dictionary has been built.", skippeableTests.Length);
+                    Log.Debug("ITR: SkippableTests dictionary has been built.");
                 }
                 else
                 {

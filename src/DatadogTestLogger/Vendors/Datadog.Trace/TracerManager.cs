@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
@@ -66,6 +67,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             IDiscoveryService discoveryService,
             DataStreamsManager dataStreamsManager,
             string defaultServiceName,
+            IGitMetadataTagsProvider gitMetadataTagsProvider,
             ITraceProcessor[] traceProcessors = null)
         {
             Settings = settings;
@@ -75,6 +77,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             Statsd = statsd;
             RuntimeMetrics = runtimeMetricsWriter;
             DefaultServiceName = defaultServiceName;
+            GitMetadataTagsProvider = gitMetadataTagsProvider;
             DataStreamsManager = dataStreamsManager;
             DirectLogSubmission = directLogSubmission;
             Telemetry = telemetry;
@@ -112,6 +115,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Gets the default service name for traces where a service name is not specified.
         /// </summary>
         public string DefaultServiceName { get; }
+
+        public IGitMetadataTagsProvider GitMetadataTagsProvider { get; }
 
         /// <summary>
         /// Gets this tracer's settings.
@@ -276,7 +281,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             // In AAS, the trace agent is deployed alongside the tracer and managed by the tracer
             // Disable this check as it may hit the trace agent before it is ready to receive requests and give false negatives
             // Also disable if tracing is not enabled (as likely to be in an environment where agent is not available)
-            if (instanceSettings.TraceEnabled && !AzureAppServices.Metadata.IsRelevant)
+            if (instanceSettings.TraceEnabled && !instanceSettings.IsRunningInAzureAppService)
             {
                 try
                 {
@@ -313,6 +318,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
                     writer.WritePropertyName("version");
                     writer.WriteValue(TracerConstants.AssemblyVersion);
+
+                    writer.WritePropertyName("native_tracer_version");
+                    writer.WriteValue(Instrumentation.GetNativeTracerVersion());
 
                     writer.WritePropertyName("platform");
                     writer.WriteValue(FrameworkDescription.Instance.ProcessArchitecture);
@@ -617,7 +625,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     }
                     catch (Exception e)
                     {
-                        Log.Error(e, e.Message);
+                        Log.Error(e, "Error executing trace processor {TraceProcessorType}", processor?.GetType());
                     }
                 }
             }

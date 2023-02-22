@@ -57,7 +57,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Processors
         {
             if (TraceUtil.TruncateUTF8(ref r, MaxResourceLen))
             {
-                Log.Debug("span.truncate: truncated `Resource` (max {maxResourceLen} chars): {resource}", MaxResourceLen, r);
+                Log.Debug("span.truncate: truncated `Resource` (max {MaxResourceLen} chars): {Resource}", MaxResourceLen, r);
             }
 
             return r;

@@ -11,31 +11,27 @@
 #nullable enable
 
 using System;
-using System.Threading;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 internal static class ThreadSafeRandom
 {
 #if NET6_0_OR_GREATER
-    public static int Next(int maxValue) => Random.Shared.Next(maxValue);
-
-    public static int Next(int minValue, int maxValue) => Random.Shared.Next(minValue, maxValue);
-
-    public static double NextDouble() => Random.Shared.NextDouble();
+    public static Random Shared => Random.Shared;
 #else
     private static readonly Random Global = new();
 
     [ThreadStatic]
     private static Random? _local;
 
-    private static Random Local
+    public static Random Shared
     {
         get
         {
             if (_local is null)
             {
                 int seed;
+
                 lock (Global)
                 {
                     seed = Global.Next();
@@ -48,19 +44,5 @@ internal static class ThreadSafeRandom
         }
     }
 
-    public static int Next(int maxValue)
-    {
-        return Local.Next(maxValue);
-    }
-
-    public static int Next(int minValue, int maxValue)
-    {
-        return Local.Next(minValue, maxValue);
-    }
-
-    public static double NextDouble()
-    {
-        return Local.NextDouble();
-    }
 #endif
 }

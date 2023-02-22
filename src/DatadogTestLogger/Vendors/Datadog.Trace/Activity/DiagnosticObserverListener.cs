@@ -87,7 +87,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity
             }
             catch (Exception ex)
             {
-                Log.Error(ex, ex.Message);
+                Log.Error(ex, "Error calling OnShouldListenToDelegate");
             }
         }
 

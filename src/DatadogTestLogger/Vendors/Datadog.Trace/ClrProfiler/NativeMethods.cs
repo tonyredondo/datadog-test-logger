@@ -10,6 +10,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke;
 
 // ReSharper disable MemberHidesStaticFromOuterClass
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
@@ -169,6 +170,25 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
             }
         }
 
+        public static int RegisterIastAspects(string[] aspects)
+        {
+            if (aspects == null || aspects.Length == 0)
+            {
+                return 0;
+            }
+
+            if (IsWindows)
+            {
+                Windows.RegisterIastAspects(aspects, aspects.Length);
+            }
+            else
+            {
+                NonWindows.RegisterIastAspects(aspects, aspects.Length);
+            }
+
+            return aspects.Length;
+        }
+
         // the "dll" extension is required on .NET Framework
         // and optional on .NET Core
         // The DllImport methods are re-written by cor_profiler to have the correct vales
@@ -203,6 +223,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 
             [DllImport("Datadog.Tracer.Native.dll")]
             public static extern void DisableTracerCLRProfiler();
+
+            [DllImport("Datadog.Tracer.Native.dll")]
+            public static extern void RegisterIastAspects([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr, SizeParamIndex = 1)] string[] aspects, int aspectsLength);
         }
 
         // assume .NET Core if not running on Windows
@@ -238,6 +261,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 
             [DllImport("Datadog.Tracer.Native")]
             public static extern void DisableTracerCLRProfiler();
+
+            [DllImport("Datadog.Tracer.Native")]
+            public static extern void RegisterIastAspects([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr, SizeParamIndex = 1)] string[] aspects, int aspectsLength);
         }
     }
 }

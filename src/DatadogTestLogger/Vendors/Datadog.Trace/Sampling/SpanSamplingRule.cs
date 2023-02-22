@@ -63,10 +63,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling
 
             // null/absent for MaxPerSecond indicates unlimited, which is a negative value in the limiter
             _limiter = MaxPerSecond is null ? new SpanRateLimiter(-1) : new SpanRateLimiter((int?)MaxPerSecond);
-
-            // cache strings for tagging to reduce allocations
-            SamplingRateString = SamplingRate.ToString();
-            MaxPerSecondString = MaxPerSecond?.ToString();
         }
 
         /// <inheritdoc/>
@@ -74,12 +70,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling
 
         /// <inheritdoc/>
         public float? MaxPerSecond { get; } = null;
-
-        /// <inheritdoc/>
-        public string SamplingRateString { get; }
-
-        /// <inheritdoc/>
-        public string MaxPerSecondString { get; }
 
         /// <summary>
         ///     Creates <see cref="SpanSamplingRule"/>s from the supplied JSON <paramref name="configuration"/>.

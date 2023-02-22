@@ -16,13 +16,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke
 {
     internal record ProbeStatus
     {
-        public ProbeStatus(string probeId, Status status)
+        public ProbeStatus(string probeId, Status status, string errorMessage = null)
         {
             ProbeId = probeId;
+            ErrorMessage = errorMessage;
             Status = status;
         }
 
         public string ProbeId { get; }
+
+        public string ErrorMessage { get; }
 
         public Status Status { get; }
     }

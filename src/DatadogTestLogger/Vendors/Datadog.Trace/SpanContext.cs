@@ -31,6 +31,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             Keys.RawTraceId,
             Keys.RawSpanId,
             Keys.PropagatedTags,
+            Keys.AdditionalW3CTraceState,
 
             // For mismatch version support we need to keep supporting old keys.
             HttpHeaderNames.TraceId,
@@ -45,6 +46,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// to specify that the new span should not inherit the currently active scope as its parent.
         /// </summary>
         public static readonly ISpanContext None = new ReadOnlySpanContext(traceId: 0, spanId: 0, serviceName: null);
+
+        private string _origin;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanContext"/> class
@@ -114,14 +117,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// <param name="rawTraceId">Raw trace id value</param>
         /// <param name="rawSpanId">Raw span id value</param>
         internal SpanContext(ISpanContext parent, TraceContext traceContext, string serviceName, ulong? traceId = null, ulong? spanId = null, string rawTraceId = null, string rawSpanId = null)
-            : this(parent?.TraceId ?? traceId, serviceName)
+            : this(parent?.TraceId > 0 ? parent.TraceId : traceId, serviceName)
         {
-            SpanId = spanId ?? SpanIdGenerator.CreateNew();
+            SpanId = spanId ?? RandomIdGenerator.Shared.NextSpanId();
             Parent = parent;
             TraceContext = traceContext;
+
             if (parent is SpanContext spanContext)
             {
-                Origin = spanContext.Origin;
                 RawTraceId = spanContext.RawTraceId ?? rawTraceId;
                 PathwayContext = spanContext.PathwayContext;
             }
@@ -137,7 +140,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             TraceId = traceId > 0
                           ? traceId.Value
-                          : SpanIdGenerator.CreateNew();
+                          : RandomIdGenerator.Shared.NextSpanId();
 
             ServiceName = serviceName;
 
@@ -177,9 +180,24 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         public string ServiceName { get; set; }
 
         /// <summary>
-        /// Gets or sets the origin of the trace
+        /// Gets or sets the origin of the trace.
+        /// For local contexts, this property delegates to TraceContext.Origin.
+        /// This is a temporary work around because we use SpanContext
+        /// for all local spans and also for propagation.
         /// </summary>
-        internal string Origin { get; set; }
+        internal string Origin
+        {
+            get => TraceContext?.Origin ?? _origin;
+            set
+            {
+                _origin = value;
+
+                if (TraceContext is not null)
+                {
+                    TraceContext.Origin = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the header value that contains the propagated trace tags,
@@ -208,6 +226,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Gets the raw spanId
         /// </summary>
         internal string RawSpanId { get; }
+
+        /// <summary>
+        /// Gets or sets additional key/value pairs from an upstream "tracestate" W3C header that we will propagate downstream.
+        /// This value will _not_ include the "dd" key, which is parsed out into other individual values
+        /// (e.g. sampling priority, origin, propagates tags, etc).
+        /// </summary>
+        internal string AdditionalW3CTraceState { get; set; }
 
         internal PathwayContext? PathwayContext { get; private set; }
 
@@ -313,8 +338,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     return true;
 
                 case Keys.PropagatedTags:
+                case HttpHeaderNames.PropagatedTags:
                     // return the value from TraceContext if available
                     value = TraceContext?.Tags.ToPropagationHeader() ?? PropagatedTags;
+                    return true;
+
+                case Keys.AdditionalW3CTraceState:
+                    // return the value from TraceContext if available
+                    value = TraceContext?.AdditionalW3CTraceState ?? AdditionalW3CTraceState;
                     return true;
 
                 default:
@@ -355,7 +386,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             // The code randomly chooses between the two PathwayContexts.
             // If there is a race, then that's okay
             // Randomly select between keeping the current context (0) or replacing (1)
-            if (ThreadSafeRandom.Next(2) == 1)
+            if (ThreadSafeRandom.Shared.Next(2) == 1)
             {
                 PathwayContext = pathwayContext;
             }
@@ -372,6 +403,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             public const string RawTraceId = $"{Prefix}RawTraceId";
             public const string RawSpanId = $"{Prefix}RawSpanId";
             public const string PropagatedTags = $"{Prefix}PropagatedTags";
+            public const string AdditionalW3CTraceState = $"{Prefix}AdditionalW3CTraceState";
         }
     }
 }

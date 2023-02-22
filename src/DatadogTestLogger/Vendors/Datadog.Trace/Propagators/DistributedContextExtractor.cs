@@ -16,6 +16,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
 {
     internal class DistributedContextExtractor : IContextExtractor
     {
+        public static readonly DistributedContextExtractor Instance = new();
+
+        private DistributedContextExtractor()
+        {
+        }
+
         public bool TryExtract<TCarrier, TCarrierGetter>(TCarrier carrier, TCarrierGetter carrierGetter, out SpanContext? spanContext)
             where TCarrierGetter : struct, ICarrierGetter<TCarrier>
         {
@@ -27,6 +33,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
             }
 
             var traceId = ParseUtility.ParseUInt64(carrier, carrierGetter, SpanContext.Keys.TraceId);
+
             if (traceId is null or 0)
             {
                 // a valid traceId is required to use distributed tracing
@@ -39,10 +46,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
             var rawTraceId = ParseUtility.ParseString(carrier, carrierGetter, SpanContext.Keys.RawTraceId);
             var rawSpanId = ParseUtility.ParseString(carrier, carrierGetter, SpanContext.Keys.RawSpanId);
             var propagatedTraceTags = ParseUtility.ParseString(carrier, carrierGetter, SpanContext.Keys.PropagatedTags);
+            var w3CTraceState = ParseUtility.ParseString(carrier, carrierGetter, SpanContext.Keys.AdditionalW3CTraceState);
 
             spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, origin, rawTraceId, rawSpanId)
                           {
-                              PropagatedTags = propagatedTraceTags
+                              PropagatedTags = propagatedTraceTags,
+                              AdditionalW3CTraceState = w3CTraceState,
                           };
 
             return true;
