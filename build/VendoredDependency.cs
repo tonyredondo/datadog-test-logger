@@ -40,6 +40,7 @@ public class VendoredDependency
                 "SpanExtensions.cs",
                 "SpanExtensions.Core.cs",
                 "SpanExtensions.Framework.cs",
+                "IastTags.g.cs",
             },
             Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
                 AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile),
@@ -208,6 +209,16 @@ public class VendoredDependency
                         "#if !NETCOREAPP2_0_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0");
                     builder.Replace("NET7_0_OR_GREATER", "NET8_0_OR_GREATER");
 
+                    if (filePath.Contains("AsyncManualResetEvent.cs"))
+                    {
+                        builder.Replace("#if NETCOREAPP2_1_OR_GREATER", "#if NETCOREAPP3_1_OR_GREATER");
+                    }
+
+                    if (filePath.Contains("Propagator.cs"))
+                    {
+                        builder.Replace("#if NETCOREAPP", "#if NETCOREAPP3_1_OR_GREATER");
+                    }
+                    
                     // Fix namespace conflicts in `using alias` directives. For example, transform:
                     //      using Foo = dnlib.A.B.C;
                     // To:

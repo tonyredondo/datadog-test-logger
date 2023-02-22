@@ -36,6 +36,8 @@ internal static class AsmRemoteConfigurationProducts
     public static AsmShimProduct AsmDataProduct { get; } = new();
 
     public static AsmShimProduct AsmDDProduct { get; } = new();
+
+    public static AsmShimProduct AsmProduct { get; } = new();
 }
 
 internal class AsmShimProduct : Product
