@@ -16,6 +16,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
 using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
@@ -26,6 +27,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(RemoteConfigurationApi));
 
         private readonly IApiRequestFactory _apiRequestFactory;
+        private readonly string _containerId;
         private string _configEndpoint = null;
 
         private RemoteConfigurationApi(IApiRequestFactory apiRequestFactory, IDiscoveryService discoveryService)
@@ -36,6 +38,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.
                 {
                     _configEndpoint = config.ConfigurationEndpoint;
                 });
+
+            _containerId = ContainerMetadata.GetContainerId();
         }
 
         public static RemoteConfigurationApi Create(IApiRequestFactory apiRequestFactory, IDiscoveryService discoveryService)
@@ -56,8 +60,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.
             var apiRequest = _apiRequestFactory.Create(uri);
 
             var requestContent = JsonConvert.SerializeObject(request);
+            Log.Debug("Sending Remote Configuration Request: {Content}", requestContent);
             var bytes = Encoding.UTF8.GetBytes(requestContent);
             var payload = new ArraySegment<byte>(bytes);
+
+            if (_containerId != null)
+            {
+                apiRequest.AddHeader(AgentHttpHeaderNames.ContainerId, _containerId);
+            }
 
             using var apiResponse = await apiRequest.PostAsync(payload, MimeTypes.Json).ConfigureAwait(false);
             var isRcmDisabled = apiResponse.StatusCode == 404;

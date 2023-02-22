@@ -10,6 +10,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -22,7 +23,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 [EditorBrowsable(EditorBrowsableState.Never)]
 internal static class CoverageReporter
 {
-    private static CoverageEventHandler _handler = new DefaultCoverageEventHandler();
+    private static readonly List<Action<CoverageContextContainer?>> CoverageContextContainerChangeActions = new();
+    private static CoverageEventHandler _handler = new DefaultWithGlobalCoverageEventHandler();
 
     /// <summary>
     /// Gets or sets coverage handler
@@ -37,4 +39,25 @@ internal static class CoverageReporter
     }
 
     internal static CoverageContextContainer? Container => _handler.Container;
+
+    internal static CoverageContextContainer GlobalContainer => _handler.GlobalContainer;
+
+    internal static void AddContextContainerChangeAction(Action<CoverageContextContainer?> action)
+    {
+        lock (CoverageContextContainerChangeActions)
+        {
+            CoverageContextContainerChangeActions.Add(action);
+        }
+    }
+
+    internal static void FireContextContainerChangeAction(CoverageContextContainer? ctx)
+    {
+        lock (CoverageContextContainerChangeActions)
+        {
+            foreach (var action in CoverageContextContainerChangeActions)
+            {
+                action?.Invoke(ctx);
+            }
+        }
+    }
 }

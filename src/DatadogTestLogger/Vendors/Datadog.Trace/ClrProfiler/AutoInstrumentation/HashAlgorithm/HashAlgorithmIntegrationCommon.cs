@@ -34,7 +34,7 @@ internal class HashAlgorithmIntegrationCommon
 
             try
             {
-                return IastModule.OnHashingAlgorithm(GetAlgorithmName(algorithm.GetType()), IntegrationId, iast);
+                return IastModule.OnHashingAlgorithm(GetAlgorithmName(algorithm.GetType()), IntegrationId);
             }
             catch (Exception ex)
             {

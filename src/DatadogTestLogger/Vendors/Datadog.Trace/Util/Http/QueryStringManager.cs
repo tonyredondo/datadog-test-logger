@@ -8,6 +8,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+using System;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscation;
 
@@ -16,15 +17,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http
     internal class QueryStringManager
     {
         private readonly bool _reportQueryString;
-        private readonly ObfuscatorBase _obfuscator;
+        private readonly Lazy<ObfuscatorBase> _obfuscatorLazy;
 
         internal QueryStringManager(bool reportQueryString, double timeout, string pattern = null, IDatadogLogger logger = null)
         {
             _reportQueryString = reportQueryString;
             pattern ??= Tracer.Instance.Settings.ObfuscationQueryStringRegex;
-            _obfuscator = ObfuscatorFactory.GetObfuscator(timeout, pattern, logger, reportQueryString);
+            _obfuscatorLazy = new(() => ObfuscatorFactory.GetObfuscator(timeout, pattern, logger, reportQueryString));
         }
 
-        internal string Obfuscate(string queryString) => !_reportQueryString ? string.Empty : _obfuscator.Obfuscate(queryString);
+        internal string Obfuscate(string queryString) => !_reportQueryString ? string.Empty : _obfuscatorLazy.Value.Obfuscate(queryString);
     }
 }

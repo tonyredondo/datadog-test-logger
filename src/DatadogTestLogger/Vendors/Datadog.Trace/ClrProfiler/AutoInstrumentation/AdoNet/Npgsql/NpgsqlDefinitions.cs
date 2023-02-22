@@ -17,7 +17,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     AssemblyName = "Npgsql",
     TypeName = "Npgsql.NpgsqlCommand",
     MinimumVersion = "4.0.0",
-    MaximumVersion = "6.*.*",
+    MaximumVersion = "7.*.*",
     IntegrationName = nameof(IntegrationId.Npgsql),
     DataReaderType = "Npgsql.NpgsqlDataReader",
     DataReaderTaskType = "System.Threading.Tasks.Task`1<Npgsql.NpgsqlDataReader>",

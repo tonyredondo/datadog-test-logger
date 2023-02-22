@@ -28,10 +28,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
    MethodName = "ComputeHash",
    ReturnTypeName = ClrNames.ByteArray,
    MinimumVersion = "1.0.0",
-   MaximumVersion = "7.*.*",
+   MaximumVersion = "6.*.*",
    InstrumentationCategory = InstrumentationCategory.Iast,
    IntegrationName = nameof(Configuration.IntegrationId.HashAlgorithm))]
-
+[InstrumentMethod(
+    AssemblyNames = new[] { "System.Security.Cryptography" },
+    TypeNames = new[] { "System.Security.Cryptography.HashAlgorithm" },
+    ParameterTypeNames = new[] { ClrNames.ByteArray, ClrNames.Int32, ClrNames.Int32 },
+    MethodName = "ComputeHash",
+    ReturnTypeName = ClrNames.ByteArray,
+    MinimumVersion = "7.0.0",
+    MaximumVersion = "7.*.*",
+    InstrumentationCategory = InstrumentationCategory.Iast,
+    IntegrationName = nameof(Configuration.IntegrationId.HashAlgorithm))]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 internal class HashAlgorithmIntegration

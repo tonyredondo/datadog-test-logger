@@ -35,7 +35,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         MethodName = MethodName,
         ReturnTypeName = WebRequestCommon.WebResponseTask,
         MinimumVersion = WebRequestCommon.Major4,
-        MaximumVersion = WebRequestCommon.Major6,
+        MaximumVersion = WebRequestCommon.Major7,
         IntegrationName = WebRequestCommon.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

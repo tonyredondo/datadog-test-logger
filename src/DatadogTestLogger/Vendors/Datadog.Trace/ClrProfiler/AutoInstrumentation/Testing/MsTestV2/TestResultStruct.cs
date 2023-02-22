@@ -11,6 +11,8 @@
 using System;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
+#pragma warning disable CS0649 // Field is never assigned to
+
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.MsTestV2;
 
 /// <summary>

@@ -36,8 +36,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
         private static readonly byte[] OSPlatformBytes = new byte[] { 111, 115, 46, 112, 108, 97, 116, 102, 111, 114, 109 };
         // OSVersionBytes = System.Text.Encoding.UTF8.GetBytes("os.version");
         private static readonly byte[] OSVersionBytes = new byte[] { 111, 115, 46, 118, 101, 114, 115, 105, 111, 110 };
-        // TestsSkippedBytes = System.Text.Encoding.UTF8.GetBytes("_dd.ci.itr.tests_skipped");
-        private static readonly byte[] TestsSkippedBytes = new byte[] { 95, 100, 100, 46, 99, 105, 46, 105, 116, 114, 46, 116, 101, 115, 116, 115, 95, 115, 107, 105, 112, 112, 101, 100 };
 
         public override string? GetTag(string key)
         {
@@ -54,7 +52,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
                 "os.architecture" => OSArchitecture,
                 "os.platform" => OSPlatform,
                 "os.version" => OSVersion,
-                "_dd.ci.itr.tests_skipped" => TestsSkipped,
                 _ => base.GetTag(key),
             };
         }
@@ -92,9 +89,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
                     break;
                 case "os.version": 
                     OSVersion = value;
-                    break;
-                case "_dd.ci.itr.tests_skipped": 
-                    TestsSkipped = value;
                     break;
                 case "test.bundle": 
                     Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(TestModuleSpanTags));
@@ -160,11 +154,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
             if (OSVersion is not null)
             {
                 processor.Process(new TagItem<string>("os.version", OSVersion, OSVersionBytes));
-            }
-
-            if (TestsSkipped is not null)
-            {
-                processor.Process(new TagItem<string>("_dd.ci.itr.tests_skipped", TestsSkipped, TestsSkippedBytes));
             }
 
             base.EnumerateTags(ref processor);
@@ -246,13 +235,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
             {
                 sb.Append("os.version (tag):")
                   .Append(OSVersion)
-                  .Append(',');
-            }
-
-            if (TestsSkipped is not null)
-            {
-                sb.Append("_dd.ci.itr.tests_skipped (tag):")
-                  .Append(TestsSkipped)
                   .Append(',');
             }
 

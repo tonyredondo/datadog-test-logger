@@ -30,6 +30,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
    MethodName = "ComputeHashAsync",
    ReturnTypeName = ClrNames.Task,
    MinimumVersion = "1.0.0",
+   MaximumVersion = "6.*.*",
+   InstrumentationCategory = InstrumentationCategory.Iast,
+   IntegrationName = nameof(Configuration.IntegrationId.HashAlgorithm))]
+[InstrumentMethod(
+   AssemblyNames = new[] { "System.Security.Cryptography" },
+   TypeNames = new[] { "System.Security.Cryptography.HashAlgorithm" },
+   ParameterTypeNames = new[] { ClrNames.Stream, ClrNames.CancellationToken },
+   MethodName = "ComputeHashAsync",
+   ReturnTypeName = ClrNames.Task,
+   MinimumVersion = "7.0.0",
    MaximumVersion = "7.*.*",
    InstrumentationCategory = InstrumentationCategory.Iast,
    IntegrationName = nameof(Configuration.IntegrationId.HashAlgorithm))]

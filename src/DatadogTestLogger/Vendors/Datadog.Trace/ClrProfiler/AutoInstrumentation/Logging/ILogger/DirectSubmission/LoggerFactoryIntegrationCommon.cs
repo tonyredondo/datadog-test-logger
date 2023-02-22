@@ -65,12 +65,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             }
             catch (Exception ex)
             {
-                Log.Warning(ex, "Error loading logger factory types for " + typeof(TLoggerFactory));
+                Log.Warning(ex, "Error loading logger factory types for {LoggerFactoryType}", typeof(TLoggerFactory));
                 ProviderInterfaces = null;
             }
         }
 
         internal static void AddDirectSubmissionLoggerProvider(TLoggerFactory loggerFactory)
+            => AddDirectSubmissionLoggerProvider(loggerFactory, scopeProvider: null);
+
+        internal static void AddDirectSubmissionLoggerProvider(TLoggerFactory loggerFactory, IExternalScopeProvider? scopeProvider)
         {
             if (ProviderInterfaces is null)
             {
@@ -80,7 +83,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             var provider = new DirectSubmissionLoggerProvider(
                 TracerManager.Instance.DirectLogSubmission.Sink,
-                TracerManager.Instance.DirectLogSubmission.Settings.MinimumLevel);
+                TracerManager.Instance.DirectLogSubmission.Settings.MinimumLevel,
+                scopeProvider);
 
             AddDirectSubmissionLoggerProvider(loggerFactory, provider);
         }
