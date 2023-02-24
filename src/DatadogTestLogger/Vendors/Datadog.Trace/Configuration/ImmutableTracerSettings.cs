@@ -135,6 +135,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
                     return string.IsNullOrWhiteSpace(version) ? null : version.Trim();
                 }
             }
+
+            DbmPropagationMode = settings.DbmPropagationMode;
         }
 
         /// <summary>
@@ -417,6 +419,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// Gets a value indicating whether the tracer is running in AAS
         /// </summary>
         internal bool IsRunningInAzureAppService { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the tracer should propagate service data in db queries
+        /// </summary>
+        internal DbmPropagationLevel DbmPropagationMode { get; }
 
         /// <summary>
         /// Gets the AAS settings

@@ -281,6 +281,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             {
                 HttpClientExcludedUrlSubstrings = TrimSplitString(urlSubstringSkips.ToUpperInvariant(), commaSeparator);
             }
+
+            var dbmPropagationMode = source?.GetString(ConfigurationKeys.DbmPropagationMode);
+            DbmPropagationMode = dbmPropagationMode == null ? DbmPropagationLevel.Disabled : ValidateDbmPropagationInput(dbmPropagationMode);
         }
 
         /// <summary>
@@ -593,6 +596,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         internal bool IsRunningInAzureAppService { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the tracer should propagate service data in db queries
+        /// </summary>
+        internal DbmPropagationLevel DbmPropagationMode { get; set; }
+
+        /// <summary>
         /// Gets or sets the AAS settings
         /// </summary>
         internal ImmutableAzureAppServiceSettings AzureAppServiceMetadata { get; set; }
@@ -760,6 +768,31 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             }
 
             return httpErrorCodesArray;
+        }
+
+        internal static DbmPropagationLevel ValidateDbmPropagationInput(string inputValue)
+        {
+            DbmPropagationLevel propagationValue;
+
+            if (inputValue.Equals("disabled", StringComparison.OrdinalIgnoreCase))
+            {
+                propagationValue = DbmPropagationLevel.Disabled;
+            }
+            else if (inputValue.Equals("service", StringComparison.OrdinalIgnoreCase))
+            {
+                propagationValue = DbmPropagationLevel.Service;
+            }
+            else if (inputValue.Equals("full", StringComparison.OrdinalIgnoreCase))
+            {
+                propagationValue = DbmPropagationLevel.Full;
+            }
+            else
+            {
+                propagationValue = DbmPropagationLevel.Disabled;
+                Log.Warning("Wrong setting '{0}' for DD_DBM_PROPAGATION_MODE supported values include: disabled, service or full.", inputValue);
+            }
+
+            return propagationValue;
         }
     }
 }
