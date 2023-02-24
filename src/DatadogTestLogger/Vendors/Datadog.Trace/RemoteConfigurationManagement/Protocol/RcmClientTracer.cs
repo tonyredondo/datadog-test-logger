@@ -8,13 +8,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+using System.Collections.Generic;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol
 {
     internal class RcmClientTracer
     {
-        public RcmClientTracer(string runtimeId, string tracerVersion, string service, string env, string appVersion)
+        public RcmClientTracer(string runtimeId, string tracerVersion, string service, string env, string appVersion, List<string> tags)
         {
             RuntimeId = runtimeId;
             Language = TracerConstants.Language;
@@ -22,6 +23,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.
             Service = service;
             Env = env;
             AppVersion = appVersion;
+            Tags = tags;
         }
 
         [JsonProperty("runtime_id")]
@@ -41,5 +43,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.
 
         [JsonProperty("app_version")]
         public string AppVersion { get; }
+
+        [JsonProperty("tags")]
+        public List<string> Tags { get; }
     }
 }

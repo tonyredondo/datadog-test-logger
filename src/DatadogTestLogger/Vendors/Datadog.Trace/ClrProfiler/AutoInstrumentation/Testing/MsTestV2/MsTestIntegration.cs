@@ -146,7 +146,7 @@ internal static class MsTestIntegration
         }
         catch (Exception ex)
         {
-            Log.Error(ex, ex.Message);
+            Log.Error(ex, "Error reading MSTest traits");
         }
 
         return testProperties;

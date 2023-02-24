@@ -24,6 +24,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         ITraceSampler Sampler { get; }
 
+        IGitMetadataTagsProvider GitMetadataTagsProvider { get; }
+
         ImmutableTracerSettings Settings { get; }
 
         void Write(ArraySegment<Span> span);

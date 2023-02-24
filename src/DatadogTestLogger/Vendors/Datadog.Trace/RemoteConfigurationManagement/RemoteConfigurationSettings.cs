@@ -30,7 +30,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement
             RuntimeId = Util.RuntimeId.Get();
             TracerVersion = TracerConstants.ThreePartVersion;
 
-            var pollInterval = configurationSource?.GetInt32(ConfigurationKeys.Rcm.PollInterval);
+            var pollInterval =
+                configurationSource?.GetInt32(ConfigurationKeys.Rcm.PollInterval)
+#pragma warning disable CS0618
+                    ?? configurationSource?.GetInt32(ConfigurationKeys.Rcm.PollIntervalInternal);
+#pragma warning restore CS0618
 
             pollInterval =
                 pollInterval is null or <= 0 or > 5000

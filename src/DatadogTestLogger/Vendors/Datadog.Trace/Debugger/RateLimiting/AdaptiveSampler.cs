@@ -134,7 +134,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting
 
         internal double NextDouble()
         {
-            return ThreadSafeRandom.NextDouble();
+            return ThreadSafeRandom.Shared.NextDouble();
         }
 
         private double ComputeIntervalAlpha(int lookback)

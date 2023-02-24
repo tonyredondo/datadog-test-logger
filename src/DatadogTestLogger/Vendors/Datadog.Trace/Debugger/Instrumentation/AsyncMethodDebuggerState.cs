@@ -10,8 +10,8 @@
 
 using System;
 using System.ComponentModel;
-using System.Reflection;
 using System.Runtime.CompilerServices;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation.Collections;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
@@ -27,11 +27,17 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
         /// <summary>
         /// Initializes a new instance of the <see cref="AsyncMethodDebuggerState"/> class.
         /// </summary>
-        internal AsyncMethodDebuggerState()
+        internal AsyncMethodDebuggerState(string probeId, ref ProbeData probeData)
         {
+            ProbeId = probeId;
             HasLocalsOrReturnValue = false;
             HasArguments = false;
-            SnapshotCreator = new DebuggerSnapshotCreator();
+            SnapshotCreator = DebuggerSnapshotCreator.BuildSnapshotCreator(probeData.Processor);
+            ProbeData = probeData;
+        }
+
+        private AsyncMethodDebuggerState()
+        {
         }
 
         /// <summary>
@@ -51,14 +57,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
         internal bool HasArguments { get; set; }
 
         /// <summary>
-        /// Gets or sets a value of the parent (caller) state
-        /// </summary>
-        internal AsyncMethodDebuggerState Parent { get; set; }
-
-        /// <summary>
         /// Gets the value of the MethodMetadataInfo that related to the current async method
         /// </summary>
-        internal ref MethodMetadataInfo MethodMetadataInfo => ref MethodMetadataProvider.Get(MethodMetadataIndex);
+        internal ref MethodMetadataInfo MethodMetadataInfo => ref MethodMetadataCollection.Instance.Get(MethodMetadataIndex);
+
+        /// <summary>
+        /// Gets the value of ProbeData associated with the state
+        /// </summary>
+        internal ProbeData ProbeData { get; }
 
         /// <summary>
         /// Gets the LiveDebugger SnapshotCreator

@@ -29,6 +29,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging
             _rateLimiter = rateLimiter;
         }
 
+        public static DatadogSerilogLogger NullLogger { get; } = new(SilentLogger.Instance, new NullLogRateLimiter());
+
         public bool IsEnabled(LogEventLevel level) => _logger.IsEnabled(level);
 
         public void Debug(string messageTemplate, [CallerLineNumber] int sourceLine = 0, [CallerFilePath] string sourceFile = "")

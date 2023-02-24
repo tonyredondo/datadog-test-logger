@@ -37,8 +37,8 @@ internal static class TagPropagation
     public const string PropagatedTagPrefix = "_dd.p.";
 
     // "x-datadog-tags" header format is "key1=value1,key2=value2"
-    private const char TagPairSeparator = ',';
-    private const char KeyValueSeparator = '=';
+    public const char TagPairSeparator = ',';
+    public const char KeyValueSeparator = '=';
 
     private const int PropagatedTagPrefixLength = 6; // "_dd.p.".Length
 
@@ -162,7 +162,7 @@ internal static class TagPropagation
             {
                 if (!IsValid(tag.Key, tag.Value))
                 {
-                    Log.Debug("Propagated tag is not valid. Key: \"{key}\", Value: \"{value}\"", tag.Key, tag.Value);
+                    Log.Debug("Propagated tag is not valid. Key: \"{Key}\", Value: \"{Value}\"", tag.Key, tag.Value);
 
                     // if tag contains invalid chars,
                     // set tag "_dd.propagation_error:encoding_error"...

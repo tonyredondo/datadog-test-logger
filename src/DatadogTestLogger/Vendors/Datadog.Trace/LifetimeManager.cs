@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
@@ -116,7 +117,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     }
                     else if (actionOrFunc is Func<Task> func)
                     {
-                        func().Wait(TaskTimeout);
+                        AsyncUtil.RunSync(func, (int)TaskTimeout.TotalMilliseconds);
                     }
                     else
                     {

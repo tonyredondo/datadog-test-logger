@@ -38,7 +38,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 }
                 catch (Exception ex)
                 {
-                    Logger.Information(ex, "Could not deserialize Kafka header {headerName}", name);
+                    Logger.Information(ex, "Could not deserialize Kafka header {HeaderName}", name);
                 }
             }
 

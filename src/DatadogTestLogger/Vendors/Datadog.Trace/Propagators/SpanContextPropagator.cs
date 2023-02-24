@@ -54,9 +54,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
                         return _instance;
                     }
 
-                    var distributedContextPropagator = (IContextExtractor)new DistributedContextExtractor();
-                    var datadogPropagator = new DatadogContextPropagator();
-                    _instance ??= new SpanContextPropagator(new[] { datadogPropagator }, new[] { distributedContextPropagator, datadogPropagator });
+                    _instance = new SpanContextPropagator(
+                        new IContextInjector[] { DatadogContextPropagator.Instance },
+                        new IContextExtractor[]
+                        {
+                            DistributedContextExtractor.Instance,
+                            DatadogContextPropagator.Instance
+                        });
+
                     return _instance;
                 }
             }
@@ -65,7 +70,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
             {
                 if (value is null)
                 {
-                    ThrowHelper.ThrowArgumentNullException("value");
+                    ThrowHelper.ThrowArgumentNullException(nameof(value));
                 }
 
                 lock (GlobalLock)

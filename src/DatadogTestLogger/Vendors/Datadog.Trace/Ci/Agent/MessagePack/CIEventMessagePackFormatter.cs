@@ -68,7 +68,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack
             }
             else
             {
-                Log.Error<int>("Error while locking the events buffer with {count} events.", value.Events.Count);
+                Log.Error<int>("Error while locking the events buffer with {Count} events.", value.Events.Count);
                 offset += MessagePackBinary.WriteNil(ref bytes, offset);
             }
 

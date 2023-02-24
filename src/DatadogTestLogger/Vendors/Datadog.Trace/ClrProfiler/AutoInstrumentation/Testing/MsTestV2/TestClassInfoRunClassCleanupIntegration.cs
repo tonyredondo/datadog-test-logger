@@ -40,14 +40,8 @@ internal static class TestClassInfoRunClassCleanupIntegration
     /// <param name="arg">Instance of the argument</param>
     /// <returns>Calltarget state value</returns>
     internal static CallTargetState OnMethodBegin<TTarget, TArg>(TTarget instance, TArg arg)
-        where TTarget : ITestAssemblyInfo
     {
-        if (!MsTestIntegration.IsEnabled)
-        {
-            return CallTargetState.GetDefault();
-        }
-
-        if (TestClassInfoRunClassInitializeIntegration.TestClassInfos.TryGetValue(instance.Instance, out var suiteObject) && suiteObject is TestSuite suite)
+        if (MsTestIntegration.IsEnabled && TestClassInfoRunClassInitializeIntegration.TestClassInfos.TryGetValue(instance, out var suiteObject) && suiteObject is TestSuite suite)
         {
             return new CallTargetState(null, suite);
         }
@@ -56,7 +50,7 @@ internal static class TestClassInfoRunClassCleanupIntegration
     }
 
     /// <summary>
-    /// OnAsyncMethodEnd callback
+    /// OnMethodEnd callback
     /// </summary>
     /// <typeparam name="TTarget">Type of the target</typeparam>
     /// <typeparam name="TReturn">Type of the return value</typeparam>

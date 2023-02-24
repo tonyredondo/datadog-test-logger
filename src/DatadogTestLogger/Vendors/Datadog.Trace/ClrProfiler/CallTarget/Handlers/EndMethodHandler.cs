@@ -11,6 +11,7 @@
 using System;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers
 {
@@ -28,7 +29,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handler
                     _invokeDelegate = (InvokeDelegate)dynMethod.CreateDelegate(typeof(InvokeDelegate));
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not BlockException)
             {
                 throw new CallTargetInvokerException(ex);
             }

@@ -19,5 +19,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         /// Gets the current test
         /// </summary>
         ITest CurrentTest { get; }
+
+        /// <summary>
+        /// Gets the current result
+        /// </summary>
+        ITestResult CurrentResult { get; }
     }
 }

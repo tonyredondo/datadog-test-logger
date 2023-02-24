@@ -22,6 +22,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     /// <summary>
     /// Duck type for ILoggerProvider
     /// </summary>
+    [Microsoft.Extensions.Logging.ProviderAlias("Datadog")]
     internal class DirectSubmissionLoggerProvider
     {
         private readonly Func<string, DirectSubmissionLogger> _createLoggerFunc;
@@ -31,8 +32,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         private readonly DirectSubmissionLogLevel _minimumLogLevel;
         private IExternalScopeProvider? _scopeProvider;
 
-        internal DirectSubmissionLoggerProvider(IDatadogSink sink, DirectSubmissionLogLevel minimumLogLevel)
-            : this(sink, formatter: null, minimumLogLevel)
+        internal DirectSubmissionLoggerProvider(IDatadogSink sink, DirectSubmissionLogLevel minimumLogLevel, IExternalScopeProvider? scopeProvider)
+            : this(sink, formatter: null, minimumLogLevel, scopeProvider)
         {
         }
 
@@ -40,12 +41,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         internal DirectSubmissionLoggerProvider(
             IDatadogSink sink,
             LogFormatter? formatter,
-            DirectSubmissionLogLevel minimumLogLevel)
+            DirectSubmissionLogLevel minimumLogLevel,
+            IExternalScopeProvider? scopeProvider)
         {
             _sink = sink;
             _formatter = formatter;
             _minimumLogLevel = minimumLogLevel;
             _createLoggerFunc = CreateLoggerImplementation;
+            _scopeProvider = scopeProvider;
         }
 
         /// <summary>

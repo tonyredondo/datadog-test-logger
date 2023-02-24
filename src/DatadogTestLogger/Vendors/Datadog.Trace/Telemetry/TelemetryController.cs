@@ -75,9 +75,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 
         public bool FatalError => Volatile.Read(ref _fatalError);
 
-        public void RecordTracerSettings(ImmutableTracerSettings settings, string defaultServiceName, AzureAppServices appServicesMetadata)
+        public void RecordTracerSettings(ImmutableTracerSettings settings, string defaultServiceName)
         {
-            _configuration.RecordTracerSettings(settings, defaultServiceName, appServicesMetadata);
+            _configuration.RecordTracerSettings(settings, defaultServiceName);
             _integrations.RecordTracerSettings(settings);
         }
 

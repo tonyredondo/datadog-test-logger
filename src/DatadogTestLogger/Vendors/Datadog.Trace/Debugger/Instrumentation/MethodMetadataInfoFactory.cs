@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation.Collections;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.dnlib.DotNet.Pdb;
@@ -23,20 +24,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
     /// </summary>
     internal static class MethodMetadataInfoFactory
     {
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<MethodMetadataInfo>();
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(MethodMetadataInfoFactory));
 
         public static MethodMetadataInfo Create(MethodBase method, Type type)
         {
             return new MethodMetadataInfo(GetParameterNames(method), GetLocalVariableNames(method), type, method);
         }
 
-        public static MethodMetadataInfo Create<TTarget>(MethodBase method, TTarget targetObject, Type type, AsyncHelper.AsyncKickoffMethodInfo asyncKickOffInfo)
+        public static MethodMetadataInfo Create(MethodBase method, Type type, AsyncHelper.AsyncKickoffMethodInfo asyncKickOffInfo)
         {
             return new MethodMetadataInfo(
                 GetParameterNames(method),
                 GetLocalVariableNames(method),
-                AsyncHelper.GetHoistedLocalsFromStateMachine(targetObject, asyncKickOffInfo),
-                AsyncHelper.GetHoistedArgumentsFromStateMachine(targetObject, GetParameterNames(asyncKickOffInfo.KickoffMethod)),
+                AsyncHelper.GetHoistedLocalsFromStateMachine(type, asyncKickOffInfo),
+                AsyncHelper.GetHoistedArgumentsFromStateMachine(type, GetParameterNames(asyncKickOffInfo.KickoffMethod)),
                 type,
                 method,
                 asyncKickOffInfo.KickoffParentType,
@@ -103,7 +104,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
             }
             catch (Exception e)
             {
-                Log.Error(e, $"Failed to obtain local variable names from PDB for {method.Name}");
+                Log.Error(e, "Failed to obtain local variable names from PDB for {Name}", method.Name);
                 return null;
             }
         }

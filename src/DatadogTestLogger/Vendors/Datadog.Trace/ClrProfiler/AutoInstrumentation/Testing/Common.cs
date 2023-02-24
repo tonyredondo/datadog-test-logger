@@ -14,22 +14,13 @@ using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing
 {
     internal static class Common
     {
         internal static readonly IDatadogLogger Log = Ci.CIVisibility.Log;
-
-        internal static void FlushSpans(IntegrationId integrationInfo)
-        {
-            if (!Tracer.Instance.Settings.IsIntegrationEnabled(integrationInfo))
-            {
-                return;
-            }
-
-            CIVisibility.FlushSpans();
-        }
 
         internal static string GetParametersValueData(object paramValue)
         {
@@ -71,7 +62,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             try
             {
                 SynchronizationContext.SetSynchronizationContext(null);
-                var skippableTests = CIVisibility.GetSkippableTestsFromSuiteAndNameAsync(testSuite, testName).GetAwaiter().GetResult();
+                var skippableTests = AsyncUtil.RunSync(() => CIVisibility.GetSkippableTestsFromSuiteAndNameAsync(testSuite, testName));
                 if (skippableTests.Count > 0)
                 {
                     foreach (var skippableTest in skippableTests)
@@ -96,8 +87,18 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                                     targetValue = GetParametersValueData(testMethodArguments[i]);
                                 }
 
-                                if (!parameters.Arguments.TryGetValue(methodParameters[i].Name ?? string.Empty, out var argValue) ||
-                                    (string)argValue != targetValue)
+                                if (!parameters.Arguments.TryGetValue(methodParameters[i].Name ?? string.Empty, out var argValue))
+                                {
+                                    matchSignature = false;
+                                    break;
+                                }
+
+                                if (argValue is not string strArgValue)
+                                {
+                                    strArgValue = argValue?.ToString() ?? "(null)";
+                                }
+
+                                if (strArgValue != targetValue)
                                 {
                                     matchSignature = false;
                                     break;

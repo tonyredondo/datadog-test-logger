@@ -24,8 +24,6 @@ internal partial class TestModuleSpanTags : TestSessionSpanTags
         SessionId = sessionTags.SessionId;
         Command = sessionTags.Command;
         WorkingDirectory = sessionTags.WorkingDirectory;
-        Environment = sessionTags.Environment;
-        Version = sessionTags.Version;
     }
 
     public ulong ModuleId { get; set; }
@@ -62,7 +60,4 @@ internal partial class TestModuleSpanTags : TestSessionSpanTags
 
     [Tag(CommonTags.OSVersion)]
     public string OSVersion { get; set; }
-
-    [Tag(CommonTags.TestsSkipped)]
-    public string TestsSkipped { get; set; }
 }

@@ -25,7 +25,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Util
         {
             if (NativeLoader.TryGetRuntimeIdFromNative(out var runtimeId))
             {
-                Log.Information("Runtime id retrieved from native loader: " + runtimeId);
+                Log.Information("Runtime id retrieved from native loader: {RuntimeId}", runtimeId);
                 return runtimeId;
             }
 

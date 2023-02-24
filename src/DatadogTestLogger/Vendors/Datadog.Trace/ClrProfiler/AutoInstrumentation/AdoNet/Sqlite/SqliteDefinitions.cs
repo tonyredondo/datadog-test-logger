@@ -17,7 +17,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     AssemblyName = "Microsoft.Data.Sqlite",
     TypeName = "Microsoft.Data.Sqlite.SqliteCommand",
     MinimumVersion = "2.0.0",
-    MaximumVersion = "6.*.*",
+    MaximumVersion = "7.*.*",
     IntegrationName = nameof(IntegrationId.Sqlite),
     DataReaderType = "Microsoft.Data.Sqlite.SqliteDataReader",
     DataReaderTaskType = "System.Threading.Tasks.Task`1<Microsoft.Data.Sqlite.SqliteDataReader>",

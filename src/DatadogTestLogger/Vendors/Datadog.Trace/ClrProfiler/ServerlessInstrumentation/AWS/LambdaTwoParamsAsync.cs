@@ -10,7 +10,7 @@
 
 using System;
 using System.ComponentModel;
-
+using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
@@ -50,7 +50,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrume
         /// <param name="exception">Exception instance in case the original code threw an exception.</param>
         /// <param name="state">Calltarget state value</param>
         /// <returns>A response value</returns>
-        internal static TReturn OnAsyncMethodEnd<TTarget, TReturn>(TTarget instance, TReturn returnValue, Exception exception, in CallTargetState state)
+        internal static Task<TReturn> OnAsyncMethodEnd<TTarget, TReturn>(TTarget instance, TReturn returnValue, Exception exception, in CallTargetState state)
         {
             Serverless.Debug("OnMethodEnd - two params");
             return LambdaCommon.EndInvocationAsync(returnValue, exception, state.Scope, RequestBuilder);

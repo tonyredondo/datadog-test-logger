@@ -18,7 +18,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models
 
         public string MetricName { get; set; }
 
-        public MetricValue Value { get; set; }
+        public SnapshotSegment Value { get; set; }
 
         public bool Equals(MetricProbe other)
         {

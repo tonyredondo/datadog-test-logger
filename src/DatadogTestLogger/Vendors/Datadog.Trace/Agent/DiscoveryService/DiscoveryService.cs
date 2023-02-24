@@ -59,11 +59,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService
             _discoveryTask.ContinueWith(t => Log.Error(t.Exception, "Error in discovery task"), TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        private DiscoveryService(IApiRequestFactory apiRequestFactory)
-            : this(apiRequestFactory, initialRetryDelayMs: 500, maxRetryDelayMs: 5_000, recheckIntervalMs: 30_000)
-        {
-        }
-
         /// <summary>
         /// Gets all the supported endpoints for testing purposes only
         /// </summary>
@@ -85,7 +80,28 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService
                     tcpTimeout: TimeSpan.FromSeconds(15),
                     AgentHttpHeaderNames.MinimalHeaders,
                     () => new MinimalAgentHeaderHelper(),
-                    uri => uri));
+                    uri => uri),
+                initialRetryDelayMs: 500,
+                maxRetryDelayMs: 5_000,
+                recheckIntervalMs: 30_00);
+
+        public static DiscoveryService Create(
+            ImmutableExporterSettings exporterSettings,
+            TimeSpan tcpTimeout,
+            int initialRetryDelayMs,
+            int maxRetryDelayMs,
+            int recheckIntervalMs)
+            => new(
+                AgentTransportStrategy.Get(
+                    exporterSettings,
+                    productName: "discovery",
+                    tcpTimeout: tcpTimeout,
+                    AgentHttpHeaderNames.MinimalHeaders,
+                    () => new MinimalAgentHeaderHelper(),
+                    uri => uri),
+                initialRetryDelayMs,
+                maxRetryDelayMs,
+                recheckIntervalMs);
 
         /// <inheritdoc cref="IDiscoveryService.SubscribeToChanges"/>
         public void SubscribeToChanges(Action<AgentConfiguration> callback)

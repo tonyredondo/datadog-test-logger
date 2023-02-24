@@ -12,6 +12,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
 {
@@ -21,6 +22,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
         /// B3 single header
         /// </summary>
         public const string B3 = "b3";
+
+        public static readonly B3SingleHeaderContextPropagator Instance = new();
+
+        private B3SingleHeaderContextPropagator()
+        {
+        }
 
         public void Inject<TCarrier, TCarrierSetter>(SpanContext context, TCarrier carrier, TCarrierSetter carrierSetter)
             where TCarrierSetter : struct, ICarrierSetter<TCarrier>
@@ -46,16 +53,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
                 // 80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1
                 // e457b5a2e4d86bd1-e457b5a2e4d86bd1-1-05e3ac9a4f6e3b90
                 // e457b5a2e4d86bd1-e457b5a2e4d86bd1-1
-                if (brValue!.Length != 68 && brValue!.Length != 51 &&
-                    brValue!.Length != 52 && brValue!.Length != 35)
+                if (brValue!.Length is not 68 and not 51 and not 52 and not 35)
                 {
                     return false;
                 }
 
-#if NETCOREAPP
-                ReadOnlySpan<char> rawTraceId = null;
-                ReadOnlySpan<char> rawSpanId = null;
-                char rawSampled = '0';
+#if NETCOREAPP3_1_OR_GREATER
+                ReadOnlySpan<char> rawTraceId;
+                ReadOnlySpan<char> rawSpanId;
+                char rawSampled;
+
                 if (brValue.Length > 50 && brValue[32] == '-' && brValue[49] == '-')
                 {
                     // 128 bits trace id
@@ -75,12 +82,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
                     return false;
                 }
 
-                var traceId = rawTraceId.Length == 32 ?
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId.Slice(16)) :
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId);
-                var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
-                var samplingPriority = rawSampled == '1' ? 1 : 0;
+                ulong traceId;
 
+                var success = rawTraceId.Length == 32 ?
+                                  HexString.TryParseUInt64(rawTraceId.Slice(16), out traceId) :
+                                  HexString.TryParseUInt64(rawTraceId, out traceId);
+
+                if (!success || traceId == 0)
+                {
+                    return false;
+                }
+
+                if (!HexString.TryParseUInt64(rawSpanId, out var parentId))
+                {
+                    parentId = 0;
+                }
+
+                var samplingPriority = rawSampled == '1' ? 1 : 0;
                 spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, null, rawTraceId.ToString(), rawSpanId.ToString());
 #else
                 string? rawTraceId = null;
@@ -105,12 +123,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
                     return false;
                 }
 
-                var traceId = rawTraceId.Length == 32 ?
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId.Substring(16)) :
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId);
-                var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
-                var samplingPriority = rawSampled == '1' ? 1 : 0;
+                ulong traceId;
 
+                var success = rawTraceId.Length == 32 ?
+                                  HexString.TryParseUInt64(rawTraceId.Substring(16), out traceId) :
+                                  HexString.TryParseUInt64(rawTraceId, out traceId);
+
+                if (!success || traceId == 0)
+                {
+                    return false;
+                }
+
+                if (!HexString.TryParseUInt64(rawSpanId, out var parentId))
+                {
+                    parentId = 0;
+                }
+
+                var samplingPriority = rawSampled == '1' ? 1 : 0;
                 spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, null, rawTraceId, rawSpanId);
 #endif
 
@@ -120,7 +149,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
             return false;
         }
 
-        private bool IsValidTraceId([NotNullWhen(true)] string? traceId)
+        private static bool IsValidTraceId([NotNullWhen(true)] string? traceId)
         {
             if (string.IsNullOrEmpty(traceId))
             {
@@ -135,7 +164,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
             return true;
         }
 
-        private bool IsValidSpanId([NotNullWhen(true)] string? spanId)
+        private static bool IsValidSpanId([NotNullWhen(true)] string? spanId)
         {
             if (string.IsNullOrEmpty(spanId))
             {

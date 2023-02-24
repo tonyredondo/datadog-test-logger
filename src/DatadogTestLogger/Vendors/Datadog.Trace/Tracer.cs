@@ -16,7 +16,6 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
-using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
@@ -205,6 +204,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         public string DefaultServiceName => TracerManager.DefaultServiceName;
 
         /// <summary>
+        /// Gets the git metadata provider.
+        /// </summary>
+        IGitMetadataTagsProvider IDatadogTracer.GitMetadataTagsProvider => TracerManager.GitMetadataTagsProvider;
+
+        /// <summary>
         /// Gets this tracer's settings.
         /// </summary>
         public ImmutableTracerSettings Settings => TracerManager.Settings;
@@ -327,7 +331,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// <param name="trace">The <see cref="Span"/> collection to write.</param>
         void IDatadogTracer.Write(ArraySegment<Span> trace)
         {
-            if (Settings.TraceEnabled || AzureAppServices.Metadata.CustomTracingEnabled)
+            if (Settings.TraceEnabled || Settings.AzureAppServiceMetadata?.CustomTracingEnabled is true)
             {
                 TracerManager.WriteTrace(trace);
             }
@@ -351,31 +355,35 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
             TraceContext traceContext;
 
-            // try to get the trace context (from local spans),
-            // otherwise start a new trace context and get sampling priority (from propagated spans)
             if (parent is SpanContext parentSpanContext)
             {
-                // if traceContext is not null, parent is from a local (non-propagated) span
-                // and this child span belongs in the same TraceContext
+                // if the parent's TraceContext is not null, parent is a local span
+                // and the new span we are creating belongs in the same TraceContext
                 traceContext = parentSpanContext.TraceContext;
 
                 if (traceContext == null)
                 {
-                    // if traceContext is null, parent was extracted from propagation headers.
-                    // start a new trace and keep the sampling priority and trace tags.
+                    // if parent is SpanContext but its TraceContext is null, then it was extracted from
+                    // propagation headers. create a new TraceContext (this will start a new trace) and initialize
+                    // it with the propagated values (sampling priority, origin, tags, W3C trace state, etc).
                     var traceTags = TagPropagation.ParseHeader(parentSpanContext.PropagatedTags, Settings.OutgoingTagPropagationHeaderMaxLength);
                     traceContext = new TraceContext(this, traceTags);
 
                     var samplingPriority = parentSpanContext.SamplingPriority ?? DistributedTracer.Instance.GetSamplingPriority();
                     traceContext.SetSamplingPriority(samplingPriority);
+                    traceContext.Origin = parentSpanContext.Origin;
+                    traceContext.AdditionalW3CTraceState = parentSpanContext.AdditionalW3CTraceState;
                 }
             }
             else
             {
-                // parent is not a SpanContext, start a new trace
-                var samplingPriority = DistributedTracer.Instance.GetSamplingPriority();
-
+                // if parent is not a SpanContext, it must be either a ReadOnlySpanContext or
+                // a user-defined ISpanContext implementation. we don't have a TraceContext,
+                // so create a new one (this will start a new trace).
                 traceContext = new TraceContext(this, tags: null);
+
+                // in a version-mismatch scenario, try to get the sampling priority from the "other" tracer
+                var samplingPriority = DistributedTracer.Instance.GetSamplingPriority();
                 traceContext.SetSamplingPriority(samplingPriority);
 
                 if (traceId == null)
@@ -412,30 +420,24 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             // Apply any global tags
             if (Settings.GlobalTags.Count > 0)
             {
+                // if DD_TAGS contained "env", "version", "git.commit.sha", or "git.repository.url",  they were used to set
+                // ImmutableTracerSettings.Environment, ImmutableTracerSettings.ServiceVersion, ImmutableTracerSettings.GitCommitSha, and ImmutableTracerSettings.GitRepositoryUrl
+                // and removed from Settings.GlobalTags
                 foreach (var entry in Settings.GlobalTags)
                 {
                     span.SetTag(entry.Key, entry.Value);
                 }
             }
 
-            // automatically add the "env" tag if defined, taking precedence over an "env" tag set from a global tag
-            var env = Settings.Environment;
-            if (!string.IsNullOrWhiteSpace(env))
-            {
-                span.SetTag(Tags.Env, env);
-            }
-
-            // automatically add the "version" tag if defined, taking precedence over an "version" tag set from a global tag
-            var version = Settings.ServiceVersion;
-            if (!string.IsNullOrWhiteSpace(version) && string.Equals(spanContext.ServiceName, DefaultServiceName))
-            {
-                span.SetTag(Tags.Version, version);
-            }
-
             if (addToTraceContext)
             {
                 spanContext.TraceContext.AddSpan(span);
             }
+
+            // Extract the Git metadata. This is done here because we may only be able to do it in the context of a request.
+            // However, to reduce memory consumption, we don't actually add the result as tags on the span, and instead
+            // write them directly to the <see cref="TraceChunkModel"/>.
+            TracerManager.GitMetadataTagsProvider.TryExtractGitMetadata(out _);
 
             return span;
         }

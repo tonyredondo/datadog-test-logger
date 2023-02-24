@@ -25,7 +25,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         ReturnTypeName = ClrNames.Void,
         ParameterTypeNames = new[] { KafkaConstants.TopicPartitionTypeName, KafkaConstants.MessageTypeName, KafkaConstants.ActionOfDeliveryReportTypeName },
         MinimumVersion = "1.4.0",
-        MaximumVersion = "1.*.*",
+        MaximumVersion = "2.*.*",
         IntegrationName = KafkaConstants.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -48,9 +48,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         {
             // manually doing duck cast here so we have access to the _original_ TopicPartition type
             // as a generic parameter, for injecting headers
+            var partition = topicPartition.DuckCast<ITopicPartition>();
             Scope scope = KafkaHelper.CreateProducerScope(
                 Tracer.Instance,
-                topicPartition.DuckCast<ITopicPartition>(),
+                partition,
                 isTombstone: message.Value is null,
                 finishOnClose: deliveryHandler is null);
 
@@ -59,6 +60,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 KafkaHelper.TryInjectHeaders<TTopicPartition, TMessage>(
                     scope.Span.Context,
                     Tracer.Instance.TracerManager.DataStreamsManager,
+                    partition?.Topic,
                     message);
                 return new CallTargetState(scope);
             }

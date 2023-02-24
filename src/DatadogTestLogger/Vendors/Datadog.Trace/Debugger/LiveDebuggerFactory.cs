@@ -16,6 +16,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.ProbeStatuses;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots;
 using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
@@ -35,7 +36,8 @@ internal class LiveDebuggerFactory
             return LiveDebugger.Create(settings, string.Empty, null, null, null, null, null, null);
         }
 
-        var snapshotStatusSink = SnapshotSink.Create(settings);
+        var snapshotSlicer = SnapshotSlicer.Create(settings);
+        var snapshotStatusSink = SnapshotSink.Create(settings, snapshotSlicer);
         var probeStatusSink = ProbeStatusSink.Create(serviceName, settings);
 
         var apiFactory = AgentTransportStrategy.Get(

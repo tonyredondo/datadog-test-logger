@@ -100,7 +100,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             settings ??= ImmutableTracerSettings.FromDefaultSources();
 
             var defaultServiceName = settings.ServiceName ??
-                                     GetApplicationName() ??
+                                     GetApplicationName(settings) ??
                                      UnknownServiceName;
 
             discoveryService ??= GetDiscoveryService(settings);
@@ -114,28 +114,35 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
             if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
             {
-                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName), TimeSpan.FromSeconds(10));
+                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName), TimeSpan.FromSeconds(10), settings.IsRunningInAzureAppService);
             }
 
+            var gitMetadataTagsProvider = GetGitMetadataTagsProvider(settings);
             logSubmissionManager = DirectLogSubmissionManager.Create(
                 logSubmissionManager,
                 settings.LogSubmissionSettings,
                 defaultServiceName,
                 settings.Environment,
-                settings.ServiceVersion);
+                settings.ServiceVersion,
+                gitMetadataTagsProvider);
 
             telemetry ??= TelemetryFactory.CreateTelemetryController(settings);
-            telemetry.RecordTracerSettings(settings, defaultServiceName, AzureAppServices.Metadata);
+            telemetry.RecordTracerSettings(settings, defaultServiceName);
             telemetry.RecordSecuritySettings(Security.Instance.Settings);
             telemetry.RecordIastSettings(Datadog.Trace.Iast.Iast.Instance.Settings);
             telemetry.RecordProfilerSettings(Profiler.Instance);
 
-            SpanContextPropagator.Instance = ContextPropagators.GetSpanContextPropagator(settings.PropagationStyleInject, settings.PropagationStyleExtract);
+            SpanContextPropagator.Instance = SpanContextPropagatorFactory.GetSpanContextPropagator(settings.PropagationStyleInject, settings.PropagationStyleExtract);
 
             dataStreamsManager ??= DataStreamsManager.Create(settings, discoveryService, defaultServiceName);
 
-            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName);
+            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName, gitMetadataTagsProvider);
             return tracerManager;
+        }
+
+        protected virtual IGitMetadataTagsProvider GetGitMetadataTagsProvider(ImmutableTracerSettings settings)
+        {
+            return new GitMetadataTagsProvider(settings);
         }
 
         /// <summary>
@@ -152,8 +159,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             ITelemetryController telemetry,
             IDiscoveryService discoveryService,
             DataStreamsManager dataStreamsManager,
-            string defaultServiceName)
-            => new TracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName);
+            string defaultServiceName,
+            IGitMetadataTagsProvider gitMetadataTagsProvider)
+            => new TracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName, gitMetadataTagsProvider);
 
         protected virtual ITraceSampler GetSampler(ImmutableTracerSettings settings)
         {
@@ -281,13 +289,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// the hosted app name (.NET Framework on IIS only), assembly name, and process name.
         /// </summary>
         /// <returns>The default service name.</returns>
-        private static string GetApplicationName()
+        private static string GetApplicationName(ImmutableTracerSettings settings)
         {
             try
             {
-                if (AzureAppServices.Metadata.IsRelevant)
+                if (settings.IsRunningInAzureAppService)
                 {
-                    return AzureAppServices.Metadata.SiteName;
+                    return settings.AzureAppServiceMetadata.SiteName;
                 }
 
                 if (Serverless.Metadata is { IsRunningInLambda: true, ServiceName: var serviceName })

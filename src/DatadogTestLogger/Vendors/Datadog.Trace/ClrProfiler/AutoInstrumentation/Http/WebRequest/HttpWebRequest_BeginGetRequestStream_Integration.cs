@@ -36,7 +36,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         ReturnTypeName = ClrNames.IAsyncResult,
         ParameterTypeNames = new[] { ClrNames.AsyncCallback, ClrNames.Object },
         MinimumVersion = WebRequestCommon.Major4,
-        MaximumVersion = WebRequestCommon.Major6,
+        MaximumVersion = WebRequestCommon.Major7,
         IntegrationName = WebRequestCommon.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

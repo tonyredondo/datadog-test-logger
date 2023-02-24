@@ -16,7 +16,6 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
-using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
 using DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
@@ -27,7 +26,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 {
     internal class CITracerManagerFactory : TracerManagerFactory
     {
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<CITracerManagerFactory>();
         private readonly CIVisibilitySettings _settings;
         private readonly IDiscoveryService _discoveryService;
         private readonly bool _enabledEventPlatformProxy;
@@ -50,9 +48,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             ITelemetryController telemetry,
             IDiscoveryService discoveryService,
             DataStreamsManager dataStreamsManager,
-            string defaultServiceName)
+            string defaultServiceName,
+            IGitMetadataTagsProvider gitMetadataTagsProvider)
         {
-            return new CITracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName);
+            return new CITracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName, gitMetadataTagsProvider);
+        }
+
+        protected override IGitMetadataTagsProvider GetGitMetadataTagsProvider(ImmutableTracerSettings settings)
+        {
+            return new CIGitMetadataTagsProvider();
         }
 
         protected override ITraceSampler GetSampler(ImmutableTracerSettings settings)
