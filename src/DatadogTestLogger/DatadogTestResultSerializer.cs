@@ -42,6 +42,8 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
             Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_INSTRUMENTATION_TELEMETRY_AGENT_PROXY_ENABLED", "false");
             Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED", "false");
             Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_APPSEC_ENABLED", "false");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_ITR_ENABLED", "false");
+            Environment.SetEnvironmentVariable($"{LoggerPrefix}DD_CIVISIBILITY_GIT_UPLOAD_ENABLED", "false");
             using (var _ = new DatadogEnvironmentVariablesReplacer(LoggerPrefix))
             {
                 ShowEnvironmentVariables(builder, "MODIFIED ENVIRONMENT VARIABLES");
