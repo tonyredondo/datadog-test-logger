@@ -34,7 +34,7 @@ internal sealed class TestSession
     private TestSession(string? command, string? workingDirectory, string? framework, DateTimeOffset? startDate, bool propagateEnvironmentVariables)
     {
         // First we make sure that CI Visibility is initialized.
-        CIVisibility.Initialize();
+        CIVisibility.InitializeFromManualInstrumentation();
 
         var environment = CIEnvironmentValues.Instance;
 
@@ -42,7 +42,7 @@ internal sealed class TestSession
         WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory;
         Framework = framework;
 
-        WorkingDirectory = CIEnvironmentValues.Instance.MakeRelativePathFromSourceRoot(WorkingDirectory, false);
+        WorkingDirectory = environment.MakeRelativePathFromSourceRoot(WorkingDirectory, false);
 
         var tags = new TestSessionSpanTags
         {
