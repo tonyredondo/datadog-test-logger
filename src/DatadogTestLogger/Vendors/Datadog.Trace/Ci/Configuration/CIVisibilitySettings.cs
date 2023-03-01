@@ -128,7 +128,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
         /// <summary>
         /// Gets a value indicating whether the Git Upload metadata is going to be used.
         /// </summary>
-        public bool? GitUploadEnabled { get; }
+        public bool? GitUploadEnabled { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the Intelligent Test Runner Tests skipping feature is enabled.
@@ -138,7 +138,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
         /// <summary>
         /// Gets a value indicating whether the Intelligent Test Runner is enabled.
         /// </summary>
-        public bool IntelligentTestRunnerEnabled { get; }
+        public bool IntelligentTestRunnerEnabled { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether EVP Proxy must be used.
@@ -171,6 +171,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration
             ApiKey = apiKey;
             ApplicationKey = applicationKey;
             AgentlessUrl = agentlessUrl;
+        }
+
+        internal void SetDefaultManualInstrumentationSettings()
+        {
+            // If we are using only the Public API without auto-instrumentation (TestSession/TestModule/TestSuite/Test classes only)
+            // then we can disable both GitUpload and Intelligent Test Runner feature (only used by our integration).
+            GitUploadEnabled = false;
+            IntelligentTestRunnerEnabled = false;
         }
 
         private TracerSettings InitializeTracerSettings()

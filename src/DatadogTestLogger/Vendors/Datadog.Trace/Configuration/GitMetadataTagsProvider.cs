@@ -10,6 +10,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
 
@@ -21,6 +22,7 @@ internal class GitMetadataTagsProvider : IGitMetadataTagsProvider
 {
     private readonly ImmutableTracerSettings _immutableTracerSettings;
     private GitMetadata? _cachedGitTags = null;
+    private int _tryCount = 0;
 
     public GitMetadataTagsProvider(ImmutableTracerSettings immutableTracerSettings)
     {
@@ -96,9 +98,20 @@ internal class GitMetadataTagsProvider : IGitMetadataTagsProvider
         {
             // Cannot determine the entry assembly. This may mean this method was called too early.
             // Return false to indicate that we should try again later.
-            Log.Debug("Cannot extract SourceLink information as the entry assembly could not be determined.");
-            result = default;
-            return false;
+
+            var nbTries = Interlocked.Increment(ref _tryCount);
+            if (nbTries > 100)
+            {
+                Log.Debug("Tried 100 times to get the SourceLink information. Giving up.");
+                result = GitMetadata.Empty;
+                return true;
+            }
+            else
+            {
+                Log.Debug("Cannot extract SourceLink information as the entry assembly could not be determined.");
+                result = default;
+                return false;
+            }
         }
 
         if (SourceLinkInformationExtractor.TryGetSourceLinkInfo(assembly, out var commitSha, out var repositoryUrl))
