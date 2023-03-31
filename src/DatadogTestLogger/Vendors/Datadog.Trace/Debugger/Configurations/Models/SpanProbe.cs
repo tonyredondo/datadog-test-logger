@@ -14,8 +14,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models
 
 internal class SpanProbe : ProbeDefinition, IEquatable<SpanProbe>
 {
-    public string Name { get; set; }
-
     public bool Equals(SpanProbe other)
     {
         if (ReferenceEquals(null, other))
@@ -28,7 +26,7 @@ internal class SpanProbe : ProbeDefinition, IEquatable<SpanProbe>
             return true;
         }
 
-        return base.Equals(other) && Name == other.Name;
+        return base.Equals(other);
     }
 
     public override bool Equals(object obj)
@@ -53,6 +51,6 @@ internal class SpanProbe : ProbeDefinition, IEquatable<SpanProbe>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(base.GetHashCode(), Name);
+        return base.GetHashCode();
     }
 }

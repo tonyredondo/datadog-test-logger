@@ -17,6 +17,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
         ProbeType ProbeType,
         ProbeLocation ProbeLocation,
         EvaluateAt EvaluateAt,
+        MetricKind? MetricKind,
+        string MetricName,
         bool HasCondition,
         string[] Tags)
     {
@@ -29,6 +31,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
         internal EvaluateAt EvaluateAt { get; } = EvaluateAt;
 
         internal bool IsFullSnapshot { get; } = ProbeType == ProbeType.Snapshot;
+
+        internal MetricKind? MetricKind { get; } = MetricKind;
+
+        internal string MetricName { get; } = MetricName;
 
         internal bool HasCondition { get; } = HasCondition;
 

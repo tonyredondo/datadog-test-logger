@@ -15,6 +15,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 {
@@ -106,7 +107,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
                 }
 
                 string resourceUrl = requestUri != null ? UriHelpers.CleanUri(requestUri, removeScheme: true, tryRemoveIds: true) : null;
-                string httpUrl = requestUri != null ? UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false) : null;
 
                 tags = new HttpTags();
 
@@ -117,7 +117,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
                 span.ResourceName = $"{httpMethod} {resourceUrl}";
 
                 tags.HttpMethod = httpMethod?.ToUpperInvariant();
-                tags.HttpUrl = httpUrl;
+                if (requestUri is not null)
+                {
+                    tags.HttpUrl = HttpRequestUtils.GetUrl(requestUri, tracer.TracerManager.QueryStringManager);
+                }
+
                 tags.InstrumentationName = IntegrationRegistry.GetName(integrationId);
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);

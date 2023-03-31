@@ -61,6 +61,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         Process,
         HashAlgorithm,
         SymmetricAlgorithm,
-        OpenTelemetry,
+        OpenTelemetry
     }
 }

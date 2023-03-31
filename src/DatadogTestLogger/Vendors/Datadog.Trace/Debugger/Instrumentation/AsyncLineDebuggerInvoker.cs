@@ -52,9 +52,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
                     return;
                 }
 
+                state.SnapshotCreator.StopSampling();
                 var localVariableNames = state.MethodMetadataInfo.LocalVariableNames;
                 if (!MethodDebuggerInvoker.TryGetLocalName(index, localVariableNames, out var localName))
                 {
+                    state.SnapshotCreator.StartSampling();
                     return;
                 }
 
@@ -66,6 +68,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
                 }
 
                 state.HasLocalsOrReturnValue = true;
+                state.SnapshotCreator.StartSampling();
             }
             catch (Exception e)
             {
@@ -160,7 +163,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
                 }
 
                 var kickoffParentObject = AsyncHelper.GetAsyncKickoffThisObject(instance);
-                var state = new AsyncLineDebuggerState(probeId, scope: default, DateTimeOffset.UtcNow, methodMetadataIndex, ref probeData, lineNumber, probeFilePath, instance, kickoffParentObject);
+                var state = new AsyncLineDebuggerState(probeId, scope: default, methodMetadataIndex, ref probeData, lineNumber, probeFilePath, instance, kickoffParentObject);
 
                 if (!state.SnapshotCreator.ProbeHasCondition &&
                     !state.ProbeData.Sampler.Sample())
@@ -176,6 +179,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
                     state.IsActive = false;
                 }
 
+                state.SnapshotCreator.StartSampling();
                 return state;
             }
             catch (Exception e)
@@ -200,6 +204,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
                     return;
                 }
 
+                state.SnapshotCreator.StopSampling();
                 var hasArgumentsOrLocals = state.HasLocalsOrReturnValue ||
                                            state.MethodMetadataInfo.AsyncMethodHoistedArguments.Length > 0 ||
                                            state.KickoffInvocationTarget != null;

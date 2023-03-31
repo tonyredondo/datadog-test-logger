@@ -18,15 +18,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke
 {
     internal static class DebuggerNativeMethods
     {
-        public static void InstrumentProbes(NativeMethodProbeDefinition[] methodProbes, NativeLineProbeDefinition[] lineProbes, NativeRemoveProbeRequest[] revertProbes)
+        public static void InstrumentProbes(NativeMethodProbeDefinition[] methodProbes, NativeLineProbeDefinition[] lineProbes, NativeSpanProbeDefinition[] spanProbes, NativeRemoveProbeRequest[] revertProbes)
         {
             if (FrameworkDescription.Instance.IsWindows())
             {
-                Windows.InstrumentProbes(methodProbes, methodProbes.Length, lineProbes, lineProbes.Length, revertProbes, revertProbes.Length);
+                Windows.InstrumentProbes(methodProbes, methodProbes.Length, lineProbes, lineProbes.Length, spanProbes, spanProbes.Length, revertProbes, revertProbes.Length);
             }
             else
             {
-                NonWindows.InstrumentProbes(methodProbes, methodProbes.Length, lineProbes, lineProbes.Length, revertProbes, revertProbes.Length);
+                NonWindows.InstrumentProbes(methodProbes, methodProbes.Length, lineProbes, lineProbes.Length, spanProbes, spanProbes.Length, revertProbes, revertProbes.Length);
             }
         }
 
@@ -75,6 +75,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke
                 int methodProbesLength,
                 [In] NativeLineProbeDefinition[] lineProbes,
                 int lineProbesLength,
+                [In] NativeSpanProbeDefinition[] spanProbes,
+                int spanProbesLength,
                 [In] NativeRemoveProbeRequest[] revertProbes,
                 int revertProbesLength);
 
@@ -95,6 +97,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke
                 int methodProbesLength,
                 [In] NativeLineProbeDefinition[] lineProbes,
                 int lineProbesLength,
+                [In] NativeSpanProbeDefinition[] spanProbes,
+                int spanProbesLength,
                 [In] NativeRemoveProbeRequest[] revertProbes,
                 int revertProbesLength);
 

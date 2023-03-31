@@ -15,6 +15,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
 {
     internal class DebuggerSettings
     {
+        public const string DebuggerMetricPrefix = "dynamic.instrumentation.metric.probe";
         public const int DefaultMaxDepthToSerialize = 3;
         public const int DefaultMaxSerializationTimeInMilliseconds = 200;
         public const int DefaultMaxNumberOfItemsInCollectionToCopy = 100;

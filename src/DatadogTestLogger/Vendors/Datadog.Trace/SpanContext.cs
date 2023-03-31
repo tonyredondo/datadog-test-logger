@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace
@@ -200,10 +201,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         }
 
         /// <summary>
-        /// Gets or sets the header value that contains the propagated trace tags,
-        /// formatted as "key1=value1,key2=value2".
+        /// Gets or sets the propagated trace tags collection.
         /// </summary>
-        internal string PropagatedTags { get; set; }
+        internal TraceTagCollection PropagatedTags { get; set; }
 
         /// <summary>
         /// Gets the trace context.
@@ -340,7 +340,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                 case Keys.PropagatedTags:
                 case HttpHeaderNames.PropagatedTags:
                     // return the value from TraceContext if available
-                    value = TraceContext?.Tags.ToPropagationHeader() ?? PropagatedTags;
+                    value = TraceContext?.Tags.ToPropagationHeader() ?? PropagatedTags?.ToPropagationHeader();
                     return true;
 
                 case Keys.AdditionalW3CTraceState:
