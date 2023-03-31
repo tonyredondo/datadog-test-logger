@@ -60,7 +60,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
     private void ShowEnvironmentVariables(StringBuilder builder, string title)
     {
-        const string defaultRegexPattern = @"^(DD_|COR_|CORECLR_|BUILD_|SYSTEM_).*";
+        const string defaultRegexPattern = @"^(DD_|COR_|CORECLR_).*";
         
         // we let the user to replace the pattern using DD_LOGGER_ENV_PATTERN
         var envPattern = Environment.GetEnvironmentVariable($"{LoggerPrefix}ENV_PATTERN");
