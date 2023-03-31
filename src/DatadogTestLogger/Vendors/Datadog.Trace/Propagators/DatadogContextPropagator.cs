@@ -11,6 +11,8 @@
 #nullable enable
 
 using System.Globalization;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
 {
@@ -51,11 +53,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
                 carrierSetter.Set(carrier, HttpHeaderNames.SamplingPriority, samplingPriorityString);
             }
 
-            var propagatedTraceTags = context.TraceContext?.Tags.ToPropagationHeader() ?? context.PropagatedTags;
+            var propagatedTraceTags = context.TraceContext?.Tags.ToPropagationHeader() ??
+                                      context.PropagatedTags?.ToPropagationHeader();
 
             if (!string.IsNullOrEmpty(propagatedTraceTags))
             {
-                carrierSetter.Set(carrier, HttpHeaderNames.PropagatedTags, propagatedTraceTags);
+                carrierSetter.Set(carrier, HttpHeaderNames.PropagatedTags, propagatedTraceTags!);
             }
         }
 
@@ -76,10 +79,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
             var origin = ParseUtility.ParseString(carrier, carrierGetter, HttpHeaderNames.Origin);
             var propagatedTraceTags = ParseUtility.ParseString(carrier, carrierGetter, HttpHeaderNames.PropagatedTags);
 
+            var traceTags = TagPropagation.ParseHeader(propagatedTraceTags);
+
             spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, origin)
                           {
-                              PropagatedTags = propagatedTraceTags
+                              PropagatedTags = traceTags
                           };
+
             return true;
         }
     }

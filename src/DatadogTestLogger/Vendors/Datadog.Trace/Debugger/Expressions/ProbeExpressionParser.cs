@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Models;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
@@ -402,6 +403,12 @@ internal partial class ProbeExpressionParser<T>
         if (typeof(T).IsAssignableFrom(finalExpr.Type))
         {
             return finalExpr;
+        }
+
+        if (typeof(T).IsNumeric()
+            && typeof(IConvertible).IsAssignableFrom(finalExpr.Type))
+        {
+            return CallConvertToNumericType<T>(finalExpr);
         }
 
         if (typeof(T) != typeof(string))

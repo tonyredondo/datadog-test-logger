@@ -20,6 +20,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     internal class LoggerLogFormatter
     {
         private const string MessageTemplateKey = "{OriginalFormat}";
+        internal const string LoggerNameKey = "Category";
 
         public static string FormatLogEvent<T>(LogFormatter logFormatter, in LogEntry<T> logEntry)
         {
@@ -54,6 +55,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             var haveVersion = false;
             var haveEnv = false;
             string? messageTemplate = null;
+
+            if (!string.IsNullOrEmpty(logEntry.Category))
+            {
+                writer.WritePropertyName(LoggerNameKey, escape: false);
+                writer.WriteValue(logEntry.Category);
+            }
 
             if (logEntry.State is { } state)
             {

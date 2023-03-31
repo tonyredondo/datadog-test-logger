@@ -69,7 +69,15 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         curatedEnvironmentVariables.Sort((a, b) => a.Key.CompareTo(b.Key));
         foreach (var envVars in curatedEnvironmentVariables)
         {
-            builder.AppendLine($"  {envVars.Key}={envVars.Value}");
+            if (envVars.Key.Contains("API_KEY") || envVars.Key.Contains("APP_KEY") || envVars.Key.Contains("APPLICATION_KEY"))
+            {
+                // Hide sensitive data.
+                builder.AppendLine($"  {envVars.Key}=***********************************");
+            }
+            else
+            {
+                builder.AppendLine($"  {envVars.Key}={envVars.Value}");
+            }
         }
 
         builder.AppendLine();

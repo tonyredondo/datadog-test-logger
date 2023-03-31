@@ -366,8 +366,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     // if parent is SpanContext but its TraceContext is null, then it was extracted from
                     // propagation headers. create a new TraceContext (this will start a new trace) and initialize
                     // it with the propagated values (sampling priority, origin, tags, W3C trace state, etc).
-                    var traceTags = TagPropagation.ParseHeader(parentSpanContext.PropagatedTags, Settings.OutgoingTagPropagationHeaderMaxLength);
-                    traceContext = new TraceContext(this, traceTags);
+                    traceContext = new TraceContext(this, parentSpanContext.PropagatedTags);
 
                     var samplingPriority = parentSpanContext.SamplingPriority ?? DistributedTracer.Instance.GetSamplingPriority();
                     traceContext.SetSamplingPriority(samplingPriority);
@@ -377,8 +376,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             }
             else
             {
-                // if parent is not a SpanContext, it must be either a ReadOnlySpanContext or
-                // a user-defined ISpanContext implementation. we don't have a TraceContext,
+                // if parent is not a SpanContext, it must be either a ReadOnlySpanContext,
+                // a user-defined ISpanContext implementation, or null (no parent). we don't have a TraceContext,
                 // so create a new one (this will start a new trace).
                 traceContext = new TraceContext(this, tags: null);
 
@@ -391,9 +390,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     var activity = Activity.ActivityListener.GetCurrentActivity();
                     if (activity is Activity.DuckTypes.IW3CActivity w3CActivity)
                     {
-                        // If there's an existing activity we use the same traceId (converted).
-                        rawTraceId = w3CActivity.TraceId;
-                        traceId = Convert.ToUInt64(w3CActivity.TraceId.Substring(16), 16);
+                        // If the Activity has an ActivityIdFormat.Hierarchical instead of W3C it's TraceId & SpanId will be null
+                        if (w3CActivity.TraceId is { } w3cTraceId)
+                        {
+                            // If there's an existing activity we use the same traceId (converted).
+                            rawTraceId = w3cTraceId;
+                            traceId = Convert.ToUInt64(w3cTraceId.Substring(16), 16);
+                        }
                     }
                 }
             }

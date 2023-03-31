@@ -31,7 +31,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink.
         private readonly Task _flushTask;
         private readonly Action? _disableSinkAction;
         private readonly TaskCompletionSource<bool> _processExit = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private readonly TaskCompletionSource<bool> _tracerInitialized = new();
+        private readonly TaskCompletionSource<bool> _tracerInitialized = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private readonly ConcurrentQueue<TaskCompletionSource<bool>> _flushCompletionSources = new();
         private volatile bool _enqueueLogEnabled = true;
 

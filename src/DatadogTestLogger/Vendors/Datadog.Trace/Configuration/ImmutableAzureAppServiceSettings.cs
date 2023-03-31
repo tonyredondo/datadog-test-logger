@@ -79,6 +79,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
                         SiteKind = "functionapp";
                         SiteType = "function";
                         IsFunctionsApp = true;
+                        IsIsolatedFunctionsApp = FunctionsWorkerRuntime?.EndsWith("-isolated", StringComparison.OrdinalIgnoreCase) == true;
                         PlatformStrategy.ShouldSkipClientSpan = ShouldSkipClientSpanWithinFunctions;
                         break;
                     case AzureContext.AzureAppService:
@@ -130,6 +131,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         public string FunctionsExtensionVersion { get; }
 
         public string FunctionsWorkerRuntime { get; }
+
+        public bool IsIsolatedFunctionsApp { get; }
 
         public string InstanceName { get; }
 

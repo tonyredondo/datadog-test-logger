@@ -21,6 +21,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 {
     internal class Log4NetLogFormatter
     {
+        internal const string LoggerNameKey = "logger";
+
         public static void FormatLogEvent(LogFormatter logFormatter, StringBuilder sb, ILoggingEventDuckBase logEntry, DateTime timestamp)
         {
             logFormatter.FormatLog(
@@ -48,6 +50,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             {
                 writer.WritePropertyName("@x", escape: false);
                 writer.WriteValue(exception);
+            }
+
+            if (!string.IsNullOrEmpty(logEntry.LoggerName))
+            {
+                writer.WritePropertyName(LoggerNameKey, escape: false);
+                writer.WriteValue(logEntry.LoggerName);
             }
 
             var properties = logEntry.GetProperties();

@@ -47,6 +47,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
               && (assemblyName.StartsWith("App_Web_", StringComparison.Ordinal)
                || assemblyName.StartsWith("App_Theme_", StringComparison.Ordinal)
                || assemblyName.StartsWith("App_GlobalResources.", StringComparison.Ordinal)
+               || assemblyName.StartsWith("App_LocalResources.", StringComparison.Ordinal)
                || assemblyName.StartsWith("App_global.asax.", StringComparison.Ordinal)
                || assemblyName.StartsWith("App_Code.", StringComparison.Ordinal)
                || assemblyName.StartsWith("App_WebReferences.", StringComparison.Ordinal)))

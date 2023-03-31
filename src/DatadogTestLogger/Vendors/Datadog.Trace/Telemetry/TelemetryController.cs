@@ -31,7 +31,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
         private readonly TelemetryTransportManager _transportManager;
         private readonly TimeSpan _flushInterval;
         private readonly TimeSpan _heartBeatInterval;
-        private readonly TaskCompletionSource<bool> _tracerInitialized = new();
+        private readonly TaskCompletionSource<bool> _tracerInitialized = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private readonly TaskCompletionSource<bool> _processExit = new();
         private readonly Task _flushTask;
         private readonly Task _heartbeatTask;

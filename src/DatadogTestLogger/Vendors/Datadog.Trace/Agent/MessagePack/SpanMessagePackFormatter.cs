@@ -9,6 +9,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
@@ -66,10 +67,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
         private readonly byte[] _metricsBytes = StringEncoding.UTF8.GetBytes("metrics");
 
         private readonly byte[] _samplingPriorityNameBytes = StringEncoding.UTF8.GetBytes(Metrics.SamplingPriority);
-        private readonly byte[][] _samplingPriorityValueBytes;
 
         private readonly byte[] _processIdNameBytes = StringEncoding.UTF8.GetBytes(Metrics.ProcessId);
-        private readonly byte[] _processIdValueBytes;
 
         // Azure App Service tag names and values
         private byte[] _aasSiteNameTagNameBytes;
@@ -86,18 +85,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
 
         private SpanMessagePackFormatter()
         {
-            double processId = DomainMetadata.Instance.ProcessId;
-            _processIdValueBytes = processId > 0 ? MessagePackSerializer.Serialize(processId) : null;
-
-            // values begin at -1, so they are shifted by 1 from their array index: [-1, 0, 1, 2]
-            // these must serialized as msgpack float64 (Double in .NET).
-            _samplingPriorityValueBytes = new[]
-                                          {
-                                              MessagePackSerializer.Serialize((double)SamplingPriorityValues.UserReject),
-                                              MessagePackSerializer.Serialize((double)SamplingPriorityValues.AutoReject),
-                                              MessagePackSerializer.Serialize((double)SamplingPriorityValues.AutoKeep),
-                                              MessagePackSerializer.Serialize((double)SamplingPriorityValues.UserKeep),
-                                          };
         }
 
         int IMessagePackFormatter<TraceChunkModel>.Serialize(ref byte[] bytes, int offset, TraceChunkModel traceChunk, IFormatterResolver formatterResolver)
@@ -106,16 +93,21 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
         }
 
         // overload of IMessagePackFormatter<TraceChunkModel>.Serialize() with `in` modifier on `TraceChunkModel` parameter
-        public int Serialize(ref byte[] bytes, int offset, in TraceChunkModel traceChunk, IFormatterResolver formatterResolver)
+        public int Serialize(ref byte[] bytes, int offset, in TraceChunkModel traceChunk, IFormatterResolver formatterResolver, int? maxSize = null)
         {
             int originalOffset = offset;
 
             // start writing span[]
             offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, traceChunk.SpanCount);
-
             // serialize each span
             for (var i = 0; i < traceChunk.SpanCount; i++)
             {
+                if (maxSize != null && offset - originalOffset >= maxSize)
+                {
+                    // We've already reached the maximum size, give up
+                    return 0;
+                }
+
                 // when serializing each span, we need additional information that is not
                 // available in the span object itself, like its position in the trace chunk
                 // or if its parent can also be found in the same chunk, so we use SpanModel
@@ -225,14 +217,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
             // TODO: for each trace tag, determine if it should be added to the local root,
             // to the first span in the chunk, or to all orphan spans.
             // For now, we add them to the local root which is correct in most cases.
-            if (model.IsLocalRoot && model.TraceChunk.Tags?.ToArray() is { Length: > 0 } traceTags)
+            if (model.IsLocalRoot && model.TraceChunk.Tags is { Count: > 0 } traceTags)
             {
-                count += traceTags.Length;
-
-                foreach (var tag in traceTags)
-                {
-                    WriteTag(ref bytes, ref offset, tag.Key, tag.Value, tagProcessors);
-                }
+                var traceTagWriter = new TraceTagWriter(this, tagProcessors, bytes, offset);
+                traceTags.Enumerate(ref traceTagWriter);
+                bytes = traceTagWriter.Bytes;
+                offset = traceTagWriter.Offset;
+                count += traceTagWriter.Count;
             }
 
             // add "runtime-id" tag to service-entry (aka top-level) spans
@@ -467,11 +458,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
             count += tagWriter.Count;
 
             // add "process_id" tag to local root span (if present)
-            if (model.IsLocalRoot && _processIdValueBytes != null)
+            var processId = DomainMetadata.Instance.ProcessId;
+
+            if (processId != 0 && model.IsLocalRoot)
             {
                 count++;
                 offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _processIdNameBytes);
-                offset += MessagePackBinary.WriteRaw(ref bytes, offset, _processIdValueBytes);
+                offset += MessagePackBinary.WriteDouble(ref bytes, offset, processId);
             }
 
             // add "_sampling_priority_v1" tag to all "chunk orphans"
@@ -481,16 +474,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
                 count++;
                 offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _samplingPriorityNameBytes);
 
-                if (samplingPriority is >= -1 and <= 2)
-                {
-                    // values begin at -1, so they are shifted by 1 from their array index: [-1, 0, 1, 2]
-                    offset += MessagePackBinary.WriteRaw(ref bytes, offset, _samplingPriorityValueBytes[samplingPriority + 1]);
-                }
-                else
-                {
-                    // fallback to support unknown future values that are not cached
-                    offset += MessagePackBinary.WriteDouble(ref bytes, offset, samplingPriority);
-                }
+                // sampling priority must be serialized as msgpack float64 (Double in .NET).
+                offset += MessagePackBinary.WriteDouble(ref bytes, offset, samplingPriority);
             }
 
             if (span.IsTopLevel && (!Ci.CIVisibility.IsRunning || !Ci.CIVisibility.Settings.Agentless))
@@ -572,6 +557,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
             public int Offset;
             public int Count;
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal TagWriter(SpanMessagePackFormatter formatter, ITagProcessor[] tagProcessors, byte[] bytes, int offset)
             {
                 _formatter = formatter;
@@ -581,6 +567,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
                 Count = 0;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Process(TagItem<string> item)
             {
                 if (item.KeyUtf8 is null)
@@ -595,6 +582,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
                 Count++;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Process(TagItem<double> item)
             {
                 if (item.KeyUtf8 is null)
@@ -606,6 +594,33 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent.MessagePack
                     _formatter.WriteMetric(ref Bytes, ref Offset, item.KeyUtf8, item.Value, _tagProcessors);
                 }
 
+                Count++;
+            }
+        }
+
+        internal struct TraceTagWriter : TraceTagCollection.ITagEnumerator
+        {
+            private readonly SpanMessagePackFormatter _formatter;
+            private readonly ITagProcessor[] _tagProcessors;
+
+            public byte[] Bytes;
+            public int Offset;
+            public int Count;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal TraceTagWriter(SpanMessagePackFormatter formatter, ITagProcessor[] tagProcessors, byte[] bytes, int offset)
+            {
+                _formatter = formatter;
+                _tagProcessors = tagProcessors;
+                Bytes = bytes;
+                Offset = offset;
+                Count = 0;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Next(KeyValuePair<string, string> item)
+            {
+                _formatter.WriteTag(ref Bytes, ref Offset, item.Key, item.Value, _tagProcessors);
                 Count++;
             }
         }

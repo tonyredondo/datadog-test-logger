@@ -10,6 +10,7 @@
 
 #nullable enable
 using System;
+using System.Collections.Generic;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
@@ -17,9 +18,13 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.ProbeStatuses;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Sink;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots;
+using DatadogTestLogger.Vendors.Datadog.Trace.DogStatsd;
 using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger;
 
@@ -33,7 +38,7 @@ internal class LiveDebuggerFactory
         if (!settings.Enabled)
         {
             Log.Information("Live Debugger is disabled. To enable it, please set DD_DYNAMIC_INSTRUMENTATION_ENABLED environment variable to 'true'.");
-            return LiveDebugger.Create(settings, string.Empty, null, null, null, null, null, null);
+            return LiveDebugger.Create(settings, string.Empty, null, null, null, null, null, null, null);
         }
 
         var snapshotSlicer = SnapshotSlicer.Create(settings);
@@ -56,6 +61,24 @@ internal class LiveDebuggerFactory
         var probeStatusPoller = ProbeStatusPoller.Create(probeStatusSink, settings);
 
         var configurationUpdater = ConfigurationUpdater.Create(tracerSettings.Environment, tracerSettings.ServiceVersion);
-        return LiveDebugger.Create(settings, serviceName, discoveryService, remoteConfigurationManager, lineProbeResolver, debuggerSink, probeStatusPoller, configurationUpdater);
+
+        IDogStatsd statsd;
+        if (FrameworkDescription.Instance.IsWindows()
+            && tracerSettings.Exporter.MetricsTransport == TransportType.UDS)
+        {
+            Log.Information("Metric probes are not supported on Windows when transport type is UDS");
+            statsd = new NoOpStatsd();
+        }
+        else
+        {
+            var constantTags = new List<string>
+            {
+                $"service:{NormalizerTraceProcessor.NormalizeService(serviceName)}"
+            };
+
+            statsd = TracerManagerFactory.CreateDogStatsdClient(tracerSettings, constantTags, DebuggerSettings.DebuggerMetricPrefix);
+        }
+
+        return LiveDebugger.Create(settings, serviceName, discoveryService, remoteConfigurationManager, lineProbeResolver, debuggerSink, probeStatusPoller, configurationUpdater, statsd);
     }
 }

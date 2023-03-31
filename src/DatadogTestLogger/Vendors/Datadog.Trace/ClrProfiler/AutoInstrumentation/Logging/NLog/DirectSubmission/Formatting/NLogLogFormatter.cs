@@ -20,6 +20,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 {
     internal class NLogLogFormatter
     {
+        internal const string LoggerNameKey = "LoggerName";
+
         public static string FormatLogEvent(LogFormatter logFormatter, in LogEntry logEntryWrapper)
         {
             var sb = StringBuilderCache.Acquire(StringBuilderCache.MaxBuilderSize);
@@ -38,7 +40,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 eventId: null,
                 GetLogLevelString(logEntry.Level),
                 logEntry.Exception,
-                (JsonTextWriter w, in LogEntry e) => RenderProperties(w, e));
+                (JsonTextWriter w, in LogEntry e) => RenderProperties(w, in e));
         }
 
         private static LogPropertyRenderingDetails RenderProperties(JsonTextWriter writer, in LogEntry logEntryWrapper)
@@ -49,6 +51,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             var haveTags = false;
             var haveEnv = false;
             var haveVersion = false;
+
+            var loggerName = logEntryWrapper.LogEventInfo.LoggerName;
+            if (!string.IsNullOrEmpty(loggerName))
+            {
+                writer.WritePropertyName(LoggerNameKey, escape: false);
+                writer.WriteValue(loggerName);
+            }
 
             if (logEntryWrapper.Properties is not null)
             {

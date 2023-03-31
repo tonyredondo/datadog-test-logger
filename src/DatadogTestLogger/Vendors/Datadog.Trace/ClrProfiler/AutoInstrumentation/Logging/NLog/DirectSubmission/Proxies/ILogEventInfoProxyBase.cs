@@ -30,6 +30,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         public LogLevelProxy Level { get; }
 
         /// <summary>
+        /// Gets the logger name/category
+        /// </summary>
+        public string LoggerName { get; }
+
+        /// <summary>
         /// Gets the exception
         /// </summary>
         public Exception Exception { get; }

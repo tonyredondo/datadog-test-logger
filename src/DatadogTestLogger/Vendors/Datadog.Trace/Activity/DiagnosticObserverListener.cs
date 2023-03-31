@@ -96,7 +96,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity
         {
             if (shouldListen)
             {
-                ((IObservable<KeyValuePair<string, object>>)source.Instance).Subscribe(new DiagnosticSourceEventListener(source.Name));
+                ((IObservable<KeyValuePair<string, object>>?)source.Instance)?.Subscribe(new DiagnosticSourceEventListener(source.Name));
             }
         }
     }
