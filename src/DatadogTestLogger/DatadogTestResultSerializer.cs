@@ -79,7 +79,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
                 continue;
             }
 
-            if (Regex.Match(key, envPattern).Success)
+            if (Regex.Match(key, envPattern, RegexOptions.IgnoreCase).Success)
             {
                 curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars.Value?.ToString() ?? string.Empty));
             }
