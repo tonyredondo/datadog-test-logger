@@ -82,6 +82,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     }
 
                     SpanContextPropagator.Instance.Inject(scope.Span.Context, basicProperties.Headers, default(ContextPropagation));
+                    RabbitMQIntegration.SetDataStreamsCheckpointOnProduce(Tracer.Instance, scope.Span, tags, basicProperties.Headers);
                 }
             }
 

@@ -18,6 +18,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Activity.DuckTypes;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
@@ -49,21 +50,57 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
             string? rawTraceId = null;
             string? rawSpanId = null;
 
+            // for non-IW3CActivity interfaces we'll use Activity.Id as the key as they don't have a guaranteed TraceId+SpanId
+            // for IW3CActivity interfaces we'll use the Activity.TraceId + Activity.SpanId as the key
+            // have to also validate that the TraceId and SpanId actually exist and aren't null - as they can be in some cases
+            string? activityKey = null;
+
             if (activity is IW3CActivity w3cActivity)
             {
+                if (w3cActivity.TraceId is { } activityTraceId && w3cActivity.SpanId is { } activitySpanId)
+                {
+                    activityKey = activityTraceId + activitySpanId;
+                }
+
                 // If the user has specified a parent context, get the parent Datadog SpanContext
                 if (w3cActivity.ParentSpanId is not null
-                    && w3cActivity.ParentId is string parentId
-                    && ActivityMappingById.TryGetValue(parentId, out ActivityMapping mapping))
+                 && w3cActivity.ParentId is { } parentId)
                 {
-                    parent = mapping.Scope.Span.Context;
+                    // we know that we have a parent context, but we use TraceId+ParentSpanId for the mapping
+                    // This is a result of an issue with OTel v1.0.1 (unsure if OTel or us tbh) where the
+                    // ".ParentId" matched for the Trace+Span IDs but not for the flags portion
+                    // Doing a lookup on just the TraceId+ParentSpanId seems to be more resilient
+                    if (w3cActivity.TraceId is { } && w3cActivity.ParentSpanId is { } parentSpanId)
+                    {
+                        if (ActivityMappingById.TryGetValue(w3cActivity.TraceId + w3cActivity.ParentSpanId, out ActivityMapping mapping))
+                        {
+                            parent = mapping.Scope.Span.Context;
+                        }
+                        else
+                        {
+                            // create a new parent span context for the ActivityContext
+#if NETCOREAPP3_1_OR_GREATER
+                            _ = HexString.TryParseUInt64(w3cActivity.TraceId.AsSpan(16), out var newActivityTraceId);
+                            _ = HexString.TryParseUInt64(w3cActivity.ParentSpanId, out var newActivitySpanId);
+#else
+                            _ = HexString.TryParseUInt64(w3cActivity.TraceId.Substring(16), out var newActivityTraceId);
+                            _ = HexString.TryParseUInt64(w3cActivity.ParentSpanId, out var newActivitySpanId);
+#endif
+                            parent = Tracer.Instance.CreateSpanContext(SpanContext.None, traceId: newActivityTraceId, spanId: newActivitySpanId, rawTraceId: w3cActivity.TraceId, rawSpanId: w3cActivity.ParentSpanId);
+                        }
+                    }
+                    else
+                    {
+                        // we have a ParentSpanId/ParentId, but no TraceId/SpanId, so default to use the ParentId for lookup
+                        if (ActivityMappingById.TryGetValue(w3cActivity.ParentId, out ActivityMapping mapping))
+                        {
+                            parent = mapping.Scope.Span.Context;
+                        }
+                    }
                 }
 
                 if (parent is null && activeSpan is not null)
                 {
-                    // If this is the first activity (no parent) and we already have an active span
-                    // or the span was started after the parent activity so we use the span as a parent
-
                     // We ensure the activity follows the same TraceId as the span
                     // And marks the ParentId the current spanId
 
@@ -94,7 +131,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
                     traceId ??= Convert.ToUInt64(w3cTraceId.Substring(16), 16);
                     spanId = Convert.ToUInt64(w3cSpanId, 16);
                     rawTraceId = w3cTraceId;
-                    rawSpanId = w3cActivity.SpanId;
                 }
             }
 
@@ -111,7 +147,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
                     return;
                 }
 
-                ActivityMappingById.GetOrAdd(activity.Id, _ => new(activity.Instance!, CreateScopeFromActivity(activity, parent, traceId, spanId, rawTraceId, rawSpanId)));
+                activityKey ??= activity.Id;
+                ActivityMappingById.GetOrAdd(activityKey, _ => new(activity.Instance!, CreateScopeFromActivity(activity, parent, traceId, spanId, rawTraceId, rawSpanId)));
             }
             catch (Exception ex)
             {
@@ -122,7 +159,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
             {
                 var span = Tracer.Instance.StartSpan(activity.OperationName, parent: parent, startTime: activity.StartTimeUtc, traceId: traceId, spanId: spanId, rawTraceId: rawTraceId, rawSpanId: rawSpanId);
                 Tracer.Instance.TracerManager.Telemetry.IntegrationGeneratedSpan(IntegrationId);
-
                 return Tracer.Instance.ActivateSpan(span, false);
             }
         }
@@ -139,7 +175,17 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
                         return;
                     }
 
-                    if (ActivityMappingById.TryRemove(activity.Id, out ActivityMapping value) && value.Scope?.Span is not null)
+                    string key;
+                    if (activity is IW3CActivity w3cActivity)
+                    {
+                        key = w3cActivity.TraceId + w3cActivity.SpanId;
+                    }
+                    else
+                    {
+                        key = activity.Id;
+                    }
+
+                    if (ActivityMappingById.TryRemove(key, out ActivityMapping someValue) && someValue.Scope?.Span is not null)
                     {
                         // We have the exact scope associated with the Activity
                         if (Log.IsEnabled(LogEventLevel.Debug))
@@ -147,7 +193,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
                             Log.Debug("DefaultActivityHandler.ActivityStopped: [Source={SourceName}, Id={Id}, RootId={RootId}, OperationName={OperationName}, StartTimeUtc={StartTimeUtc}, Duration={Duration}]", new object[] { sourceName, activity.Id, activity.RootId, activity.OperationName!, activity.StartTimeUtc, activity.Duration });
                         }
 
-                        CloseActivityScope(sourceName, activity, value.Scope);
+                        CloseActivityScope(sourceName, activity, someValue.Scope);
                         return;
                     }
                 }
@@ -223,7 +269,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
                 where TInner : IActivity
             {
                 var span = scope.Span;
-
                 OtlpHelpers.UpdateSpanFromActivity(activity, scope.Span);
 
                 // OpenTelemtry SDK / OTLP Fixups
@@ -236,8 +281,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.Handlers
                 // - service.name
                 // - service.namespace
                 // - service.version
-
                 span.Finish(activity.StartTimeUtc.Add(activity.Duration));
+
                 scope.Close();
             }
         }

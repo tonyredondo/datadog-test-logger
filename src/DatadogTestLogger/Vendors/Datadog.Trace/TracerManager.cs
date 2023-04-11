@@ -83,7 +83,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             Telemetry = telemetry;
             DiscoveryService = discoveryService;
             TraceProcessors = traceProcessors ?? Array.Empty<ITraceProcessor>();
-            QueryStringManager = new(settings?.QueryStringReportingEnabled ?? true, settings?.ObfuscationQueryStringRegexTimeout ?? 100, settings?.ObfuscationQueryStringRegex ?? TracerSettings.DefaultObfuscationQueryStringRegex);
+            QueryStringManager = new(settings.QueryStringReportingEnabled, settings.ObfuscationQueryStringRegexTimeout, settings.QueryStringReportingSize, settings.ObfuscationQueryStringRegex);
             var lstTagProcessors = new List<ITagProcessor>(TraceProcessors.Length);
             foreach (var traceProcessor in TraceProcessors)
             {
@@ -408,6 +408,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
                     writer.WritePropertyName("obfuscation_querystring_regex_timout");
                     writer.WriteValue(instanceSettings.ObfuscationQueryStringRegexTimeout);
+
+                    writer.WritePropertyName("obfuscation_querystring_size");
+                    writer.WriteValue(instanceSettings.QueryStringReportingSize);
 
                     if (string.Compare(instanceSettings.ObfuscationQueryStringRegex, TracerSettings.DefaultObfuscationQueryStringRegex, StringComparison.Ordinal) != 0)
                     {

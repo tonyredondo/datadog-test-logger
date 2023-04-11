@@ -14,12 +14,15 @@ using System.Linq.Expressions;
 using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions;
 
 internal class ProbeExpressionEvaluator
 {
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ProbeExpressionEvaluator));
+
     private Lazy<CompiledExpression<string>[]> _compiledTemplates;
 
     private Lazy<CompiledExpression<bool>?> _compiledCondition;
@@ -60,11 +63,19 @@ internal class ProbeExpressionEvaluator
         }
     }
 
+    internal CompiledExpression<double>? CompiledMetric
+    {
+        get
+        {
+            return _compiledMetric.Value;
+        }
+    }
+
     internal DebuggerExpression[] Templates { get; }
 
     internal DebuggerExpression? Condition { get; }
 
-    private DebuggerExpression? Metric { get; }
+    internal DebuggerExpression? Metric { get; }
 
     internal ExpressionEvaluationResult Evaluate(MethodScopeMembers scopeMembers)
     {
@@ -114,7 +125,7 @@ internal class ProbeExpressionEvaluator
                 }
                 catch (Exception e)
                 {
-                    HandleException(ref result, compiledExpressions[i], e.Message);
+                    HandleException(ref result, compiledExpressions[i], e);
                 }
             }
 
@@ -153,7 +164,7 @@ internal class ProbeExpressionEvaluator
         }
         catch (Exception e)
         {
-            HandleException(ref result, compiledExpression, e.Message);
+            HandleException(ref result, compiledExpression, e);
             result.Condition = true;
         }
     }
@@ -180,7 +191,7 @@ internal class ProbeExpressionEvaluator
         }
         catch (Exception e)
         {
-            HandleException(ref result, compiledExpression, e.Message);
+            HandleException(ref result, compiledExpression, e);
         }
     }
 
@@ -253,31 +264,32 @@ internal class ProbeExpressionEvaluator
         return !string.IsNullOrEmpty(expression.Json) && string.IsNullOrEmpty(expression.Str);
     }
 
-    private void HandleException<T>(ref ExpressionEvaluationResult result, CompiledExpression<T> compiledExpression, string message)
+    private void HandleException<T>(ref ExpressionEvaluationResult result, CompiledExpression<T> compiledExpression, Exception e)
     {
+        Log.Information(e, "Failed to parse probe expression: {Expression}", compiledExpression.RawExpression);
         result.Errors ??= new List<EvaluationError>();
         if (compiledExpression.Errors != null)
         {
             result.Errors.AddRange(compiledExpression.Errors);
         }
 
-        result.Errors.Add(new EvaluationError { Expression = GetRelevantExpression(compiledExpression.ParsedExpression), Message = message });
+        result.Errors.Add(new EvaluationError { Expression = GetRelevantExpression(compiledExpression), Message = e.Message });
     }
 
-    private string GetRelevantExpression(Expression parsedExpression)
+    private string GetRelevantExpression<T>(CompiledExpression<T> compiledExpression)
     {
         const string resultAssignment = "$dd_el_result = ";
         string relevant = null;
-        switch (parsedExpression)
+        switch (compiledExpression.ParsedExpression)
         {
             case null:
-                return "N/A";
+                return compiledExpression.RawExpression ?? "N/A";
             case LambdaExpression { Body: BlockExpression block }:
                 {
                     var expressions = block.Expressions;
                     if (expressions.Count == 0)
                     {
-                        return parsedExpression.ToString();
+                        return compiledExpression.ParsedExpression.ToString();
                     }
 
                     var last = expressions[expressions.Count - 1].ToString();
@@ -288,7 +300,7 @@ internal class ProbeExpressionEvaluator
 
         if (relevant == null || !relevant.Contains(resultAssignment))
         {
-            relevant = parsedExpression.ToString();
+            relevant = compiledExpression.ParsedExpression.ToString();
         }
 
         int indexToRemove = relevant.IndexOf(resultAssignment, StringComparison.Ordinal);

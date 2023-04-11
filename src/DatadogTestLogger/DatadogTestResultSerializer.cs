@@ -5,7 +5,6 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace DatadogTestLogger;
 
@@ -60,26 +59,30 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
     private void ShowEnvironmentVariables(StringBuilder builder, string title)
     {
-        const string defaultRegexPattern = @"^(DD_|COR_|CORECLR_).*";
-        
-        // we let the user to replace the pattern using DD_LOGGER_ENV_PATTERN
-        var envPattern = Environment.GetEnvironmentVariable($"{LoggerPrefix}ENV_PATTERN");
-        if (string.IsNullOrWhiteSpace(envPattern))
-        {
-            envPattern = defaultRegexPattern;
-        }
+        string[] ciEnvironmentVariables = typeof(Vendors.Datadog.Trace.Ci.CIEnvironmentValues.Constants)
+            .GetFields()
+            .Select(f => f.GetValue(null)?.ToString())
+            .Where(f => f is not null)
+            .ToArray();
 
         builder.AppendLine(title);
         var curatedEnvironmentVariables = new List<KeyValuePair<string, string>>();
         foreach (DictionaryEntry envVars in Environment.GetEnvironmentVariables())
         {
-            var key = envVars.Key?.ToString();
+            var key = envVars.Key?.ToString().ToUpperInvariant();
             if (key is null)
             {
                 continue;
             }
 
-            if (Regex.Match(key, envPattern, RegexOptions.IgnoreCase).Success)
+            // We allow keys starting with DD_, COR_ and CORECLR_
+            if (key.StartsWith("DD_") || key.StartsWith("COR_") || key.StartsWith("CORECLR_"))
+            {
+                curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars.Value?.ToString() ?? string.Empty));
+            }
+
+            // We also allow keys from CI providers
+            if (ciEnvironmentVariables.Any(env => string.Equals(env, key, StringComparison.OrdinalIgnoreCase)))
             {
                 curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars.Value?.ToString() ?? string.Empty));
             }
@@ -90,6 +93,8 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         {
             if (envVars.Key.Contains("API_KEY") ||
                 envVars.Key.Contains("APP_KEY") ||
+                envVars.Key.Contains("APPKEY") ||
+                envVars.Key.Contains("APIKEY") ||
                 envVars.Key.Contains("APPLICATION_KEY") ||
                 envVars.Key.Contains("TOKEN"))
             {

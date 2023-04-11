@@ -215,7 +215,7 @@ public class VendoredDependency
                         builder.Replace("#if NETCOREAPP2_1_OR_GREATER", "#if NETCOREAPP3_1_OR_GREATER");
                     }
 
-                    if (filePath.Contains("Propagator.cs"))
+                    if (filePath.Contains("Propagator.cs") || filePath.Contains("DefaultActivityHandler.cs"))
                     {
                         builder.Replace("#if NETCOREAPP", "#if NETCOREAPP3_1_OR_GREATER");
                     }

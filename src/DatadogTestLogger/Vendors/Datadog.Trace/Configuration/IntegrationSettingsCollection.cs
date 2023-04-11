@@ -8,6 +8,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+#nullable enable
+
 using System;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
