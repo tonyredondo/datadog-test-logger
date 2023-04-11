@@ -8,9 +8,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
+#nullable enable
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
@@ -54,7 +53,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
-        public string GetString(string key)
+        public string? GetString(string key)
         {
             return _sources.Select(source => source.GetString(key))
                            .FirstOrDefault(value => value != null);
@@ -112,14 +111,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         }
 
         /// <inheritdoc />
-        public IDictionary<string, string> GetDictionary(string key)
+        public IDictionary<string, string>? GetDictionary(string key)
         {
             return _sources.Select(source => source.GetDictionary(key))
                         .FirstOrDefault(value => value != null);
         }
 
         /// <inheritdoc />
-        public IDictionary<string, string> GetDictionary(string key, bool allowOptionalMappings)
+        public IDictionary<string, string>? GetDictionary(string key, bool allowOptionalMappings)
         {
             return _sources.Select(source => source.GetDictionary(key, allowOptionalMappings))
                         .FirstOrDefault(value => value != null);

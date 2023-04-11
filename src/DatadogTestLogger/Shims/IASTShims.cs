@@ -32,6 +32,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast
         public static Scope? OnHashingAlgorithm(string? commandText, IntegrationId integrationId) => null;
         public static Scope? OnCipherAlgorithm(string? commandText, IntegrationId integrationId) => null;
         public static Scope? OnCipherAlgorithm(Type? type, IntegrationId integrationId) => null;
+        public static void OnCommandInjection(string fileName, string arguments, IEnumerable<string> argumentList, IntegrationId integrationId) {}
     }
 }
 

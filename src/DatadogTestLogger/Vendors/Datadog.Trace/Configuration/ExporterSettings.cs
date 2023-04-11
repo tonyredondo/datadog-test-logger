@@ -8,8 +8,11 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using MetricsTransportType = DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
@@ -72,7 +75,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// using the specified <see cref="IConfigurationSource"/> to initialize values.
         /// </summary>
         /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
-        public ExporterSettings(IConfigurationSource source)
+        public ExporterSettings(IConfigurationSource? source)
             : this(source, File.Exists)
         {
         }
@@ -81,37 +84,39 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// Initializes a new instance of the <see cref="ExporterSettings"/> class.
         /// Direct use in tests only.
         /// </summary>
-        internal ExporterSettings(IConfigurationSource source, Func<string, bool> fileExists)
+        internal ExporterSettings(IConfigurationSource? source, Func<string, bool> fileExists)
         {
             _fileExists = fileExists;
 
             ValidationWarnings = new List<string>();
 
+            source ??= NullConfigurationSource.Instance;
+
             // Get values from the config
-            var traceAgentUrl = source?.GetString(ConfigurationKeys.AgentUri);
-            var tracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
-            var tracesUnixDomainSocketPath = source?.GetString(ConfigurationKeys.TracesUnixDomainSocketPath);
+            var traceAgentUrl = source.GetString(ConfigurationKeys.AgentUri);
+            var tracesPipeName = source.GetString(ConfigurationKeys.TracesPipeName);
+            var tracesUnixDomainSocketPath = source.GetString(ConfigurationKeys.TracesUnixDomainSocketPath);
 
-            var tracesPipeTimeoutMs = source?.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs) ?? 0;
-            var agentHost = source?.GetString(ConfigurationKeys.AgentHost) ??
+            var tracesPipeTimeoutMs = source.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs) ?? 0;
+            var agentHost = source.GetString(ConfigurationKeys.AgentHost) ??
                         // backwards compatibility for names used in the past
-                        source?.GetString("DD_TRACE_AGENT_HOSTNAME") ??
-                        source?.GetString("DATADOG_TRACE_AGENT_HOSTNAME");
+                        source.GetString("DD_TRACE_AGENT_HOSTNAME") ??
+                        source.GetString("DATADOG_TRACE_AGENT_HOSTNAME");
 
-            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort) ??
+            var agentPort = source.GetInt32(ConfigurationKeys.AgentPort) ??
                         // backwards compatibility for names used in the past
-                        source?.GetInt32("DATADOG_TRACE_AGENT_PORT");
+                        source.GetInt32("DATADOG_TRACE_AGENT_PORT");
 
-            var dogStatsdPort = source?.GetInt32(ConfigurationKeys.DogStatsdPort) ?? 0;
-            var metricsPipeName = source?.GetString(ConfigurationKeys.MetricsPipeName);
-            var metricsUnixDomainSocketPath = source?.GetString(ConfigurationKeys.MetricsUnixDomainSocketPath);
-            var partialFlushMinSpans = source?.GetInt32(ConfigurationKeys.PartialFlushMinSpans);
+            var dogStatsdPort = source.GetInt32(ConfigurationKeys.DogStatsdPort) ?? 0;
+            var metricsPipeName = source.GetString(ConfigurationKeys.MetricsPipeName);
+            var metricsUnixDomainSocketPath = source.GetString(ConfigurationKeys.MetricsUnixDomainSocketPath);
+            var partialFlushMinSpans = source.GetInt32(ConfigurationKeys.PartialFlushMinSpans);
 
             ConfigureTraceTransport(traceAgentUrl, tracesPipeName, agentHost, agentPort, tracesUnixDomainSocketPath);
             ConfigureMetricsTransport(traceAgentUrl, agentHost, dogStatsdPort, metricsPipeName, metricsUnixDomainSocketPath);
 
             TracesPipeTimeoutMs = tracesPipeTimeoutMs > 0 ? tracesPipeTimeoutMs : 500;
-            PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled) ?? false;
+            PartialFlushEnabled = source.GetBool(ConfigurationKeys.PartialFlushEnabled) ?? false;
             PartialFlushMinSpans = partialFlushMinSpans > 0 ? partialFlushMinSpans.Value : 500;
         }
 
@@ -141,7 +146,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// Default is <c>null</c>.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TracesPipeName"/>
-        public string TracesPipeName { get; set; }
+        public string? TracesPipeName { get; set; }
 
         /// <summary>
         /// Gets or sets the timeout in milliseconds for the windows named pipe requests.
@@ -155,19 +160,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// Default is <c>null</c>.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.MetricsPipeName"/>
-        public string MetricsPipeName { get; set; }
+        public string? MetricsPipeName { get; set; }
 
         /// <summary>
         /// Gets or sets the unix domain socket path where the Tracer can connect to the Agent.
         /// This parameter is deprecated and shall be removed. Consider using AgentUri instead
         /// </summary>
-        public string TracesUnixDomainSocketPath { get; set; }
+        public string? TracesUnixDomainSocketPath { get; set; }
 
         /// <summary>
         /// Gets or sets the unix domain socket path where the Tracer can send stats.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.MetricsUnixDomainSocketPath"/>
-        public string MetricsUnixDomainSocketPath { get; set; }
+        public string? MetricsUnixDomainSocketPath { get; set; }
 
         /// <summary>
         /// Gets or sets the port where the DogStatsd server is listening for connections.
@@ -211,7 +216,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
         internal List<string> ValidationWarnings { get; }
 
-        private void ConfigureMetricsTransport(string traceAgentUrl, string agentHost, int dogStatsdPort, string metricsPipeName, string metricsUnixDomainSocketPath)
+        private void ConfigureMetricsTransport(string? traceAgentUrl, string? agentHost, int dogStatsdPort, string? metricsPipeName, string? metricsUnixDomainSocketPath)
         {
             // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
             // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
@@ -221,7 +226,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
                 ValidationWarnings.Add("The provided dogStatsD port isn't valid, it should be positive.");
             }
 
-            if (!string.IsNullOrWhiteSpace(traceAgentUrl) && !traceAgentUrl.StartsWith(UnixDomainSocketPrefix) && Uri.TryCreate(traceAgentUrl, UriKind.Absolute, out var uri))
+            if (!string.IsNullOrWhiteSpace(traceAgentUrl) && !traceAgentUrl!.StartsWith(UnixDomainSocketPrefix) && Uri.TryCreate(traceAgentUrl, UriKind.Absolute, out var uri))
             {
                 // No need to set AgentHost, it is taken from the AgentUri and set in ConfigureTrace
                 MetricsTransport = MetricsTransportType.UDP;
@@ -261,14 +266,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             DogStatsdPort = dogStatsdPort > 0 ? dogStatsdPort : DefaultDogstatsdPort;
         }
 
-        private void ConfigureTraceTransport(string agentUri, string tracesPipeName, string agentHost, int? agentPort, string tracesUnixDomainSocketPath)
+        [MemberNotNull(nameof(_agentUri))]
+        private void ConfigureTraceTransport(string? agentUri, string? tracesPipeName, string? agentHost, int? agentPort, string? tracesUnixDomainSocketPath)
         {
             // Check the parameters in order of precedence
             // For some cases, we allow falling back on another configuration (eg invalid url as the application will need to be restarted to fix it anyway).
             // For other cases (eg a configured unix domain socket path not found), we don't fallback as the problem could be fixed outside the application.
             if (!string.IsNullOrWhiteSpace(agentUri))
             {
-                if (TrySetAgentUriAndTransport(agentUri))
+                if (TrySetAgentUriAndTransport(agentUri!))
                 {
                     return;
                 }
@@ -280,11 +286,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
                 TracesPipeName = tracesPipeName;
 
                 // The Uri isn't needed anymore in that case, just populating it for retro compatibility.
-                if (Uri.TryCreate($"http://{agentHost ?? DefaultAgentHost}:{agentPort ?? DefaultAgentPort}", UriKind.Absolute, out var uri))
+                if (!Uri.TryCreate($"http://{agentHost ?? DefaultAgentHost}:{agentPort ?? DefaultAgentPort}", UriKind.Absolute, out var uri))
                 {
-                    SetAgentUriReplacingLocalhost(uri);
+                    // fallback so _agentUri is always non-null
+                    uri = CreateDefaultUri();
                 }
 
+                SetAgentUriReplacingLocalhost(uri);
                 return;
             }
 
@@ -314,19 +322,24 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             {
                 // setting the urls as well for retro compatibility in the almost impossible case where someone
                 // used this config and accessed the AgentUri property as well (to avoid a potential null ref)
-                TrySetAgentUriAndTransport(UnixDomainSocketPrefix + DefaultTracesUnixDomainSocket);
+                // Using Set not TrySet because we know this is a valid Uri and ensures _agentUri is always non-null
+                SetAgentUriAndTransport(new Uri(UnixDomainSocketPrefix + DefaultTracesUnixDomainSocket));
                 return;
             }
 
             ValidationWarnings.Add("No transport configuration found, using default values");
-            TrySetAgentUriAndTransport(DefaultAgentHost, DefaultAgentPort);
+
+            // we know this URL is valid so don't use TrySet, otherwise can't guarantee _agentUri is non null
+            SetAgentUriAndTransport(CreateDefaultUri());
         }
 
+        [MemberNotNullWhen(true, nameof(_agentUri))]
         private bool TrySetAgentUriAndTransport(string host, int port)
         {
             return TrySetAgentUriAndTransport($"http://{host}:{port}");
         }
 
+        [MemberNotNullWhen(true, nameof(_agentUri))]
         private bool TrySetAgentUriAndTransport(string url)
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
@@ -339,6 +352,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             return true;
         }
 
+        [MemberNotNull(nameof(_agentUri))]
         private void SetAgentUriAndTransport(Uri uri)
         {
             if (uri.OriginalString.StartsWith(UnixDomainSocketPrefix, StringComparison.OrdinalIgnoreCase))
@@ -367,6 +381,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             SetAgentUriReplacingLocalhost(uri);
         }
 
+        [MemberNotNull(nameof(_agentUri))]
         private void SetAgentUriReplacingLocalhost(Uri uri)
         {
             if (string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
@@ -383,5 +398,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
                 _agentUri = uri;
             }
         }
+
+        private Uri CreateDefaultUri() => new Uri($"http://{DefaultAgentHost}:{DefaultAgentPort}");
     }
 }

@@ -221,7 +221,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                                            ? new[] { "direction:in", $"group:{groupId}", "type:kafka" }
                                            : new[] { "direction:in", $"group:{groupId}", $"topic:{topic}", "type:kafka" };
 
-                        span.SetDataStreamsCheckpoint(dataStreamsManager, edgeTags);
+                        span.SetDataStreamsCheckpoint(dataStreamsManager, CheckpointKind.Consume, edgeTags);
                     }
                 }
             }
@@ -298,7 +298,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     var edgeTags = string.IsNullOrEmpty(topic)
                         ? defaultProduceEdgeTags
                         : new[] { "direction:out", $"topic:{topic}", "type:kafka" };
-                    span.SetDataStreamsCheckpoint(dataStreamsManager, edgeTags);
+                    span.SetDataStreamsCheckpoint(dataStreamsManager, CheckpointKind.Produce, edgeTags);
                     dataStreamsManager.InjectPathwayContext(span.Context.PathwayContext, adapter);
                 }
             }

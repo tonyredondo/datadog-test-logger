@@ -59,19 +59,58 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
     private void ShowEnvironmentVariables(StringBuilder builder, string title)
     {
+        string[] ciEnvironmentVariables = typeof(Vendors.Datadog.Trace.Ci.CIEnvironmentValues.Constants)
+            .GetFields()
+            .Select(f => f.GetValue(null)?.ToString())
+            .Where(f => f is not null)
+            .ToArray();
+
         builder.AppendLine(title);
         var curatedEnvironmentVariables = new List<KeyValuePair<string, string>>();
-        foreach (DictionaryEntry? envVars in Environment.GetEnvironmentVariables())
+        foreach (DictionaryEntry envVars in Environment.GetEnvironmentVariables())
         {
-            curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(envVars?.Key?.ToString() ?? string.Empty, envVars?.Value?.ToString() ?? string.Empty));
+            var key = envVars.Key?.ToString().ToUpperInvariant();
+            if (key is null)
+            {
+                continue;
+            }
+
+            // We allow keys starting with DD_, COR_ and CORECLR_
+            if (key.StartsWith("DD_") || key.StartsWith("COR_") || key.StartsWith("CORECLR_"))
+            {
+                curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars.Value?.ToString() ?? string.Empty));
+            }
+
+            // We also allow keys from CI providers
+            if (ciEnvironmentVariables.Any(env => string.Equals(env, key, StringComparison.OrdinalIgnoreCase)))
+            {
+                curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars.Value?.ToString() ?? string.Empty));
+            }
         }
 
-        curatedEnvironmentVariables.Sort((a, b) => a.Key.CompareTo(b.Key));
+        curatedEnvironmentVariables.Sort((a, b) => string.Compare(a.Key, b.Key, StringComparison.Ordinal));
         foreach (var envVars in curatedEnvironmentVariables)
         {
-            if (envVars.Key.Contains("API_KEY") || envVars.Key.Contains("APP_KEY") || envVars.Key.Contains("APPLICATION_KEY"))
+            if (envVars.Key.Contains("API_KEY") ||
+                envVars.Key.Contains("APP_KEY") ||
+                envVars.Key.Contains("APPKEY") ||
+                envVars.Key.Contains("APIKEY") ||
+                envVars.Key.Contains("APPLICATION_KEY") ||
+                envVars.Key.Contains("TOKEN"))
             {
-                // Hide sensitive data.
+                if (string.IsNullOrEmpty(envVars.Value))
+                {
+                    builder.AppendLine($"  {envVars.Key}=<empty>");
+                }
+                else
+                {
+                    // Hide sensitive data.
+                    builder.AppendLine($"  {envVars.Key}=***********************************");
+                }
+            }
+            else if (Guid.TryParse(envVars.Value, out _))
+            {
+                // If we identify an UUID we hide the value (we only need to know it was present for debugging purposes)
                 builder.AppendLine($"  {envVars.Key}=***********************************");
             }
             else

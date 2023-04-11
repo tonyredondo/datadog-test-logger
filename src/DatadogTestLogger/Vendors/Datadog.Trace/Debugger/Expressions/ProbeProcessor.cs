@@ -9,10 +9,12 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models;
+using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Models;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
@@ -71,7 +73,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
 
         internal ProbeInfo ProbeInfo { get; }
 
-        private bool IsMetricCountWithoutExpression => ProbeInfo.ProbeType == ProbeType.Metric && _metric == null && ProbeInfo.MetricKind == MetricKind.COUNT;
+        private bool IsMetricCountWithoutExpression => ProbeInfo.ProbeType == ProbeType.Metric && (_metric?.Json == null) && ProbeInfo.MetricKind == MetricKind.COUNT;
 
         [DebuggerStepThrough]
         private bool HasCondition() => _condition.HasValue;
@@ -244,41 +246,47 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
                 }
                 else
                 {
-                    if (ProbeInfo.ProbeType != ProbeType.Metric)
-                    {
-                        // we taking the duration at the evaluation time - this might be different from what we have in the snapshot
-                        snapshotCreator.SetDuration();
-                    }
-
+                    // we are taking the duration at the evaluation time - this might be different from what we have in the snapshot
+                    snapshotCreator.SetDuration();
                     evaluationResult = GetOrCreateEvaluator().Evaluate(snapshotCreator.MethodScopeMembers);
                 }
             }
             catch (Exception e)
             {
-                // if the evaluation failed stop capturing
                 Log.Error(e, "Failed to evaluate expression for probe: {ProbeId}", ProbeInfo.ProbeId);
-                shouldStopCapture = true;
+                if (evaluationResult.IsNull())
+                {
+                    evaluationResult = new ExpressionEvaluationResult();
+                }
+
+                evaluationResult.Errors ??= new List<EvaluationError>();
+                evaluationResult.Errors.Add(new EvaluationError { Message = $"Failed to evaluate expression for probe ID: {ProbeInfo.ProbeId}. Error: {e.Message}" });
                 return evaluationResult;
             }
 
             if (evaluationResult.IsNull())
             {
                 Log.Error("Evaluation result should not be null. Probe: {ProbeId}", ProbeInfo.ProbeId);
-                shouldStopCapture = true;
+                evaluationResult.Errors = new List<EvaluationError> { new() { Message = $"Evaluation result is null. Probe ID: {ProbeInfo.ProbeId}" } };
                 return evaluationResult;
             }
 
-            if (evaluationResult.Condition is false && !evaluationResult.HasError)
+            if (evaluationResult.HasError)
             {
-                // if the expression evaluated to false
+                return evaluationResult;
+            }
+
+            if (evaluationResult.Condition is false)
+            {
+                // if the expression evaluated to false, stop capture
                 shouldStopCapture = true;
                 return evaluationResult;
             }
 
             if (evaluationResult.Condition is true &&
-                !evaluationResult.HasError &&
                 !ProbeRateLimiter.Instance.Sample(ProbeInfo.ProbeId))
             {
+                // if condition is true, stop capture if there is a rate limit
                 shouldStopCapture = true;
                 return evaluationResult;
             }
@@ -287,7 +295,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
             {
                 LiveDebugger.Instance.SendMetrics(ProbeInfo.MetricKind.Value, ProbeInfo.MetricName, evaluationResult.Metric.Value);
                 // snapshot creator is created for all probes in the method invokers,
-                // if it is a metric probe, once we sent the value, we can stop the invokers working and dispose the snapshot creator
+                // if it is a metric probe, once we sent the value, we can stop the invokers and dispose the snapshot creator
                 snapshotCreator.Dispose();
                 shouldStopCapture = true;
             }
@@ -354,11 +362,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
                 case MethodState.EntryAsync:
                     if (snapshotCreator.CaptureBehaviour == CaptureBehaviour.Evaluate)
                     {
-                        if (evaluationResult.IsNull())
-                        {
-                            throw new ArgumentException($"{nameof(evaluationResult)} can't be null when we are in {nameof(CaptureBehaviour.Evaluate)}", nameof(evaluationResult));
-                        }
-
                         snapshotCreator.SetEvaluationResult(ref evaluationResult);
                     }
 
@@ -378,11 +381,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
                 case MethodState.EntryEnd:
                     if (snapshotCreator.CaptureBehaviour == CaptureBehaviour.Evaluate)
                     {
-                        if (evaluationResult.IsNull())
-                        {
-                            throw new ArgumentException($"{nameof(evaluationResult)} can't be null when we are in {nameof(CaptureBehaviour.Evaluate)}", nameof(evaluationResult));
-                        }
-
                         snapshotCreator.SetEvaluationResult(ref evaluationResult);
                     }
 
@@ -406,11 +404,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
                     {
                         if (snapshotCreator.CaptureBehaviour == CaptureBehaviour.Evaluate)
                         {
-                            if (evaluationResult.IsNull())
-                            {
-                                throw new ArgumentException($"{nameof(evaluationResult)} can't be null when we are in {nameof(CaptureBehaviour.Evaluate)}", nameof(evaluationResult));
-                            }
-
                             snapshotCreator.SetEvaluationResult(ref evaluationResult);
                         }
 
@@ -450,11 +443,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
                 case MethodState.EndLineAsync:
                     if (snapshotCreator.CaptureBehaviour == CaptureBehaviour.Evaluate)
                     {
-                        if (evaluationResult.IsNull())
-                        {
-                            throw new ArgumentException($"{nameof(evaluationResult)} can't be null when we are in {nameof(CaptureBehaviour.Evaluate)}", nameof(evaluationResult));
-                        }
-
                         snapshotCreator.SetEvaluationResult(ref evaluationResult);
                     }
 

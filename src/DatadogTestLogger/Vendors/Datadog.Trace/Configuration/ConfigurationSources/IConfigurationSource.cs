@@ -8,6 +8,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+#nullable enable
+
 using System.Collections.Generic;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
@@ -23,7 +25,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
-        string GetString(string key);
+        string? GetString(string key);
 
         /// <summary>
         /// Gets the <see cref="int"/> value of
@@ -55,7 +57,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
-        IDictionary<string, string> GetDictionary(string key);
+        IDictionary<string, string>? GetDictionary(string key);
 
         /// <summary>
         /// Gets the <see cref="IDictionary{TKey, TValue}"/> value of
@@ -64,6 +66,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// <param name="key">The key that identifies the setting.</param>
         /// <param name="allowOptionalMappings">Determines whether to create dictionary entries when the input has no value mapping</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
-        IDictionary<string, string> GetDictionary(string key, bool allowOptionalMappings);
+        IDictionary<string, string>? GetDictionary(string key, bool allowOptionalMappings);
     }
 }

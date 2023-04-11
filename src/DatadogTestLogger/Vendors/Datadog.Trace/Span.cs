@@ -10,7 +10,6 @@
 
 using System;
 using System.Globalization;
-using System.Security.Cryptography;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;

@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Helpers;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Models;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Linq;
 using static DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions.ProbeExpressionParserHelper;
@@ -28,6 +29,7 @@ internal partial class ProbeExpressionParser<T>
     private const string @Duration = "@duration";
     private const string @It = "@it";
 
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ProbeExpressionParser<T>));
     private static readonly LabelTarget ReturnTarget = Expression.Label(typeof(T));
 
     /// <summary>
@@ -566,6 +568,7 @@ internal partial class ProbeExpressionParser<T>
         }
         catch (Exception e)
         {
+            Log.Error(e, "Expression was: {Expression}", expressionJson);
             parser.AddError(parsedExpression.ExpressionBody?.ToString() ?? expressionJson, e.Message);
             return new CompiledExpression<T>(
                 DefaultDelegate,

@@ -68,6 +68,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             DateTimeOffset? startTime = state.StartTime;
 
             SpanContext propagatedContext = null;
+            IBasicProperties basicProperties = null;
             string messageSize = null;
 
             if (basicGetResult.Instance != null)
@@ -80,6 +81,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 {
                     try
                     {
+                        basicProperties = basicGetResult.BasicProperties;
                         propagatedContext = SpanContextPropagator.Instance.Extract(basicPropertiesHeaders, default(ContextPropagation));
                     }
                     catch (Exception ex)
@@ -104,6 +106,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     if (exception != null)
                     {
                         scope.Span.SetException(exception);
+                    }
+
+                    if (basicProperties != null)
+                    {
+                        RabbitMQIntegration.SetDataStreamsCheckpointOnConsume(Tracer.Instance, scope.Span, tags, basicProperties.Headers);
                     }
                 }
             }

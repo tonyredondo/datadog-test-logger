@@ -11,6 +11,7 @@
 using System;
 using System.ComponentModel;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Process
 {
@@ -39,6 +40,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         {
             if (instance is System.Diagnostics.Process process && process.StartInfo is var startInfo)
             {
+                if (Iast.Iast.Instance.Settings.Enabled)
+                {
+#if NETCOREAPP3_1_OR_GREATER
+                    IastModule.OnCommandInjection(startInfo.FileName, startInfo.Arguments, startInfo.ArgumentList, Configuration.IntegrationId.Process);
+#else
+                    IastModule.OnCommandInjection(startInfo.FileName, startInfo.Arguments, null, Configuration.IntegrationId.Process);
+#endif
+                }
+
                 return new CallTargetState(scope: ProcessStartCommon.CreateScope(startInfo));
             }
 

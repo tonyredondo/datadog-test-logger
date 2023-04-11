@@ -358,10 +358,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Sets a DataStreams checkpoint
         /// </summary>
         /// <param name="manager">The <see cref="DataStreamsManager"/> to use</param>
+        /// <param name="checkpointKind">The type of the checkpoint</param>
         /// <param name="edgeTags">The edge tags for this checkpoint. NOTE: These MUST be sorted alphabetically</param>
-        internal void SetCheckpoint(DataStreamsManager manager, string[] edgeTags)
+        internal void SetCheckpoint(DataStreamsManager manager, CheckpointKind checkpointKind, string[] edgeTags)
         {
-            PathwayContext = manager.SetCheckpoint(PathwayContext, edgeTags);
+            PathwayContext = manager.SetCheckpoint(PathwayContext, checkpointKind, edgeTags);
         }
 
         /// <summary>

@@ -8,6 +8,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+#nullable enable
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="data">A string containing key-value pairs which are comma-separated, and for which the key and value are colon-separated.</param>
         /// <returns><see cref="IDictionary{TKey, TValue}"/> of key value pairs.</returns>
-        public static IDictionary<string, string> ParseCustomKeyValues(string data)
+        public static IDictionary<string, string>? ParseCustomKeyValues(string? data)
         {
             return ParseCustomKeyValues(data, allowOptionalMappings: false);
         }
@@ -42,7 +43,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// <param name="data">A string containing key-value pairs which are comma-separated, and for which the key and value are colon-separated.</param>
         /// <param name="allowOptionalMappings">Determines whether to create dictionary entries when the input has no value mapping</param>
         /// <returns><see cref="IDictionary{TKey, TValue}"/> of key value pairs.</returns>
-        public static IDictionary<string, string> ParseCustomKeyValues(string data, bool allowOptionalMappings)
+        public static IDictionary<string, string>? ParseCustomKeyValues(string? data, bool allowOptionalMappings)
         {
             // A null return value means the key was not present,
             // and CompositeConfigurationSource depends on this behavior
@@ -97,26 +98,27 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         }
 
         /// <inheritdoc />
-        public abstract string GetString(string key);
+        public abstract string? GetString(string key);
 
         /// <inheritdoc />
         public virtual int? GetInt32(string key)
         {
-            string value = GetString(key);
+            var value = GetString(key);
 
-            return int.TryParse(value, out int result)
+            return value is not null
+                && int.TryParse(value, out var result)
                        ? result
-                       : (int?)null;
+                       : null;
         }
 
         /// <inheritdoc />
         public double? GetDouble(string key)
         {
-            string value = GetString(key);
+            var value = GetString(key);
 
-            return double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out double result)
+            return value is not null && double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
                        ? result
-                       : (double?)null;
+                       : null;
         }
 
         /// <inheritdoc />
@@ -131,7 +133,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key</param>
         /// <returns><see cref="ConcurrentDictionary{TKey, TValue}"/> containing all of the key-value pairs.</returns>
-        public IDictionary<string, string> GetDictionary(string key)
+        public IDictionary<string, string>? GetDictionary(string key)
         {
             return ParseCustomKeyValues(GetString(key), allowOptionalMappings: false);
         }
@@ -142,7 +144,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// <param name="key">The key</param>
         /// <param name="allowOptionalMappings">Determines whether to create dictionary entries when the input has no value mapping</param>
         /// <returns><see cref="ConcurrentDictionary{TKey, TValue}"/> containing all of the key-value pairs.</returns>
-        public IDictionary<string, string> GetDictionary(string key, bool allowOptionalMappings)
+        public IDictionary<string, string>? GetDictionary(string key, bool allowOptionalMappings)
         {
             return ParseCustomKeyValues(GetString(key), allowOptionalMappings);
         }

@@ -50,8 +50,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             return scope;
         }
 
-        internal static void UpdateScopeFromExecuteAsync<T>(Tracer tracer, in T context)
-            where T : IOperationContext
+        internal static void UpdateScopeFromExecuteAsync(Tracer tracer, string operationType, string operationName)
         {
             if (!tracer.Settings.IsIntegrationEnabled(IntegrationId))
             {
@@ -69,17 +68,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             try
             {
-                var operation = context.Operation;
-                var operationType = operation.OperationType.ToString();
                 if (span.Tags is GraphQLTags tags)
                 {
+                    tags.OperationName = operationName;
                     span.ResourceName = $"{operationType} {tags.OperationName ?? "operation"}";
                     tags.OperationType = operationType;
                 }
                 else
                 {
-                    var operationName = span.GetTag(Trace.Tags.GraphQLOperationName);
-                    span.ResourceName = $"{operationType} {operationName ?? "operation"}";
+                    var operationNameTag = span.GetTag(Trace.Tags.GraphQLOperationName);
+                    span.ResourceName = $"{operationType} {operationNameTag ?? "operation"}";
                     span.SetTag(Trace.Tags.GraphQLOperationType, operationType);
                 }
             }
@@ -156,5 +154,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             return res;
         }
+
+        internal static string GetOperation(OperationTypeProxy operation)
+            => operation switch
+            {
+                OperationTypeProxy.Query => nameof(OperationTypeProxy.Query),
+                OperationTypeProxy.Mutation=> nameof(OperationTypeProxy.Mutation),
+                OperationTypeProxy.Subscription=> nameof(OperationTypeProxy.Subscription),
+                _ => operation.ToString(),
+            };
     }
 }
