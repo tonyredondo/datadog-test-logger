@@ -64,8 +64,21 @@ class Build : NukeBuild
             );
         });
 
+    Target Test => _ => _
+        .DependsOn(Compile)
+        .Requires(() => Version)
+        .Executes(() =>
+        {
+            var project = Solution.GetProject("DatadogTestLogger.Test");
+            DotNetTest(x => x
+                .SetProjectFile(project)
+                .SetConfiguration(Configuration)
+                .EnableNoBuild());
+        });
+
     Target Pack => _ => _
         .DependsOn(Compile)
+        .DependsOn(Test)
         .Requires(() => Version, () => ArtifactsDirectory)
         .Executes(() =>
         {

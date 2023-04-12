@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSTestSample", "..\Samples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\..\build\_build.csproj", "{130497B9-4C3A-4C9B-955C-D715DAF8B95F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatadogTestLogger.Test", "..\..\test\DatadogTestLogger.Test\DatadogTestLogger.Test.csproj", "{7C58B843-3E96-4203-AB28-F115903AEF23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{AB0736C9-9C6C-477C-9D1D-6985C8A171E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB0736C9-9C6C-477C-9D1D-6985C8A171E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB0736C9-9C6C-477C-9D1D-6985C8A171E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C58B843-3E96-4203-AB28-F115903AEF23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C58B843-3E96-4203-AB28-F115903AEF23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C58B843-3E96-4203-AB28-F115903AEF23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C58B843-3E96-4203-AB28-F115903AEF23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0388C6E4-B711-47B9-9EE9-FCBB3B7B3E45} = {C2933331-142F-4187-B5C0-5CC8BBFD7452}

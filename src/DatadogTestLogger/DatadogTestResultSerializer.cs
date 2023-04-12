@@ -57,7 +57,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
         }
     }
 
-    private void ShowEnvironmentVariables(StringBuilder builder, string title)
+    internal void ShowEnvironmentVariables(StringBuilder builder, string title, IDictionary? environmentVariables = null)
     {
         string[] ciEnvironmentVariables = typeof(Vendors.Datadog.Trace.Ci.CIEnvironmentValues.Constants)
             .GetFields()
@@ -67,7 +67,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
         builder.AppendLine(title);
         var curatedEnvironmentVariables = new List<KeyValuePair<string, string>>();
-        foreach (DictionaryEntry envVars in Environment.GetEnvironmentVariables())
+        foreach (DictionaryEntry envVars in (environmentVariables ?? Environment.GetEnvironmentVariables()))
         {
             var key = envVars.Key?.ToString().ToUpperInvariant();
             if (key is null)

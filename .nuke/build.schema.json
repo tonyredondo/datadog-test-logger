@@ -80,6 +80,7 @@
               "Compile",
               "Pack",
               "Restore",
+              "Test",
               "VendorDatadogTrace"
             ]
           }
@@ -98,6 +99,7 @@
               "Compile",
               "Pack",
               "Restore",
+              "Test",
               "VendorDatadogTrace"
             ]
           }
