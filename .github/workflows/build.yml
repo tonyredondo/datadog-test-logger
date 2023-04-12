@@ -17,5 +17,5 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
-    - name: Build and pack
+    - name: Build, test and pack
       run: ./build.sh
