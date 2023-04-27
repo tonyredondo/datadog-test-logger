@@ -26,7 +26,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 /// <typeparam name="TMeta">Type of ModuleCoverageMetadata</typeparam>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-internal static class CoverageReporter<TMeta>
+public static class CoverageReporter<TMeta>
     where TMeta : ModuleCoverageMetadata, new()
 {
     private static readonly TMeta Metadata;

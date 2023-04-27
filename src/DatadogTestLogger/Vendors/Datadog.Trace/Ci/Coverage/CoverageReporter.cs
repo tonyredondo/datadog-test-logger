@@ -21,7 +21,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 /// </summary>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-internal static class CoverageReporter
+public static class CoverageReporter
 {
     private static readonly List<Action<CoverageContextContainer?>> CoverageContextContainerChangeActions = new();
     private static CoverageEventHandler _handler = new DefaultWithGlobalCoverageEventHandler();

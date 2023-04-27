@@ -18,7 +18,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Metadata;
 /// <summary>
 /// Module Coverage Metadata base class
 /// </summary>
-internal abstract class ModuleCoverageMetadata
+public abstract class ModuleCoverageMetadata
 {
     /// <summary>
     /// Gets or sets the metadata array

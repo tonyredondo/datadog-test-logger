@@ -548,7 +548,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
             if (string.IsNullOrEmpty(_tracerHome))
             {
                 // If tracer home is empty then we try to load the Datadog.Trace.dll in the current folder.
-                return "Datadog.Trace.dll";
+                return Path.Combine(Path.GetDirectoryName(FilePath), "Datadog.testlogger.dll");
             }
 
             var targetFolder = "net461";
@@ -568,7 +568,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
                     break;
             }
 
-            return Path.Combine(_tracerHome, targetFolder, "Datadog.Trace.dll");
+            return Path.Combine(_tracerHome, targetFolder, "Datadog.testlogger.dll");
         }
 
         private string CopyRequiredAssemblies(AssemblyDefinition assemblyDefinition, TracerTarget tracerTarget)
@@ -593,8 +593,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
                         break;
                 }
 
-                var datadogTraceDllPath = Path.Combine(_tracerHome, targetFolder, "Datadog.Trace.dll");
-                var datadogTracePdbPath = Path.Combine(_tracerHome, targetFolder, "Datadog.Trace.pdb");
+                if (_tracerHome is null) return string.Empty;
+
+                var datadogTraceDllPath = Path.Combine(_tracerHome, targetFolder, "Datadog.testlogger.dll");
+                var datadogTracePdbPath = Path.Combine(_tracerHome, targetFolder, "Datadog.testlogger.pdb");
 
                 // Global lock for copying the Datadog.Trace assembly to the output folder
                 lock (PadLock)

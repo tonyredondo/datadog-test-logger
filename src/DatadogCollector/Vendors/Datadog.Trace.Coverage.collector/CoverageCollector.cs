@@ -133,7 +133,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
 
                 // Read the DD_DOTNET_TRACER_HOME environment variable
                 _tracerHome = Util.EnvironmentHelpers.GetEnvironmentVariable("DD_DOTNET_TRACER_HOME");
-                if (string.IsNullOrEmpty(_tracerHome) || !Directory.Exists(_tracerHome))
+                if (false)
                 {
                     _logger?.Error("Tracer home (DD_DOTNET_TRACER_HOME environment variable) is not defined or folder doesn't exist, coverage has been disabled.");
 
@@ -150,7 +150,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
 
         internal void ProcessFolder(string folder, SearchOption searchOption)
         {
-            if (_tracerHome is null)
+            if (false)
             {
                 return;
             }

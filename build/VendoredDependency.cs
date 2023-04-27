@@ -286,6 +286,21 @@ public class VendoredDependency
                         builder.Replace("#if NETFRAMEWORK", "#if NETFRAMEWORK_BUT_NOT_SUPPORTED");
                     }
 
+                    if (filePath.Contains("AssemblyProcessor.cs"))
+                    {
+                        builder.Replace("\"Datadog.Trace.dll\"", "\"Datadog.testlogger.dll\"");
+                        builder.Replace("\"Datadog.Trace.pdb\"", "\"Datadog.testlogger.pdb\"");
+                        builder.Replace("return \"Datadog.testlogger.dll\";", "return Path.Combine(Path.GetDirectoryName(FilePath), \"Datadog.testlogger.dll\");");
+                        builder.Replace("                }\n\n                var datadogTraceDllPath = Path.Combine(_tracerHome, targetFolder, \"Datadog.testlogger.dll\");", 
+                            "                }\n\n                if (_tracerHome is null) return string.Empty;\n\n                var datadogTraceDllPath = Path.Combine(_tracerHome, targetFolder, \"Datadog.testlogger.dll\");");
+                    }
+
+                    if (filePath.Contains("CoverageCollector.cs"))
+                    {
+                        builder.Replace("if (string.IsNullOrEmpty(_tracerHome) || !Directory.Exists(_tracerHome))", "if (false)");
+                        builder.Replace("if (_tracerHome is null)", "if (false)");
+                    }
+
                     // Fix namespace conflicts in `using alias` directives. For example, transform:
                     //      using Foo = dnlib.A.B.C;
                     // To:
@@ -300,6 +315,20 @@ public class VendoredDependency
 
                     // Don't expose anything we don't intend to
                     // by replacing all "public" access modifiers with "internal"
+
+                    if (filePath.Contains("ModuleCoverageMetadata.cs") ||
+                        filePath.Contains("ComponentCoverageInfo.cs") ||
+                        filePath.Contains("FileCoverageInfo.cs") ||
+                        filePath.Contains("GlobalCoverageInfo.cs") ||
+                        filePath.Contains("FileCoverage.cs") ||
+                        filePath.Contains("TestCoverage.cs") ||
+                        filePath.Contains("CoverageReporter.cs") ||
+                        filePath.Contains("CoverageReporter`1.cs") ||
+                        filePath.Contains("CoverageInfo.cs"))
+                    {
+                        return result;
+                    }
+                    
                     return Regex.Replace(
                         result,
                         @"public(\s+((abstract|sealed|static|unsafe)\s+)*?(partial\s+)?(class|readonly\s+(ref\s+)?struct|struct|interface|enum|delegate))",

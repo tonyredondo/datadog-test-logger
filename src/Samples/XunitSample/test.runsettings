@@ -1,7 +1,7 @@
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
-      <DataCollector friendlyName="DatadogCoverage" uri="datacollector://Datadog/CoverageCollector/1.0" enabled="True" />
+      <DataCollector friendlyName="datadog" uri="datacollector://Datadog/collector/1.0" enabled="True" />
     </DataCollectors>
   </DataCollectionRunSettings>
   <LoggerRunSettings>
