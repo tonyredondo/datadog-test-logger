@@ -45,6 +45,54 @@ public class VendoredDependency
             Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
                 AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile),
         });
+
+        All.Add(new()
+        {
+            LibraryName = "Mono.Cecil",
+            DownloadUrl = "https://github.com/jbevain/cecil/archive/refs/tags/0.11.5.zip",
+            ZipFilePrefix = "cecil-0.11.5",
+            PathToSrc = Array.Empty<string>(),
+            RelativeGlobsToExclude = new[]
+            {
+                "Test/**/*.*",
+                "Mono.Cecil/AssemblyInfo.cs",
+                "rocks/**/*.*",
+                "symbols/**/*.*",
+                "symbols/pdb/**/*.*",
+                "ProjectInfo.cs",
+                "Mono.Cecil.Tests.props",
+            },
+            Transform = filePath =>
+            {
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Mono",
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+
+                RewritePropsFileWithStandardTransform(filePath);
+            },
+        });
+
+        All.Add(new()
+        {
+            LibraryName = "Datadog.Trace.Coverage.collector",
+            DownloadUrl = "https://github.com/DataDog/dd-trace-dotnet/archive/refs/heads/master.zip",
+            ZipFilePrefix = "dd-trace-dotnet-master",
+            PathToSrc = new[] {"tracer", "src", "Datadog.Trace.Coverage.collector"},
+            RelativeGlobsToExclude = new[]
+            {
+                "AssemblyInfo.cs",
+            },
+            Transform = filePath =>
+            {
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Mono",
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace.Coverage.Collector",
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+            },
+        });
     }
 
     public static List<VendoredDependency> All { get; set; } = new List<VendoredDependency>();
@@ -224,7 +272,7 @@ public class VendoredDependency
                     {
                         builder.Replace("#if NETFRAMEWORK", "#if NETFRAMEWORK_BUT_NOT_SUPPORTED");
                     }
-                    
+
                     // Fix namespace conflicts in `using alias` directives. For example, transform:
                     //      using Foo = dnlib.A.B.C;
                     // To:
@@ -243,6 +291,33 @@ public class VendoredDependency
                         result,
                         @"public(\s+((abstract|sealed|static|unsafe)\s+)*?(partial\s+)?(class|readonly\s+(ref\s+)?struct|struct|interface|enum|delegate))",
                         match => $"internal{match.Groups[1]}");
+                });
+        }
+    }
+
+    private static void RewritePropsFileWithStandardTransform(string filePath,
+        params Func<string, string, string>[] extraTransform)
+    {
+        if (string.Equals(Path.GetExtension(filePath), ".props", StringComparison.OrdinalIgnoreCase))
+        {
+            RewriteFileWithTransform(
+                filePath,
+                content =>
+                {
+                    foreach (var transform in extraTransform)
+                    {
+                        if (transform != null)
+                        {
+                            content = transform(filePath, content);
+                        }
+                    }
+
+                    // Disable analyzer
+                    var builder = new StringBuilder(content);
+
+                    builder.Replace("<SignAssembly>true</SignAssembly>", "<SignAssembly>false</SignAssembly>");
+
+                    return builder.ToString();
                 });
         }
     }
