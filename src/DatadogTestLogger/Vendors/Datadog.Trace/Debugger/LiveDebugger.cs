@@ -38,7 +38,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
 
         private readonly DebuggerSettings _settings;
         private readonly IDiscoveryService _discoveryService;
-        private readonly IRemoteConfigurationManager _remoteConfigurationManager;
+        private readonly IRcmSubscriptionManager _subscriptionManager;
+        private readonly ISubscription _subscription;
         private readonly IDebuggerSink _debuggerSink;
         private readonly ILineProbeResolver _lineProbeResolver;
         private readonly List<ProbeDefinition> _unboundProbes;
@@ -53,7 +54,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
             DebuggerSettings settings,
             string serviceName,
             IDiscoveryService discoveryService,
-            IRemoteConfigurationManager remoteConfigurationManager,
+            IRcmSubscriptionManager remoteConfigurationManager,
             ILineProbeResolver lineProbeResolver,
             IDebuggerSink debuggerSink,
             IProbeStatusPoller probeStatusPoller,
@@ -65,18 +66,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
             _lineProbeResolver = lineProbeResolver;
             _debuggerSink = debuggerSink;
             _probeStatusPoller = probeStatusPoller;
-            _remoteConfigurationManager = remoteConfigurationManager;
+            _subscriptionManager = remoteConfigurationManager;
             _configurationUpdater = configurationUpdater;
             _dogStats = dogStats;
             _unboundProbes = new List<ProbeDefinition>();
-            Product = new LiveDebuggerProduct();
             ServiceName = serviceName;
+            _subscription = new Subscription(
+                (updates, removals) =>
+                {
+                    AcceptAddedConfiguration(updates.Values.SelectMany(u => u).Select(i => new NamedRawFile(i.Path, i.Contents)));
+                    AcceptRemovedConfiguration(removals.Values.SelectMany(u => u));
+                    return Enumerable.Empty<ApplyDetails>();
+                },
+                RcmProducts.LiveDebugging);
             discoveryService?.SubscribeToChanges(DiscoveryCallback);
         }
 
         public static LiveDebugger Instance { get; private set; }
-
-        public LiveDebuggerProduct Product { get; }
 
         public string ServiceName { get; }
 
@@ -84,7 +90,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
             DebuggerSettings settings,
             string serviceName,
             IDiscoveryService discoveryService,
-            IRemoteConfigurationManager remoteConfigurationManager,
+            IRcmSubscriptionManager remoteConfigurationManager,
             ILineProbeResolver lineProbeResolver,
             IDebuggerSink debuggerSink,
             IProbeStatusPoller probeStatusPoller,
@@ -112,12 +118,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
             try
             {
                 Log.Information("Live Debugger initialization started");
-                _remoteConfigurationManager.RegisterProduct(Product);
+                _subscriptionManager.SubscribeToChanges(_subscription);
 
                 DebuggerSnapshotSerializer.SetConfig(_settings);
-
-                Product.ConfigChanged += (sender, args) => AcceptAddedConfiguration(args);
-                Product.ConfigRemoved += (sender, args) => AcceptRemovedConfiguration(args);
                 AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => CheckUnboundProbes();
 
                 await StartAsync().ConfigureAwait(false);
@@ -163,6 +166,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
                 LifetimeManager.Instance.AddShutdownTask(_debuggerSink.Dispose);
                 LifetimeManager.Instance.AddShutdownTask(_probeStatusPoller.Dispose);
                 LifetimeManager.Instance.AddShutdownTask(_dogStats.Dispose);
+                LifetimeManager.Instance.AddShutdownTask(() => _subscriptionManager.Unsubscribe(_subscription));
             }
         }
 
@@ -328,14 +332,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
             }
         }
 
-        private void AcceptAddedConfiguration(ProductConfigChangedEventArgs args)
+        private void AcceptAddedConfiguration(IEnumerable<NamedRawFile> configContents)
         {
             var logs = new List<LogProbe>();
             var metrics = new List<MetricProbe>();
             var spans = new List<SpanProbe>();
             ServiceConfiguration serviceConfig = null;
 
-            foreach (var configContent in args.ConfigContents)
+            foreach (var configContent in configContents)
             {
                 try
                 {
@@ -363,28 +367,22 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
                 }
             }
 
-            var probeConfiguration = new ProbeConfiguration()
-            {
-                ServiceConfiguration = serviceConfig,
-                MetricProbes = metrics.ToArray(),
-                LogProbes = logs.ToArray(),
-                SpanProbes = spans.ToArray()
-            };
+            var probeConfiguration = new ProbeConfiguration() { ServiceConfiguration = serviceConfig, MetricProbes = metrics.ToArray(), LogProbes = logs.ToArray(), SpanProbes = spans.ToArray() };
 
             _configurationUpdater.AcceptAdded(probeConfiguration);
         }
 
-        private void AcceptRemovedConfiguration(ProductConfigChangedEventArgs args)
+        private void AcceptRemovedConfiguration(IEnumerable<RemoteConfigurationPath> paths)
         {
-            var removedIds = args.ConfigContents
-                   .Select(TrimProbeTypeFromPath)
-                   .ToArray();
+            var removedIds = paths
+                            .Select(TrimProbeTypeFromPath)
+                            .ToArray();
 
             _configurationUpdater.AcceptRemoved(removedIds);
 
-            string TrimProbeTypeFromPath(NamedRawFile file)
+            string TrimProbeTypeFromPath(RemoteConfigurationPath path)
             {
-                return file.Path.Id.Split('_').Last();
+                return path.Id.Split('_').Last();
             }
         }
 

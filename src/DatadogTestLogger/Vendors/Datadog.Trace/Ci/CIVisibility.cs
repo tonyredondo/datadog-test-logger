@@ -30,8 +30,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 {
     internal class CIVisibility
     {
-        private static readonly Lazy<bool> EnabledLazy = new(InternalEnabled, true);
-
+        private static Lazy<bool> _enabledLazy = new(InternalEnabled, true);
         private static CIVisibilitySettings? _settings;
         private static int _firstInitialization = 1;
         private static Task? _skippableTestsTask;
@@ -39,7 +38,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 
         internal static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(CIVisibility));
 
-        public static bool Enabled => EnabledLazy.Value;
+        public static bool Enabled => _enabledLazy.Value;
 
         public static bool IsRunning => Interlocked.CompareExchange(ref _firstInitialization, 0, 0) == 0;
 
@@ -61,6 +60,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 return null;
             }
         }
+
+        // Unlocked tracer manager is used in tests so tracer instance can be changed with a new configuration.
+        internal static bool UseLockedTracerManager { get; set; } = true;
 
         public static void Initialize()
         {
@@ -112,7 +114,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 
             // Initialize Tracer
             Log.Information("Initialize Test Tracer instance");
-            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory(settings, discoveryService, eventPlatformProxyEnabled));
+            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory(settings, discoveryService, eventPlatformProxyEnabled, UseLockedTracerManager));
             _ = Tracer.Instance;
 
             // Initialize FrameworkDescription
@@ -177,7 +179,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 
             // Initialize Tracer
             Log.Information("Initialize Test Tracer instance");
-            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory(settings, discoveryService, eventPlatformProxyEnabled));
+            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory(settings, discoveryService, eventPlatformProxyEnabled, UseLockedTracerManager));
             _ = Tracer.Instance;
 
             // Initialize FrameworkDescription
@@ -426,6 +428,18 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             }
 
             return Environment.OSVersion.VersionString;
+        }
+
+        /// <summary>
+        /// Resets CI Visibility to the initial values. Used for testing purposes.
+        /// </summary>
+        internal static void Reset()
+        {
+            _settings = null;
+            _firstInitialization = 1;
+            _enabledLazy = new(InternalEnabled, true);
+            _skippableTestsTask = null;
+            _skippableTestsBySuiteAndName = null;
         }
 
         private static async Task ShutdownAsync()

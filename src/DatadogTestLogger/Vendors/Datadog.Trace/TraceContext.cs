@@ -10,9 +10,9 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
-using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
@@ -50,7 +50,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             }
 
             Tracer = tracer;
-            Tags = tags ?? new TraceTagCollection(settings?.OutgoingTagPropagationHeaderMaxLength ?? TagPropagation.OutgoingTagPropagationHeaderMaxLength);
+            Tags = tags ?? new TraceTagCollection();
         }
 
         public Span RootSpan { get; private set; }
@@ -62,6 +62,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// <summary>
         /// Gets the collection of trace-level tags.
         /// </summary>
+        [NotNull]
         public TraceTagCollection Tags { get; }
 
         /// <summary>
@@ -154,10 +155,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                 }
                 else if (ShouldTriggerPartialFlush())
                 {
-                    Log.Debug<ulong, ulong, int>(
+                    Log.Debug<ulong, string, int>(
                         "Closing span {SpanId} triggered a partial flush of trace {TraceId} with {SpanCount} pending spans",
                         span.SpanId,
-                        span.TraceId,
+                        span.Context.RawTraceId,
                         _spans.Count);
 
                     spansToWrite = _spans.GetArray();

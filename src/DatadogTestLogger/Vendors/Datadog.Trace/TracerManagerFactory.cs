@@ -105,16 +105,18 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
             discoveryService ??= GetDiscoveryService(settings);
 
-            statsd = settings.TracerMetricsEnabled
+            bool runtimeMetricsEnabled = settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer;
+
+            statsd = (settings.TracerMetricsEnabled || runtimeMetricsEnabled)
                          ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName))
                          : null;
             sampler ??= GetSampler(settings);
-            agentWriter ??= GetAgentWriter(settings, statsd, sampler, discoveryService);
+            agentWriter ??= GetAgentWriter(settings, settings.TracerMetricsEnabled ? statsd : null, sampler, discoveryService);
             scopeManager ??= new AsyncLocalScopeManager();
 
-            if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
+            if (runtimeMetricsEnabled)
             {
-                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName), TimeSpan.FromSeconds(10), settings.IsRunningInAzureAppService);
+                runtimeMetrics ??= new RuntimeMetricsWriter(statsd, TimeSpan.FromSeconds(10), settings.IsRunningInAzureAppService);
             }
 
             var gitMetadataTagsProvider = GetGitMetadataTagsProvider(settings);

@@ -29,22 +29,6 @@ internal class Security
     public bool WafExportsErrorHappened => false;
 }
 
-internal static class AsmRemoteConfigurationProducts
-{
-    public static AsmShimProduct AsmFeaturesProduct { get; } = new();
-
-    public static AsmShimProduct AsmDataProduct { get; } = new();
-
-    public static AsmShimProduct AsmDDProduct { get; } = new();
-
-    public static AsmShimProduct AsmProduct { get; } = new();
-}
-
-internal class AsmShimProduct : Product
-{
-    public override string Name => "SHIM";
-}
-
 internal class BlockException : Exception
 {
 }

@@ -16,11 +16,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
     internal class ServiceNames
     {
-        private readonly object _lock = new object();
-        private Dictionary<string, string> _mappings = null;
+        private readonly Dictionary<string, string> _mappings = null;
+        private readonly bool _unifyServiceNames;
 
-        public ServiceNames(IDictionary<string, string> mappings)
+        public ServiceNames(IDictionary<string, string> mappings, string metadataSchemaVersion)
         {
+            _unifyServiceNames = metadataSchemaVersion == "v0" ? false : true;
             if (mappings?.Count > 0)
             {
                 _mappings = new Dictionary<string, string>(mappings);
@@ -32,6 +33,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             if (_mappings is not null && _mappings.TryGetValue(key, out var name))
             {
                 return name;
+            }
+            else if (_unifyServiceNames)
+            {
+                return applicationName;
             }
             else
             {
@@ -48,14 +53,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
             name = null;
             return false;
-        }
-
-        public void SetServiceNameMappings(IEnumerable<KeyValuePair<string, string>> mappings)
-        {
-            lock (_lock)
-            {
-                _mappings = mappings.ToDictionary(x => x.Key, x => x.Value);
-            }
         }
     }
 }

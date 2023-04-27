@@ -20,10 +20,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement
         /// </summary>
         Task StartPollingAsync();
 
-        void RegisterProduct(Product product);
-
-        void UnregisterProduct(string productName);
-
         void SetCapability(BigInteger index, bool available);
     }
 }

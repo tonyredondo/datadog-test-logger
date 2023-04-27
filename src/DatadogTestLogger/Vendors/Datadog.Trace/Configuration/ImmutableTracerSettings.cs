@@ -91,7 +91,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             HttpClientExcludedUrlSubstrings = settings.HttpClientExcludedUrlSubstrings;
             HttpServerErrorStatusCodes = settings.HttpServerErrorStatusCodes;
             HttpClientErrorStatusCodes = settings.HttpClientErrorStatusCodes;
-            ServiceNameMappings = settings.ServiceNameMappings;
+            MetadataSchemaVersion = settings.MetadataSchemaVersion;
+            ServiceNameMappings = new ServiceNames(settings.ServiceNameMappings, settings.MetadataSchemaVersion);
             TraceBufferSize = settings.TraceBufferSize;
             TraceBatchInterval = settings.TraceBatchInterval;
             RouteTemplateResourceNamesEnabled = settings.RouteTemplateResourceNamesEnabled;
@@ -125,6 +126,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
             IsRunningInAzureAppService = settings.IsRunningInAzureAppService;
             AzureAppServiceMetadata = settings.AzureAppServiceMetadata;
+
+            TraceId128BitGenerationEnabled = settings.TraceId128BitGenerationEnabled;
+            TraceId128BitLoggingEnabled = settings.TraceId128BitLoggingEnabled;
 
             static string? GetExplicitSettingOrTag(string? explicitSetting, IDictionary<string, string> globalTags, string tag)
             {
@@ -435,9 +439,27 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         internal DbmPropagationLevel DbmPropagationMode { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the tracer will generate 128-bit trace ids
+        /// instead of 64-bits trace ids.
+        /// </summary>
+        internal bool TraceId128BitGenerationEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the tracer will inject 128-bit trace ids into logs, if available,
+        /// instead of 64-bit trace ids. Note that a 128-bit trace id may be received from an upstream service
+        /// even if we are not generating them.
+        /// </summary>
+        internal bool TraceId128BitLoggingEnabled { get; }
+
+        /// <summary>
         /// Gets the AAS settings. Guaranteed not <c>null</c> when <see cref="IsRunningInAzureAppService"/> is not <c>null</c>
         /// </summary>
         internal ImmutableAzureAppServiceSettings? AzureAppServiceMetadata { get; }
+
+        /// <summary>
+        /// Gets the metadata schema version
+        /// </summary>
+        internal string MetadataSchemaVersion { get; }
 
         /// <summary>
         /// Create a <see cref="ImmutableTracerSettings"/> populated from the default sources
