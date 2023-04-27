@@ -95,7 +95,7 @@ class Build : NukeBuild
     Target VendorDatadogTrace => _ => _
         .Executes(async () =>
         {
-            var vendors = RootDirectory / "src" / "DatadogTestLogger" / "Vendors";
-            await UpdateVendorsTool.UpdateVendors(TemporaryDirectory, vendors);
+            await UpdateVendorsTool.UpdateVendorsTestLogger(TemporaryDirectory, RootDirectory / "src" / "DatadogTestLogger" / "Vendors");
+            await UpdateVendorsTool.UpdateVendorsDataCollector(TemporaryDirectory, RootDirectory / "src" / "DatadogCollector" / "Vendors");
         });
 }

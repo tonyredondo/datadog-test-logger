@@ -13,9 +13,12 @@ public class VendoredDependency
 //------------------------------------------------------------------------------
 ";
 
+    const string TestLoggerNamespace = "DatadogTestLogger";
+    const string DataCollectorNamespace = "DatadogCollector";
+    
     static VendoredDependency()
     {
-        All.Add(new()
+        AllTestLogger.Add(new()
         {
             LibraryName = "Datadog.Trace",
             DownloadUrl = "https://github.com/DataDog/dd-trace-dotnet/archive/refs/heads/master.zip",
@@ -43,10 +46,11 @@ public class VendoredDependency
                 "Generated/**/Datadog.Trace.SourceGenerators/Datadog.Trace.SourceGenerators.TagsListGenerator.TagListGenerator/IastTags.g.cs",
             },
             Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
-                AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile),
+                targetNamespacePrefix: TestLoggerNamespace,
+                AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, (a, b) => RenameLogFile(a, b, TestLoggerNamespace)),
         });
 
-        All.Add(new()
+        AllDataCollector.Add(new()
         {
             LibraryName = "Mono.Cecil",
             DownloadUrl = "https://github.com/jbevain/cecil/archive/refs/tags/0.11.5.zip",
@@ -66,14 +70,14 @@ public class VendoredDependency
             },
             Transform = filePath =>
             {
-                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Mono",
-                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Mono", targetNamespacePrefix: DataCollectorNamespace,
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, (a, b) => RenameLogFile(a, b, DataCollectorNamespace));
 
                 RewritePropsFileWithStandardTransform(filePath);
             },
         });
 
-        All.Add(new()
+        AllDataCollector.Add(new()
         {
             LibraryName = "Datadog.Trace.Coverage.collector",
             DownloadUrl = "https://github.com/DataDog/dd-trace-dotnet/archive/refs/heads/master.zip",
@@ -85,19 +89,21 @@ public class VendoredDependency
             },
             Transform = filePath =>
             {
-                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
-                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace", targetNamespacePrefix: DataCollectorNamespace,
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, (a, b) => RenameLogFile(a, b, DataCollectorNamespace));
 
-                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Mono",
-                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Mono", targetNamespacePrefix: DataCollectorNamespace,
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, (a, b) => RenameLogFile(a, b, DataCollectorNamespace));
 
-                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace.Coverage.Collector",
-                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, RenameLogFile);
+                RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace.Coverage.Collector", targetNamespacePrefix: DataCollectorNamespace,
+                    AddPreprocessorsToGeneratedCode, AddTracerManagerFactoryHack, (a, b) => RenameLogFile(a, b, DataCollectorNamespace));
             },
         });
     }
 
-    public static List<VendoredDependency> All { get; set; } = new List<VendoredDependency>();
+    public static List<VendoredDependency> AllTestLogger { get; set; } = new List<VendoredDependency>();
+
+    public static List<VendoredDependency> AllDataCollector { get; set; } = new List<VendoredDependency>();
 
     public string LibraryName { get; set; }
 
@@ -168,7 +174,7 @@ public class VendoredDependency
             .Replace(string.Join("\r\n", lines), string.Empty);
     }
 
-    private static string RenameLogFile(string filePath, string content)
+    private static string RenameLogFile(string filePath, string content, string loggerPrefix)
     {
         if (Path.GetFileName(filePath) != "DatadogLogging.cs")
         {
@@ -177,7 +183,7 @@ public class VendoredDependency
 
         return content.Replace(
             @$"var managedLogPath = Path.Combine(logDirectory, $""dotnet-tracer-managed-",
-            @$"var managedLogPath = Path.Combine(logDirectory, $""datadogtestlogger-");
+            @$"var managedLogPath = Path.Combine(logDirectory, $""{loggerPrefix.ToLowerInvariant()}-");
     }
 
     private static string AddNullableDirectiveTransform(string filePath, string content)
@@ -191,7 +197,7 @@ public class VendoredDependency
     }
 
     private static void RewriteCsFileWithStandardTransform(string filePath, string originalNamespace,
-        params Func<string, string, string>[] extraTransform)
+        string targetNamespacePrefix, params Func<string, string, string>[] extraTransform)
     {
         if (string.Equals(Path.GetExtension(filePath), ".cs", StringComparison.OrdinalIgnoreCase))
         {
@@ -221,23 +227,28 @@ public class VendoredDependency
                     builder.Replace("Debugger.Break();", "{}");
 
                     // Prevent namespace conflicts
+                    if (originalNamespace.Contains("Datadog.Trace"))
+                    {
+                        targetNamespacePrefix = TestLoggerNamespace;
+                    }
+
                     builder.Replace($"using {originalNamespace}",
-                        $"using DatadogTestLogger.Vendors.{originalNamespace}");
+                        $"using {targetNamespacePrefix}.Vendors.{originalNamespace}");
                     builder.Replace($"using static {originalNamespace}",
-                        $"using static DatadogTestLogger.Vendors.{originalNamespace}");
+                        $"using static {targetNamespacePrefix}.Vendors.{originalNamespace}");
                     builder.Replace($"namespace {originalNamespace}",
-                        $"namespace DatadogTestLogger.Vendors.{originalNamespace}");
+                        $"namespace {targetNamespacePrefix}.Vendors.{originalNamespace}");
                     builder.Replace($"[CLSCompliant(false)]", $"// [CLSCompliant(false)]");
 
                     // HACKS
-                    builder.Replace("using Datadog;", "using DatadogTestLogger;");
+                    builder.Replace("using Datadog;", $"using {targetNamespacePrefix};");
                     builder.Replace($"[assembly: {originalNamespace}",
-                        $"[assembly: DatadogTestLogger.Vendors.{originalNamespace}");
+                        $"[assembly: {targetNamespacePrefix}.Vendors.{originalNamespace}");
                     builder.Replace("public EventHandler<ErrorEventArgs>? Error { get; set; }",
-                        @"public EventHandler<global::DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs>? Error { get; set; }");
+                        @"public EventHandler<global::" + targetNamespacePrefix + ".Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.ErrorEventArgs>? Error { get; set; }");
                     builder.Replace(
                         "return new HttpResponse(statusCode, reasonPhrase, headers, new StreamContent(responseStream, length));",
-                        "return new HttpResponse(statusCode, reasonPhrase, headers, new global::DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams.HttpContent.StreamContent(responseStream, length));");
+                        "return new HttpResponse(statusCode, reasonPhrase, headers, new global::" + targetNamespacePrefix + ".Vendors.Datadog.Trace.HttpOverStreams.HttpContent.StreamContent(responseStream, length));");
                     var replacement =
                         "            _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);";
                     builder.Replace(replacement,
@@ -254,7 +265,7 @@ public class VendoredDependency
                         "#endif");
                     builder.Replace("var lastChar = eventName[^1];", "var lastChar = eventName.Last();");
                     builder.Replace("var sw = new StreamWriter(memoryStream, leaveOpen: true);",
-                        "var sw = new StreamWriter(memoryStream, encoding: global::DatadogTestLogger.EncodingCache.UTF8NoBOM, bufferSize: -1, leaveOpen: true);");
+                        "var sw = new StreamWriter(memoryStream, encoding: global::" + targetNamespacePrefix + ".EncodingCache.UTF8NoBOM, bufferSize: -1, leaveOpen: true);");
                     builder.Replace("#if !NETCOREAPP3_1_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0",
                         "#if !NETCOREAPP2_0_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0");
                     builder.Replace("NET7_0_OR_GREATER", "NET8_0_OR_GREATER");
@@ -278,13 +289,13 @@ public class VendoredDependency
                     // Fix namespace conflicts in `using alias` directives. For example, transform:
                     //      using Foo = dnlib.A.B.C;
                     // To:
-                    //      using Foo = DatadogTestLogger.Vendors.dnlib.A.B.C;
+                    //      using Foo = {targetNamespacePrefix}.Vendors.dnlib.A.B.C;
                     string result =
                         Regex.Replace(
                             builder.ToString(),
                             @$"using\s+(\S+)\s+=\s+{Regex.Escape(originalNamespace)}.(.*);",
                             match =>
-                                $"using {match.Groups[1].Value} = DatadogTestLogger.Vendors.{originalNamespace}.{match.Groups[2].Value};");
+                                $"using {match.Groups[1].Value} = {targetNamespacePrefix}.Vendors.{originalNamespace}.{match.Groups[2].Value};");
 
 
                     // Don't expose anything we don't intend to
