@@ -8,7 +8,9 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol
