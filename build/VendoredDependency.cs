@@ -54,6 +54,8 @@ public class VendoredDependency
             PathToSrc = Array.Empty<string>(),
             RelativeGlobsToExclude = new[]
             {
+                ".github/*.*",
+                ".github/**/*.*",
                 "Test/**/*.*",
                 "Mono.Cecil/AssemblyInfo.cs",
                 "rocks/**/*.*",
