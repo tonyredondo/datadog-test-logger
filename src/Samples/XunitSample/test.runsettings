@@ -1,9 +1,4 @@
 <RunSettings>
-<!--  
-  <RunConfiguration>
-    <TestAdaptersPaths>/Users/tony.redondo/repos/github/tonyredondo/datadog-test-logger/src/DatadogTestLogger/bin/Release/net6.0/</TestAdaptersPaths>
-  </RunConfiguration>
--->
   <DataCollectionRunSettings>
     <DataCollectors>
       <DataCollector friendlyName="DatadogCoverage" uri="datacollector://Datadog/CoverageCollector/1.0" enabled="True" />
