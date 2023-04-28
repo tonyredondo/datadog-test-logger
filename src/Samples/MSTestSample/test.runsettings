@@ -13,7 +13,10 @@
             uri="InProcDataCollector://Datadog/collector/1.0" 
             assemblyQualifiedName="DatadogCollector.DatadogInProcCollector, Datadog.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
             codebase="Datadog.collector.dll"
-            enabled="True" />
+            enabled="True">
+            <Configuration>
+            </Configuration>
+          </InProcDataCollector>
       </InProcDataCollectors>
   </InProcDataCollectionRunSettings>
   <LoggerRunSettings>
