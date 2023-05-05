@@ -19,6 +19,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema;
 using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 using DatadogTestLogger.Vendors.Datadog.Trace.DogStatsd;
@@ -83,6 +84,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             Telemetry = telemetry;
             DiscoveryService = discoveryService;
             TraceProcessors = traceProcessors ?? Array.Empty<ITraceProcessor>();
+            Schema = new NamingSchema(settings.MetadataSchemaVersion, defaultServiceName, settings.ServiceNameMappings);
             QueryStringManager = new(settings.QueryStringReportingEnabled, settings.ObfuscationQueryStringRegexTimeout, settings.QueryStringReportingSize, settings.ObfuscationQueryStringRegex);
             var lstTagProcessors = new List<ITagProcessor>(TraceProcessors.Length);
             foreach (var traceProcessor in TraceProcessors)
@@ -139,6 +141,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         /// Gets the global <see cref="QueryStringManager"/> instance.
         public QueryStringManager QueryStringManager { get; }
+
+        public NamingSchema Schema { get; }
 
         public IDogStatsd Statsd { get; }
 

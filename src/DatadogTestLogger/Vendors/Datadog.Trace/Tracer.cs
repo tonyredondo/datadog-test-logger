@@ -16,6 +16,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
@@ -212,6 +213,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Gets this tracer's settings.
         /// </summary>
         public ImmutableTracerSettings Settings => TracerManager.Settings;
+
+        /// <summary>
+        /// Gets this tracer's settings.
+        /// </summary>
+        internal NamingSchema Schema => TracerManager.Schema;
 
         /// <summary>
         /// Gets the active scope

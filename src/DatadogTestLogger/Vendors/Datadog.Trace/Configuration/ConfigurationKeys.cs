@@ -414,7 +414,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// Accepted values are: "v1", "v0"
         /// Default value is "v0"
         /// </summary>
-        /// <seealso cref="TracerSettings.MetadataSchemaVersion"/>
         public const string MetadataSchemaVersion = "DD_TRACE_SPAN_ATTRIBUTE_SCHEMA";
 
         /// <summary>
