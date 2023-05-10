@@ -3,7 +3,6 @@
 // </copyright>
 
 using System.Xml;
-using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -21,7 +20,6 @@ public class DatadogCoverageCollector : DataCollector
 
     public DatadogCoverageCollector()
     {
-        EnvironmentHelpers.SetEnvironmentVariable(ConfigurationKeys.DebugEnabled, "1");
         EnvironmentHelpers.SetEnvironmentVariable("DD_DOTNET_TRACER_HOME", "");
         _coverageCollector = new CoverageCollector();
     }
