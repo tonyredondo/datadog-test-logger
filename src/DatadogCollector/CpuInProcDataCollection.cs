@@ -66,6 +66,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
         var serializer = JsonSerializer.CreateDefault();
         serializer.Serialize(sw, _finalValues);
         _finalValues.Clear();
+        _cpuUsageCancellationTokenSource?.Dispose();
     }
     
     private async Task StartCollectingCpuUsageForProcess(Process process, CancellationToken cancellationToken)
