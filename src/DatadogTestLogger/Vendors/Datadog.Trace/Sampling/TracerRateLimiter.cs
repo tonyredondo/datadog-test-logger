@@ -8,11 +8,6 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling
@@ -28,7 +23,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Sampling
 
         public override void OnDisallowed(Span span, int count, int intervalMs, int maxTracesPerInterval)
         {
-            Log.Warning<ulong, int, int>("Dropping trace id {TraceId} with count of {Count} for last {Interval}ms.", span.TraceId, count, intervalMs);
+            Log.Warning<string, int, int>("Dropping trace id {TraceId} with count of {Count} for last {Interval}ms.", span.Context.RawTraceId, count, intervalMs);
         }
 
         public override void OnFinally(Span span)

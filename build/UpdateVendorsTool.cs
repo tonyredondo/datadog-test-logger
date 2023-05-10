@@ -11,11 +11,21 @@ using Serilog;
 
 public static class UpdateVendorsTool
 {
-    public static async Task UpdateVendors(
+    public static async Task UpdateVendorsTestLogger(
         AbsolutePath downloadDirectory,
         AbsolutePath vendorDirectory)
     {
-        foreach (var dependency in VendoredDependency.All)
+        foreach (var dependency in VendoredDependency.AllTestLogger)
+        {
+            await UpdateVendor(dependency, downloadDirectory, vendorDirectory);
+        }
+    }
+
+    public static async Task UpdateVendorsDataCollector(
+        AbsolutePath downloadDirectory,
+        AbsolutePath vendorDirectory)
+    {
+        foreach (var dependency in VendoredDependency.AllDataCollector)
         {
             await UpdateVendor(dependency, downloadDirectory, vendorDirectory);
         }

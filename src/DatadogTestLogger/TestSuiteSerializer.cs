@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using DatadogTestLogger.Vendors.Datadog.Trace;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Spekt.TestLogger.Core;
@@ -86,6 +87,8 @@ internal class TestSuiteSerializer
                     .ThenBy(i => i.EndTime)
                     .GroupBy(g => g.AssemblyPath).ToArray();
 
+                Dictionary<Guid, List<double>>? cpuValues = null;
+
                 foreach (var resultByAssembly in groupedResults)
                 {
                     var moduleFile = resultByAssembly.Key;
@@ -101,6 +104,23 @@ internal class TestSuiteSerializer
                     output.AppendLine("AppDomain.CurrentDomain.IsFullyTrusted: " +
                                       AppDomain.CurrentDomain.IsFullyTrusted);
 
+                    var folderPath = Path.GetDirectoryName(moduleFile) ?? string.Empty;
+                    var cpuValuesPath = Path.Combine(folderPath, "cpu_values.json");
+                    try
+                    {
+                        if (File.Exists(cpuValuesPath))
+                        {
+                            output.AppendLine("CpuValues File: " + cpuValuesPath);
+                            var jsonCpuValues = File.ReadAllText(cpuValuesPath);
+                            cpuValues = JsonConvert.DeserializeObject<Dictionary<Guid, List<double>>>(jsonCpuValues);
+                            output.AppendLine("CpuValues file loaded with " + cpuValues.Count + " test cases.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        output.AppendLine("Error reading CpuValues json file: " + ex);
+                    }
+                    
                     var testFramework = string.Empty;
                     var testFrameworkVersion = "N/A";
 
@@ -220,6 +240,20 @@ internal class TestSuiteSerializer
                             }
 
                             var test = suite.CreateTest(testName, result.StartTime);
+                            
+                            // Cpu values
+                            if (cpuValues is not null && cpuValues.TryGetValue(result.TestCase.Id, out var values))
+                            {
+                                var stats = BenchmarkDiscreteStats.GetFrom(values.ToArray());
+                                test.SetTag("test.cpu_usage.samples", stats.N);
+                                test.SetTag("test.cpu_usage.mean", stats.Mean);
+                                test.SetTag("test.cpu_usage.median", stats.Median);
+                                test.SetTag("test.cpu_usage.min", stats.Min);
+                                test.SetTag("test.cpu_usage.max", stats.Max);
+                                test.SetTag("test.cpu_usage.p90", stats.P90);
+                                test.SetTag("test.cpu_usage.p95", stats.P95);
+                                test.SetTag("test.cpu_usage.p99", stats.P99);
+                            }
 
                             // Process parameters
                             if (!string.IsNullOrEmpty(testParameters))

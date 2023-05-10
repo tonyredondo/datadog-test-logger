@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
@@ -91,6 +92,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             HttpClientExcludedUrlSubstrings = settings.HttpClientExcludedUrlSubstrings;
             HttpServerErrorStatusCodes = settings.HttpServerErrorStatusCodes;
             HttpClientErrorStatusCodes = settings.HttpClientErrorStatusCodes;
+            MetadataSchemaVersion = settings.MetadataSchemaVersion;
             ServiceNameMappings = settings.ServiceNameMappings;
             TraceBufferSize = settings.TraceBufferSize;
             TraceBatchInterval = settings.TraceBatchInterval;
@@ -125,6 +127,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
             IsRunningInAzureAppService = settings.IsRunningInAzureAppService;
             AzureAppServiceMetadata = settings.AzureAppServiceMetadata;
+
+            TraceId128BitGenerationEnabled = settings.TraceId128BitGenerationEnabled;
+            TraceId128BitLoggingEnabled = settings.TraceId128BitLoggingEnabled;
 
             static string? GetExplicitSettingOrTag(string? explicitSetting, IDictionary<string, string> globalTags, string tag)
             {
@@ -321,7 +326,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// <summary>
         /// Gets configuration values for changing service names based on configuration
         /// </summary>
-        internal ServiceNames ServiceNameMappings { get; }
+        internal IDictionary<string, string>? ServiceNameMappings { get; }
 
         /// <summary>
         /// Gets a value indicating the size in bytes of the trace buffer
@@ -435,9 +440,27 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         internal DbmPropagationLevel DbmPropagationMode { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the tracer will generate 128-bit trace ids
+        /// instead of 64-bits trace ids.
+        /// </summary>
+        internal bool TraceId128BitGenerationEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the tracer will inject 128-bit trace ids into logs, if available,
+        /// instead of 64-bit trace ids. Note that a 128-bit trace id may be received from an upstream service
+        /// even if we are not generating them.
+        /// </summary>
+        internal bool TraceId128BitLoggingEnabled { get; }
+
+        /// <summary>
         /// Gets the AAS settings. Guaranteed not <c>null</c> when <see cref="IsRunningInAzureAppService"/> is not <c>null</c>
         /// </summary>
         internal ImmutableAzureAppServiceSettings? AzureAppServiceMetadata { get; }
+
+        /// <summary>
+        /// Gets the metadata schema version
+        /// </summary>
+        internal SchemaVersion MetadataSchemaVersion { get; }
 
         /// <summary>
         /// Create a <see cref="ImmutableTracerSettings"/> populated from the default sources
@@ -486,12 +509,29 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
         internal string GetServiceName(Tracer tracer, string serviceName)
         {
-            return ServiceNameMappings.GetServiceName(tracer.DefaultServiceName, serviceName);
+            if (ServiceNameMappings is not null && ServiceNameMappings.TryGetValue(serviceName, out var name))
+            {
+                return name;
+            }
+            else if (MetadataSchemaVersion != SchemaVersion.V0)
+            {
+                return tracer.DefaultServiceName;
+            }
+            else
+            {
+                return $"{tracer.DefaultServiceName}-{serviceName}";
+            }
         }
 
-        internal bool TryGetServiceName(string key, out string serviceName)
+        internal bool TryGetServiceName(string key, out string? serviceName)
         {
-            return ServiceNameMappings.TryGetServiceName(key, out serviceName);
+            if (ServiceNameMappings is not null && ServiceNameMappings.TryGetValue(key, out serviceName))
+            {
+                return true;
+            }
+
+            serviceName = null;
+            return false;
         }
     }
 }

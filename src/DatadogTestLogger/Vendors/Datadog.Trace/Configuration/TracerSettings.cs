@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
@@ -121,12 +122,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             var headerTagsNormalizationFixEnabled = source.GetBool(ConfigurationKeys.FeatureFlags.HeaderTagsNormalizationFixEnabled) ?? true;
             // Filter out tags with empty keys or empty values, and trim whitespaces
             HeaderTags = InitializeHeaderTags(inputHeaderTags, headerTagsNormalizationFixEnabled);
+            MetadataSchemaVersion = ParseMetadataSchemaVersion(source.GetString(ConfigurationKeys.MetadataSchemaVersion));
 
-            var serviceNameMappings = source.GetDictionary(ConfigurationKeys.ServiceNameMappings)
+            ServiceNameMappings = source.GetDictionary(ConfigurationKeys.ServiceNameMappings)
                                             ?.Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value))
                                             ?.ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim());
-
-            ServiceNameMappings = new ServiceNames(serviceNameMappings);
 
             TracerMetricsEnabled = source.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
@@ -287,6 +287,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
             var dbmPropagationMode = source.GetString(ConfigurationKeys.DbmPropagationMode);
             DbmPropagationMode = dbmPropagationMode == null ? DbmPropagationLevel.Disabled : ValidateDbmPropagationInput(dbmPropagationMode);
+
+            TraceId128BitGenerationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.TraceId128BitGenerationEnabled) ?? false;
+            TraceId128BitLoggingEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.TraceId128BitLoggingEnabled) ?? false;
         }
 
         /// <summary>
@@ -548,9 +551,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         internal bool[] HttpClientErrorStatusCodes { get; set; }
 
         /// <summary>
-        /// Gets configuration values for changing service names based on configuration
+        /// Gets or sets configuration values for changing service names based on configuration
         /// </summary>
-        internal ServiceNames ServiceNameMappings { get; }
+        internal IDictionary<string, string>? ServiceNameMappings { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating the size in bytes of the trace buffer
@@ -610,9 +613,27 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         internal DbmPropagationLevel DbmPropagationMode { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the tracer will generate 128-bit trace ids
+        /// instead of 64-bits trace ids.
+        /// </summary>
+        internal bool TraceId128BitGenerationEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the tracer will inject 128-bit trace ids into logs, if available,
+        /// instead of 64-bit trace ids. Note that a 128-bit trace id may be received from an upstream service
+        /// even if we are not generating them.
+        /// </summary>
+        internal bool TraceId128BitLoggingEnabled { get; set; }
+
+        /// <summary>
         /// Gets or sets the AAS settings
         /// </summary>
         internal ImmutableAzureAppServiceSettings? AzureAppServiceMetadata { get; set; }
+
+        /// <summary>
+        /// Gets or sets the metadata schema version
+        /// </summary>
+        internal SchemaVersion MetadataSchemaVersion { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources
@@ -661,7 +682,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// as the <see cref="KeyValuePair{TKey, TValue}.Key"/>) to replacement service names as <see cref="KeyValuePair{TKey, TValue}.Value"/>).</param>
         public void SetServiceNameMappings(IEnumerable<KeyValuePair<string, string>> mappings)
         {
-            ServiceNameMappings.SetServiceNameMappings(mappings);
+            ServiceNameMappings = mappings.ToDictionary(x => x.Key, x => x.Value);
         }
 
         /// <summary>
@@ -705,6 +726,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
             return headerTags;
         }
+
+        private static SchemaVersion ParseMetadataSchemaVersion(string? value) =>
+            value switch
+            {
+                "v1" or "V1" => SchemaVersion.V1,
+                _ => SchemaVersion.V0,
+            };
 
         internal static string[] TrimSplitString(string? textValues, char[] separators)
         {

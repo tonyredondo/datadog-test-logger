@@ -79,7 +79,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
                 try
                 {
-                    scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, request.Method, request.RequestUri, WebRequestCommon.IntegrationId, out _, traceId: existingSpanContext?.TraceId, spanId: existingSpanContext?.SpanId, startTime);
+                    scope = ScopeFactory.CreateOutboundHttpScope(
+                        Tracer.Instance,
+                        request.Method,
+                        request.RequestUri,
+                        WebRequestCommon.IntegrationId,
+                        out _,
+                        traceId: existingSpanContext?.TraceId128 ?? TraceId.Zero,
+                        spanId: existingSpanContext?.SpanId ?? 0,
+                        startTime);
 
                     if (scope is not null)
                     {

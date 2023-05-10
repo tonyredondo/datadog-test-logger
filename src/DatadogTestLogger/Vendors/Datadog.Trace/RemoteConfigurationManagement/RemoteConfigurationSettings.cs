@@ -26,14 +26,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement
 
         public RemoteConfigurationSettings(IConfigurationSource? configurationSource)
         {
+            configurationSource ??= NullConfigurationSource.Instance;
+
             Id = Guid.NewGuid().ToString();
             RuntimeId = Util.RuntimeId.Get();
             TracerVersion = TracerConstants.ThreePartVersion;
 
             var pollInterval =
-                configurationSource?.GetInt32(ConfigurationKeys.Rcm.PollInterval)
+                configurationSource.GetInt32(ConfigurationKeys.Rcm.PollInterval)
 #pragma warning disable CS0618
-                    ?? configurationSource?.GetInt32(ConfigurationKeys.Rcm.PollIntervalInternal);
+                    ?? configurationSource.GetInt32(ConfigurationKeys.Rcm.PollIntervalInternal);
 #pragma warning restore CS0618
 
             pollInterval =

@@ -25,9 +25,9 @@ internal static class DatadogLoggingFactory
     private const int DefaultRateLimit = 0;
     private const int DefaultMaxLogFileSize = 10 * 1024 * 1024;
 
-    public static DatadogLoggingConfiguration GetConfiguration(IConfigurationSource? source)
+    public static DatadogLoggingConfiguration GetConfiguration(IConfigurationSource source)
     {
-        var logSinkOptions = source?.GetString(ConfigurationKeys.LogSinks)
+        var logSinkOptions = source.GetString(ConfigurationKeys.LogSinks)
                                    ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
         FileLoggingConfiguration? fileConfig = null;
@@ -36,7 +36,7 @@ internal static class DatadogLoggingFactory
             fileConfig = GetFileLoggingConfiguration(source);
         }
 
-        var rateLimit = source?.GetInt32(ConfigurationKeys.LogRateLimit) switch
+        var rateLimit = source.GetInt32(ConfigurationKeys.LogRateLimit) switch
         {
             >= 0 and { } r => r,
             _ => DefaultRateLimit,
@@ -135,13 +135,13 @@ internal static class DatadogLoggingFactory
     internal static string GetLogDirectory()
         => GetLogDirectory(GlobalConfigurationSource.CreateDefaultConfigurationSource());
 
-    private static string GetLogDirectory(IConfigurationSource? source)
+    private static string GetLogDirectory(IConfigurationSource source)
     {
-        var logDirectory = source?.GetString(ConfigurationKeys.LogDirectory);
+        var logDirectory = source.GetString(ConfigurationKeys.LogDirectory);
         if (string.IsNullOrEmpty(logDirectory))
         {
 #pragma warning disable 618 // ProfilerLogPath is deprecated but still supported
-            var nativeLogFile = source?.GetString(ConfigurationKeys.ProfilerLogPath);
+            var nativeLogFile = source.GetString(ConfigurationKeys.ProfilerLogPath);
 #pragma warning restore 618
 
             if (!string.IsNullOrEmpty(nativeLogFile))
@@ -195,7 +195,7 @@ internal static class DatadogLoggingFactory
         return logDirectory!;
     }
 
-    private static FileLoggingConfiguration? GetFileLoggingConfiguration(IConfigurationSource? source)
+    private static FileLoggingConfiguration? GetFileLoggingConfiguration(IConfigurationSource source)
     {
         string? logDirectory = null;
         try
@@ -213,10 +213,10 @@ internal static class DatadogLoggingFactory
         }
 
         // get file details
-        var maxLogSizeVar = source?.GetString(ConfigurationKeys.MaxLogFileSize);
+        var maxLogSizeVar = source.GetString(ConfigurationKeys.MaxLogFileSize);
         var maxLogFileSize = long.TryParse(maxLogSizeVar, out var maxLogSize) ? maxLogSize : DefaultMaxLogFileSize;
 
-        var logFileRetentionDays = source?.GetInt32(ConfigurationKeys.LogFileRetentionDays) switch
+        var logFileRetentionDays = source.GetInt32(ConfigurationKeys.LogFileRetentionDays) switch
         {
             >= 0 and var d => d,
             _ => 32,
