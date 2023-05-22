@@ -3,8 +3,6 @@
 // </copyright>
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector;
-using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
-using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
