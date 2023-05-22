@@ -4,6 +4,7 @@
 
 using System.Xml;
 using DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector;
+using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -16,23 +17,26 @@ namespace DatadogCollector;
 [DataCollectorFriendlyName("datadog")]
 public class DatadogCoverageCollector : DataCollector
 {
-    private readonly CoverageCollector _coverageCollector;
+    private readonly CoverageCollector? _coverageCollector;
 
     public DatadogCoverageCollector()
     {
         EnvironmentHelpers.SetEnvironmentVariable("DD_DOTNET_TRACER_HOME", "");
-        _coverageCollector = new CoverageCollector();
+        if (Configuration.Instance.CoverageEnabled)
+        {
+            _coverageCollector = new CoverageCollector();
+        }
     }
     
     public override void Initialize(XmlElement? configurationElement, DataCollectionEvents events, DataCollectionSink dataSink,
         DataCollectionLogger logger, DataCollectionEnvironmentContext? environmentContext)
     {
-        _coverageCollector.Initialize(configurationElement, events, dataSink, logger, environmentContext);
+        _coverageCollector?.Initialize(configurationElement, events, dataSink, logger, environmentContext);
     }
 
     protected override void Dispose(bool disposing)
     {
-        _coverageCollector.Dispose();
+        _coverageCollector?.Dispose();
         base.Dispose(disposing);
     }
 }
