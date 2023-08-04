@@ -11,6 +11,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
@@ -25,6 +26,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
+        [PublicApi]
         string? GetString(string key);
 
         /// <summary>
@@ -33,6 +35,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
+        [PublicApi]
         int? GetInt32(string key);
 
         /// <summary>
@@ -41,6 +44,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
+        [PublicApi]
         double? GetDouble(string key);
 
         /// <summary>
@@ -49,6 +53,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
+        [PublicApi]
         bool? GetBool(string key);
 
         /// <summary>
@@ -57,6 +62,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="key">The key that identifies the setting.</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
+        [PublicApi]
         IDictionary<string, string>? GetDictionary(string key);
 
         /// <summary>
@@ -66,6 +72,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// <param name="key">The key that identifies the setting.</param>
         /// <param name="allowOptionalMappings">Determines whether to create dictionary entries when the input has no value mapping</param>
         /// <returns>The value of the setting, or <c>null</c> if not found.</returns>
+        [PublicApi]
         IDictionary<string, string>? GetDictionary(string key, bool allowOptionalMappings);
     }
 }

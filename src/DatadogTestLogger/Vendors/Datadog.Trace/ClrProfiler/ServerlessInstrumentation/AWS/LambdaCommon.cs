@@ -15,8 +15,11 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
@@ -113,7 +116,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrume
             {
                 Serverless.Debug("samplingPriority not found");
 
-                var samplingDecision = tracer.TracerManager.Sampler?.MakeSamplingDecision(span) ?? SamplingDecision.Default;
+                var samplingDecision = tracer.CurrentTraceSettings.TraceSampler?.MakeSamplingDecision(span) ?? SamplingDecision.Default;
                 span.Context.TraceContext?.SetSamplingPriority(samplingDecision);
             }
             else
@@ -122,6 +125,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrume
                 span.Context.TraceContext?.SetSamplingPriority(Convert.ToInt32(samplingPriority), notifyDistributedTracer: false);
             }
 
+            TelemetryFactory.Metrics.RecordCountSpanCreated(MetricTags.IntegrationName.AwsLambda);
             return tracer.TracerManager.ScopeManager.Activate(span, false);
         }
 

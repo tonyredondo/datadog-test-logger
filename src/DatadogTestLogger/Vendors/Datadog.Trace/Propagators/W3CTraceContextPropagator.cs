@@ -18,6 +18,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
@@ -112,6 +114,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
         public void Inject<TCarrier, TCarrierSetter>(SpanContext context, TCarrier carrier, TCarrierSetter carrierSetter)
             where TCarrierSetter : struct, ICarrierSetter<TCarrier>
         {
+            TelemetryFactory.Metrics.RecordCountContextHeaderStyleInjected(MetricTags.ContextHeaderStyle.TraceContext);
             var traceparent = CreateTraceParentHeader(context);
             carrierSetter.Set(carrier, TraceParentHeaderName, traceparent);
 
@@ -127,8 +130,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
         {
             var samplingPriority = context.TraceContext?.SamplingPriority ?? context.SamplingPriority ?? SamplingPriorityValues.AutoKeep;
             var sampled = samplingPriority > 0 ? "01" : "00";
-
+#if NET6_0_OR_GREATER
+            return string.Create(null, stackalloc char[128], $"00-{context.RawTraceId}-{context.RawSpanId}-{sampled}");
+#else
             return $"00-{context.RawTraceId}-{context.RawSpanId}-{sampled}";
+#endif
         }
 
         internal static string CreateTraceStateHeader(SpanContext context)
@@ -306,6 +312,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
                 rawTraceId: rawTraceId,
                 rawParentId: rawSpanId);
 
+            TelemetryFactory.Metrics.RecordCountContextHeaderStyleExtracted(MetricTags.ContextHeaderStyle.TraceContext);
             return true;
         }
 

@@ -54,6 +54,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
         {
         }
 
+        public void ProductChanged(TelemetryProductType product, bool enabled, ErrorData? error)
+        {
+        }
+
         public Task DisposeAsync()
         {
             return Task.CompletedTask;

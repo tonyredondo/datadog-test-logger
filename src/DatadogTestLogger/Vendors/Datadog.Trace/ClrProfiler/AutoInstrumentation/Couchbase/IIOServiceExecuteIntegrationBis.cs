@@ -11,6 +11,7 @@
 using System;
 using System.ComponentModel;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Couchbase
 {
@@ -61,7 +62,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         /// <returns>Calltarget state value</returns>
         internal static CallTargetState OnMethodBegin<TTarget, TOperation, TConnection>(TTarget instance, TOperation operation, TConnection connection)
         {
-            return CouchbaseCommon.CommonOnMethodBegin(operation);
+            if (connection.TryDuckCast<ConnectionStruct>(out var connectionStruct))
+            {
+                var normalizedSeedNodes = CouchbaseCommon.GetNormalizedSeedNodesFromClientConfiguration(connectionStruct.Configuration.ClientConfiguration);
+                return CouchbaseCommon.CommonOnMethodBegin(operation, normalizedSeedNodes);
+            }
+
+            return CouchbaseCommon.CommonOnMethodBegin(operation, null);
         }
 
         /// <summary>

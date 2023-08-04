@@ -17,6 +17,8 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
@@ -44,6 +46,7 @@ internal sealed class Test
         scope.Span.ResourceName = $"{suite.Name}.{name}";
         scope.Span.Context.TraceContext.SetSamplingPriority((int)SamplingPriority.AutoKeep, SamplingMechanism.Manual);
         scope.Span.Context.TraceContext.Origin = TestTags.CIAppTestOriginName;
+        TelemetryFactory.Metrics.RecordCountSpanCreated(MetricTags.IntegrationName.CiAppManual);
 
         _scope = scope;
 
@@ -323,7 +326,7 @@ internal sealed class Test
         var tags = (TestSpanTags)scope.Span.Tags;
 
         // Calculate duration beforehand
-        duration ??= _scope.Span.Context.TraceContext.ElapsedSince(scope.Span.StartTime);
+        duration ??= _scope.Span.Context.TraceContext.Clock.ElapsedSince(scope.Span.StartTime);
 
         // Set coverage
         if (CIVisibility.Settings.CodeCoverageEnabled == true && Coverage.CoverageReporter.Handler.EndSession() is Coverage.Models.Tests.TestCoverage testCoverage)
@@ -349,6 +352,16 @@ internal sealed class Test
             case TestStatus.Skip:
                 tags.Status = TestTags.StatusSkip;
                 tags.SkipReason = skipReason;
+                if (tags.SkipReason == IntelligentTestRunnerTags.SkippedByReason)
+                {
+                    tags.SkippedByIntelligentTestRunner = "true";
+                    Suite.Tags.AddIntelligentTestRunnerSkippingCount(1);
+                }
+                else
+                {
+                    tags.SkippedByIntelligentTestRunner = "false";
+                }
+
                 break;
         }
 

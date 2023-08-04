@@ -9,6 +9,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent;
@@ -17,6 +18,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
 using DatadogTestLogger.Vendors.Datadog.Trace.RuntimeMetrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
@@ -42,7 +44,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
         protected override TracerManager CreateTracerManagerFrom(
             ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
-            ITraceSampler sampler,
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
@@ -51,19 +52,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             IDiscoveryService discoveryService,
             DataStreamsManager dataStreamsManager,
             string defaultServiceName,
-            IGitMetadataTagsProvider gitMetadataTagsProvider)
+            IGitMetadataTagsProvider gitMetadataTagsProvider,
+            ITraceSampler traceSampler,
+            ISpanSampler spanSampler,
+            IRemoteConfigurationManager remoteConfigurationManager,
+            IDynamicConfigurationManager dynamicConfigurationManager)
         {
             if (_useLockedManager)
             {
-                return new CITracerManager.LockedManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName, gitMetadataTagsProvider);
+                return new CITracerManager.LockedManager(settings, agentWriter, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName, gitMetadataTagsProvider, traceSampler, spanSampler, remoteConfigurationManager, dynamicConfigurationManager);
             }
             else
             {
-                return new CITracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName, gitMetadataTagsProvider);
+                return new CITracerManager(settings, agentWriter, scopeManager, statsd, runtimeMetrics, logSubmissionManager, telemetry, discoveryService, dataStreamsManager, defaultServiceName, gitMetadataTagsProvider, traceSampler, spanSampler, remoteConfigurationManager, dynamicConfigurationManager);
             }
         }
 
-        protected override IGitMetadataTagsProvider GetGitMetadataTagsProvider(ImmutableTracerSettings settings)
+        protected override IGitMetadataTagsProvider GetGitMetadataTagsProvider(ImmutableTracerSettings settings, IScopeManager scopeManager)
         {
             return new CIGitMetadataTagsProvider();
         }
@@ -73,7 +78,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             return new CISampler();
         }
 
-        protected override IAgentWriter GetAgentWriter(ImmutableTracerSettings settings, IDogStatsd statsd, ITraceSampler sampler, IDiscoveryService discoveryService)
+        protected override IAgentWriter GetAgentWriter(ImmutableTracerSettings settings, IDogStatsd statsd, Action<Dictionary<string, float>> updateSampleRates, IDiscoveryService discoveryService)
         {
             // Check for agentless scenario
             if (_settings.Agentless)
@@ -96,7 +101,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             // Event platform proxy not found
             // Set the tracer buffer size to the max
             var traceBufferSize = 1024 * 1024 * 45; // slightly lower than the 50mb payload agent limit.
-            return new ApmAgentWriter(settings, sampler, discoveryService, traceBufferSize);
+            return new ApmAgentWriter(settings, updateSampleRates, discoveryService, traceBufferSize);
         }
 
         protected override IDiscoveryService GetDiscoveryService(ImmutableTracerSettings settings)

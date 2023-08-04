@@ -20,7 +20,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = GraphQLCommon.GraphQLAssembly,
         TypeName = "GraphQL.Validation.DocumentValidator",
         MethodName = "ValidateAsyncCoreAsync",
-        ReturnTypeName = ClrNames.GenericParameterTask,
+        ReturnTypeName = ClrNames.GenericTaskWithGenericClassParameter,
         ParameterTypeNames = new[] { "GraphQL.Validation.ValidationContext", "System.Collections.Generic.IEnumerable`1[GraphQL.Validation.IValidationRule]" },
         MinimumVersion = GraphQLCommon.Major5,
         MaximumVersion = GraphQLCommon.Major7,

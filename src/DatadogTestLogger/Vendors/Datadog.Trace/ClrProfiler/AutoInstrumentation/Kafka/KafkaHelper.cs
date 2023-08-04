@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
@@ -20,12 +21,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 {
     internal static class KafkaHelper
     {
+        internal const string GroupIdKey = "group.id";
+        internal const string BootstrapServersKey = "bootstrap.servers";
         private const string MessagingType = "kafka";
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(KafkaHelper));
         private static bool _headersInjectionEnabled = true;
         private static string[] defaultProduceEdgeTags = new[] { "direction:out", "type:kafka" };
 
-        internal static Scope CreateProducerScope(Tracer tracer, ITopicPartition topicPartition, bool isTombstone, bool finishOnClose)
+        internal static Scope CreateProducerScope(
+            Tracer tracer,
+            object producer,
+            ITopicPartition topicPartition,
+            bool isTombstone,
+            bool finishOnClose)
         {
             Scope scope = null;
 
@@ -39,7 +47,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 }
 
                 var parent = tracer.ActiveScope?.Span;
-                string operationName = tracer.Schema.Messaging.GetOutboundOperationName(MessagingType);
+                string operationName = tracer.CurrentTraceSettings.Schema.Messaging.GetOutboundOperationName(MessagingType);
                 if (parent is not null &&
                     parent.OperationName == operationName &&
                     parent.GetTag(Tags.InstrumentationName) != null)
@@ -47,9 +55,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     return null;
                 }
 
-                string serviceName = tracer.Schema.Messaging.GetOutboundServiceName(MessagingType);
-
-                var tags = new KafkaTags(SpanKinds.Producer);
+                string serviceName = tracer.CurrentTraceSettings.Schema.Messaging.GetServiceName(MessagingType);
+                KafkaTags tags = tracer.CurrentTraceSettings.Schema.Messaging.CreateKafkaTags(SpanKinds.Producer);
 
                 scope = tracer.StartActiveInternal(
                     operationName,
@@ -67,14 +74,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     tags.Partition = (topicPartition?.Partition).ToString();
                 }
 
+                if (ProducerCache.TryGetProducer(producer, out var bootstrapServers))
+                {
+                    tags.BootstrapServers = bootstrapServers;
+                }
+
                 if (isTombstone)
                 {
                     tags.Tombstone = "true";
                 }
 
                 // Producer spans should always be measured
-                span.SetTag(Tags.Measured, "1");
+                span.SetMetric(Trace.Tags.Measured, 1.0);
 
+                tracer.CurrentTraceSettings.Schema.RemapPeerService(tags);
                 tags.SetAnalyticsSampleRate(KafkaConstants.IntegrationId, settings, enabledWithGlobalSetting: false);
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(KafkaConstants.IntegrationId);
             }
@@ -106,7 +119,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 }
 
                 var parent = tracer.ActiveScope?.Span;
-                string operationName = tracer.Schema.Messaging.GetInboundOperationName(MessagingType);
+                string operationName = tracer.CurrentTraceSettings.Schema.Messaging.GetInboundOperationName(MessagingType);
                 if (parent is not null &&
                     parent.OperationName == operationName &&
                     parent.GetTag(Tags.InstrumentationName) != null)
@@ -144,11 +157,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     }
                 }
 
-                string serviceName = tracer.Schema.Messaging.GetInboundServiceName(MessagingType);
-
-                var tags = new KafkaTags(SpanKinds.Consumer);
+                var serviceName = tracer.CurrentTraceSettings.Schema.Messaging.GetServiceName(MessagingType);
+                var tags = tracer.CurrentTraceSettings.Schema.Messaging.CreateKafkaTags(SpanKinds.Consumer);
 
                 scope = tracer.StartActiveInternal(operationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
+                tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(KafkaConstants.IntegrationId);
 
                 string resourceName = $"Consume Topic {(string.IsNullOrEmpty(topic) ? "kafka" : topic)}";
 
@@ -166,9 +179,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     tags.Offset = offset.ToString();
                 }
 
-                if (ConsumerGroupHelper.TryGetConsumerGroup(consumer, out var groupId))
+                if (ConsumerGroupHelper.TryGetConsumerGroup(consumer, out var groupId, out var bootstrapServers))
                 {
                     tags.ConsumerGroup = groupId;
+                    tags.BootstrapServers = bootstrapServers;
                 }
 
                 if (message is not null && message.Timestamp.Type != 0)
@@ -194,7 +208,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     message?.Headers?.Remove(DataStreamsPropagationHeaders.TemporaryBase64PathwayContext);
                     message?.Headers?.Remove(DataStreamsPropagationHeaders.TemporaryEdgeTags);
 
-                    if (!tracer.Settings.KafkaCreateConsumerScopeEnabled && message?.Headers is not null)
+                    if (!tracer.Settings.KafkaCreateConsumerScopeEnabledInternal && message?.Headers is not null)
                     {
                         // This is a brilliant and horrible approach to let customers who are already
                         // extracting the span context from a Kafka message automatically get
@@ -242,7 +256,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             try
             {
                 if (!tracer.Settings.IsIntegrationEnabled(KafkaConstants.IntegrationId)
-                    || !tracer.Settings.KafkaCreateConsumerScopeEnabled)
+                    || !tracer.Settings.KafkaCreateConsumerScopeEnabledInternal)
                 {
                     // integration disabled, skip this trace
                     return;
@@ -250,7 +264,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
                 var activeScope = tracer.InternalActiveScope;
                 var currentSpan = activeScope?.Span;
-                if (currentSpan?.OperationName != tracer.Schema.Messaging.GetInboundOperationName(MessagingType))
+                if (currentSpan?.OperationName != tracer.CurrentTraceSettings.Schema.Messaging.GetInboundOperationName(MessagingType))
                 {
                     // Not currently in a consumer operation
                     return;

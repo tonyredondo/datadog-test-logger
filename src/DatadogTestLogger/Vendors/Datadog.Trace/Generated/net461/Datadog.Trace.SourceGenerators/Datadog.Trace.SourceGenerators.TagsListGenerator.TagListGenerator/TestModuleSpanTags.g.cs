@@ -9,33 +9,84 @@
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using System;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
 {
     partial class TestModuleSpanTags
     {
-        // TypeBytes = System.Text.Encoding.UTF8.GetBytes("test.type");
-        private static readonly byte[] TypeBytes = new byte[] { 116, 101, 115, 116, 46, 116, 121, 112, 101 };
-        // ModuleBytes = System.Text.Encoding.UTF8.GetBytes("test.module");
-        private static readonly byte[] ModuleBytes = new byte[] { 116, 101, 115, 116, 46, 109, 111, 100, 117, 108, 101 };
-        // BundleBytes = System.Text.Encoding.UTF8.GetBytes("test.bundle");
-        private static readonly byte[] BundleBytes = new byte[] { 116, 101, 115, 116, 46, 98, 117, 110, 100, 108, 101 };
-        // FrameworkBytes = System.Text.Encoding.UTF8.GetBytes("test.framework");
-        private static readonly byte[] FrameworkBytes = new byte[] { 116, 101, 115, 116, 46, 102, 114, 97, 109, 101, 119, 111, 114, 107 };
-        // FrameworkVersionBytes = System.Text.Encoding.UTF8.GetBytes("test.framework_version");
-        private static readonly byte[] FrameworkVersionBytes = new byte[] { 116, 101, 115, 116, 46, 102, 114, 97, 109, 101, 119, 111, 114, 107, 95, 118, 101, 114, 115, 105, 111, 110 };
-        // RuntimeNameBytes = System.Text.Encoding.UTF8.GetBytes("runtime.name");
-        private static readonly byte[] RuntimeNameBytes = new byte[] { 114, 117, 110, 116, 105, 109, 101, 46, 110, 97, 109, 101 };
-        // RuntimeVersionBytes = System.Text.Encoding.UTF8.GetBytes("runtime.version");
-        private static readonly byte[] RuntimeVersionBytes = new byte[] { 114, 117, 110, 116, 105, 109, 101, 46, 118, 101, 114, 115, 105, 111, 110 };
-        // RuntimeArchitectureBytes = System.Text.Encoding.UTF8.GetBytes("runtime.architecture");
-        private static readonly byte[] RuntimeArchitectureBytes = new byte[] { 114, 117, 110, 116, 105, 109, 101, 46, 97, 114, 99, 104, 105, 116, 101, 99, 116, 117, 114, 101 };
-        // OSArchitectureBytes = System.Text.Encoding.UTF8.GetBytes("os.architecture");
-        private static readonly byte[] OSArchitectureBytes = new byte[] { 111, 115, 46, 97, 114, 99, 104, 105, 116, 101, 99, 116, 117, 114, 101 };
-        // OSPlatformBytes = System.Text.Encoding.UTF8.GetBytes("os.platform");
-        private static readonly byte[] OSPlatformBytes = new byte[] { 111, 115, 46, 112, 108, 97, 116, 102, 111, 114, 109 };
-        // OSVersionBytes = System.Text.Encoding.UTF8.GetBytes("os.version");
-        private static readonly byte[] OSVersionBytes = new byte[] { 111, 115, 46, 118, 101, 114, 115, 105, 111, 110 };
+        // IntelligentTestRunnerSkippingCountBytes = MessagePack.Serialize("test.itr.tests_skipping.count");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> IntelligentTestRunnerSkippingCountBytes => new byte[] { 189, 116, 101, 115, 116, 46, 105, 116, 114, 46, 116, 101, 115, 116, 115, 95, 115, 107, 105, 112, 112, 105, 110, 103, 46, 99, 111, 117, 110, 116 };
+#else
+        private static readonly byte[] IntelligentTestRunnerSkippingCountBytes = new byte[] { 189, 116, 101, 115, 116, 46, 105, 116, 114, 46, 116, 101, 115, 116, 115, 95, 115, 107, 105, 112, 112, 105, 110, 103, 46, 99, 111, 117, 110, 116 };
+#endif
+        // TypeBytes = MessagePack.Serialize("test.type");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> TypeBytes => new byte[] { 169, 116, 101, 115, 116, 46, 116, 121, 112, 101 };
+#else
+        private static readonly byte[] TypeBytes = new byte[] { 169, 116, 101, 115, 116, 46, 116, 121, 112, 101 };
+#endif
+        // ModuleBytes = MessagePack.Serialize("test.module");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> ModuleBytes => new byte[] { 171, 116, 101, 115, 116, 46, 109, 111, 100, 117, 108, 101 };
+#else
+        private static readonly byte[] ModuleBytes = new byte[] { 171, 116, 101, 115, 116, 46, 109, 111, 100, 117, 108, 101 };
+#endif
+        // BundleBytes = MessagePack.Serialize("test.bundle");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> BundleBytes => new byte[] { 171, 116, 101, 115, 116, 46, 98, 117, 110, 100, 108, 101 };
+#else
+        private static readonly byte[] BundleBytes = new byte[] { 171, 116, 101, 115, 116, 46, 98, 117, 110, 100, 108, 101 };
+#endif
+        // FrameworkBytes = MessagePack.Serialize("test.framework");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> FrameworkBytes => new byte[] { 174, 116, 101, 115, 116, 46, 102, 114, 97, 109, 101, 119, 111, 114, 107 };
+#else
+        private static readonly byte[] FrameworkBytes = new byte[] { 174, 116, 101, 115, 116, 46, 102, 114, 97, 109, 101, 119, 111, 114, 107 };
+#endif
+        // FrameworkVersionBytes = MessagePack.Serialize("test.framework_version");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> FrameworkVersionBytes => new byte[] { 182, 116, 101, 115, 116, 46, 102, 114, 97, 109, 101, 119, 111, 114, 107, 95, 118, 101, 114, 115, 105, 111, 110 };
+#else
+        private static readonly byte[] FrameworkVersionBytes = new byte[] { 182, 116, 101, 115, 116, 46, 102, 114, 97, 109, 101, 119, 111, 114, 107, 95, 118, 101, 114, 115, 105, 111, 110 };
+#endif
+        // RuntimeNameBytes = MessagePack.Serialize("runtime.name");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RuntimeNameBytes => new byte[] { 172, 114, 117, 110, 116, 105, 109, 101, 46, 110, 97, 109, 101 };
+#else
+        private static readonly byte[] RuntimeNameBytes = new byte[] { 172, 114, 117, 110, 116, 105, 109, 101, 46, 110, 97, 109, 101 };
+#endif
+        // RuntimeVersionBytes = MessagePack.Serialize("runtime.version");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RuntimeVersionBytes => new byte[] { 175, 114, 117, 110, 116, 105, 109, 101, 46, 118, 101, 114, 115, 105, 111, 110 };
+#else
+        private static readonly byte[] RuntimeVersionBytes = new byte[] { 175, 114, 117, 110, 116, 105, 109, 101, 46, 118, 101, 114, 115, 105, 111, 110 };
+#endif
+        // RuntimeArchitectureBytes = MessagePack.Serialize("runtime.architecture");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RuntimeArchitectureBytes => new byte[] { 180, 114, 117, 110, 116, 105, 109, 101, 46, 97, 114, 99, 104, 105, 116, 101, 99, 116, 117, 114, 101 };
+#else
+        private static readonly byte[] RuntimeArchitectureBytes = new byte[] { 180, 114, 117, 110, 116, 105, 109, 101, 46, 97, 114, 99, 104, 105, 116, 101, 99, 116, 117, 114, 101 };
+#endif
+        // OSArchitectureBytes = MessagePack.Serialize("os.architecture");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> OSArchitectureBytes => new byte[] { 175, 111, 115, 46, 97, 114, 99, 104, 105, 116, 101, 99, 116, 117, 114, 101 };
+#else
+        private static readonly byte[] OSArchitectureBytes = new byte[] { 175, 111, 115, 46, 97, 114, 99, 104, 105, 116, 101, 99, 116, 117, 114, 101 };
+#endif
+        // OSPlatformBytes = MessagePack.Serialize("os.platform");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> OSPlatformBytes => new byte[] { 171, 111, 115, 46, 112, 108, 97, 116, 102, 111, 114, 109 };
+#else
+        private static readonly byte[] OSPlatformBytes = new byte[] { 171, 111, 115, 46, 112, 108, 97, 116, 102, 111, 114, 109 };
+#endif
+        // OSVersionBytes = MessagePack.Serialize("os.version");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> OSVersionBytes => new byte[] { 170, 111, 115, 46, 118, 101, 114, 115, 105, 111, 110 };
+#else
+        private static readonly byte[] OSVersionBytes = new byte[] { 170, 111, 115, 46, 118, 101, 114, 115, 105, 111, 110 };
+#endif
 
         public override string? GetTag(string key)
         {
@@ -239,6 +290,49 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
             }
 
             base.WriteAdditionalTags(sb);
+        }
+        public override double? GetMetric(string key)
+        {
+            return key switch
+            {
+                "test.itr.tests_skipping.count" => IntelligentTestRunnerSkippingCount,
+                _ => base.GetMetric(key),
+            };
+        }
+
+        public override void SetMetric(string key, double? value)
+        {
+            switch(key)
+            {
+                case "test.itr.tests_skipping.count": 
+                    Logger.Value.Warning("Attempted to set readonly metric {MetricName} on {TagType}. Ignoring.", key, nameof(TestModuleSpanTags));
+                    break;
+                default: 
+                    base.SetMetric(key, value);
+                    break;
+            }
+        }
+
+        public override void EnumerateMetrics<TProcessor>(ref TProcessor processor)
+        {
+            if (IntelligentTestRunnerSkippingCount is not null)
+            {
+                processor.Process(new TagItem<double>("test.itr.tests_skipping.count", IntelligentTestRunnerSkippingCount.Value, IntelligentTestRunnerSkippingCountBytes));
+            }
+
+            base.EnumerateMetrics(ref processor);
+        }
+
+        protected override void WriteAdditionalMetrics(System.Text.StringBuilder sb)
+        {
+            if (IntelligentTestRunnerSkippingCount is not null)
+            {
+                sb.Append("test.itr.tests_skipping.count (metric):")
+                  .Append(IntelligentTestRunnerSkippingCount.Value)
+                  .Append(',');
+            }
+
+            base.WriteAdditionalMetrics(sb);
         }
     }
 }

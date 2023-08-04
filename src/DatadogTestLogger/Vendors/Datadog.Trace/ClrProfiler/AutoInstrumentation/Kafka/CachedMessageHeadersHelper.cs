@@ -9,34 +9,18 @@
 // </copyright>
 
 using System;
-using System.Reflection;
-using System.Reflection.Emit;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 {
     internal static class CachedMessageHeadersHelper<TMarkerType>
     {
-        private static readonly Func<object> _activator;
+        private static readonly ActivatorHelper HeadersActivator;
 
         static CachedMessageHeadersHelper()
         {
-            var headersType = typeof(TMarkerType).Assembly.GetType("Confluent.Kafka.Headers");
-
-            ConstructorInfo ctor = headersType.GetConstructor(System.Type.EmptyTypes);
-
-            DynamicMethod createHeadersMethod = new DynamicMethod(
-                $"KafkaCachedMessageHeadersHelpers",
-                headersType,
-                null,
-                typeof(DuckType).Module,
-                true);
-
-            ILGenerator il = createHeadersMethod.GetILGenerator();
-            il.Emit(OpCodes.Newobj, ctor);
-            il.Emit(OpCodes.Ret);
-
-            _activator = (Func<object>)createHeadersMethod.CreateDelegate(typeof(Func<object>));
+            HeadersActivator = new ActivatorHelper(typeof(TMarkerType).Assembly.GetType("Confluent.Kafka.Headers"));
         }
 
         /// <summary>
@@ -45,7 +29,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         /// <returns>A proxy for the new Headers object</returns>
         public static IHeaders CreateHeaders()
         {
-            var headers = _activator();
+            var headers = HeadersActivator.CreateInstance();
             return headers.DuckCast<IHeaders>();
         }
     }

@@ -14,8 +14,11 @@ using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.CosmosDb
 {
     /// <summary>
-    /// Microsoft.Azure.Cosmos.Database for duct typing
+    /// Microsoft.Azure.Cosmos.Database for duck typing
     /// </summary>
+    /// <remarks>
+    /// https://github.com/Azure/azure-cosmos-dotnet-v3/blob/45e5f917ea1959b71240eedf226ae89a18951dd0/Microsoft.Azure.Cosmos/src/Resource/Database/DatabaseCore.cs
+    /// </remarks>
     [DuckCopy]
     internal struct DatabaseOldStruct
     {

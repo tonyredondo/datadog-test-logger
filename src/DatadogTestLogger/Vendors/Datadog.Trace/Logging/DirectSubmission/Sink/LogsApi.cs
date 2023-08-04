@@ -13,6 +13,8 @@ using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
@@ -79,14 +81,18 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
 
                     try
                     {
-                        // TODO: Metrics/Telemetry?
+                        TelemetryFactory.Metrics.RecordCountDirectLogApiRequests();
                         response = await request.PostAsync(logs, MimeType).ConfigureAwait(false);
+
+                        TelemetryFactory.Metrics.RecordCountDirectLogApiResponses(response.GetTelemetryStatusCodeMetricTag());
 
                         if (response.StatusCode is >= 200 and < 300)
                         {
                             Log.Debug<int>("Successfully sent {Count} logs to the intake", numberOfLogs);
                             return true;
                         }
+
+                        TelemetryFactory.Metrics.RecordCountDirectLogApiErrors(MetricTags.ApiError.StatusCode);
 
                         shouldRetry = response.StatusCode switch
                         {
@@ -120,6 +126,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink
                 }
                 catch (Exception ex)
                 {
+                    var tag = ex is TimeoutException ? MetricTags.ApiError.Timeout : MetricTags.ApiError.NetworkError;
+                    TelemetryFactory.Metrics.RecordCountDirectLogApiErrors(tag);
+
                     exception = ex;
 #if DEBUG
                     if (ex.InnerException is InvalidOperationException)

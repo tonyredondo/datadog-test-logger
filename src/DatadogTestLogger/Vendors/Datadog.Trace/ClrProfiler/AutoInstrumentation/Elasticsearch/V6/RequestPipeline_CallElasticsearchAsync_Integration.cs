@@ -23,7 +23,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = ElasticsearchV6Constants.ElasticsearchAssemblyName,
         TypeName = ElasticsearchV6Constants.RequestPipelineTypeName,
         MethodName = "CallElasticsearchAsync",
-        ReturnTypeName = ClrNames.GenericParameterTask,
+        ReturnTypeName = ClrNames.GenericTaskWithGenericClassParameter,
         ParameterTypeNames = new[] { "Elasticsearch.Net.RequestData", ClrNames.CancellationToken },
         MinimumVersion = ElasticsearchV6Constants.Version6,
         MaximumVersion = ElasticsearchV6Constants.Version6,

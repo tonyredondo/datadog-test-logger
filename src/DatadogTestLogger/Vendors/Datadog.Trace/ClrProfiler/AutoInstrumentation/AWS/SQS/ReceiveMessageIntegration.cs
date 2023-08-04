@@ -50,8 +50,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 return CallTargetState.GetDefault();
             }
 
-            var scope = AwsSqsCommon.CreateScope(Tracer.Instance, Operation, out AwsSqsTags tags);
+            var scope = AwsSqsCommon.CreateScope(Tracer.Instance, Operation, out AwsSqsTags tags, spanKind: SpanKinds.Consumer);
             tags.QueueUrl = request.QueueUrl;
+            tags.QueueName = AwsSqsCommon.GetQueueName(request.QueueUrl);
 
             return new CallTargetState(scope);
         }

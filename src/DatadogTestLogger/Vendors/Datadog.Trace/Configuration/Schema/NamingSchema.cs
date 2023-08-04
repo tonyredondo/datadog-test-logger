@@ -11,23 +11,64 @@
 #nullable enable
 
 using System.Collections.Generic;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema
 {
     internal class NamingSchema
     {
-        public NamingSchema(SchemaVersion version, string defaultServiceName, IDictionary<string, string>? serviceNameMappings)
+        private readonly IReadOnlyDictionary<string, string>? _peerServiceNameMappings;
+        private readonly bool _peerServiceTagsEnabled;
+
+        public NamingSchema(
+            SchemaVersion version,
+            bool peerServiceTagsEnabled,
+            bool removeClientServiceNamesEnabled,
+            string defaultServiceName,
+            IReadOnlyDictionary<string, string>? serviceNameMappings,
+            IReadOnlyDictionary<string, string>? peerServiceNameMappings)
         {
             Version = version;
-            Database = new DatabaseSchema(version, defaultServiceName, serviceNameMappings);
-            Messaging = new MessagingSchema(version, defaultServiceName, serviceNameMappings);
+            RemoveClientServiceNamesEnabled = removeClientServiceNamesEnabled;
+            Client = new ClientSchema(version, peerServiceTagsEnabled, removeClientServiceNamesEnabled, defaultServiceName, serviceNameMappings);
+            Database = new DatabaseSchema(version, peerServiceTagsEnabled, removeClientServiceNamesEnabled, defaultServiceName, serviceNameMappings);
+            Messaging = new MessagingSchema(version, peerServiceTagsEnabled, removeClientServiceNamesEnabled, defaultServiceName, serviceNameMappings);
+            Server = new ServerSchema(version);
+            _peerServiceNameMappings = peerServiceNameMappings;
+            _peerServiceTagsEnabled = peerServiceTagsEnabled;
         }
 
         // TODO: Temporary, we can probably delete this once we migrate all the code off MetadataSchemaVersion
         public SchemaVersion Version { get; }
 
+        public ClientSchema Client { get; }
+
         public DatabaseSchema Database { get; }
 
         public MessagingSchema Messaging { get; }
+
+        public ServerSchema Server { get; }
+
+        public bool RemoveClientServiceNamesEnabled { get; }
+
+        public void RemapPeerService(ITags tags)
+        {
+            if ((Version.Equals(SchemaVersion.V0) && !_peerServiceTagsEnabled) || _peerServiceNameMappings is null || _peerServiceNameMappings.Count == 0)
+            {
+                return;
+            }
+
+            var peerService = tags.GetTag(Tags.PeerService);
+            if (peerService is null)
+            {
+                return;
+            }
+
+            if (_peerServiceNameMappings.TryGetValue(peerService, out var mappedServiceName))
+            {
+                tags.SetTag(Tags.PeerServiceRemappedFrom, peerService);
+                tags.SetTag(Tags.PeerService, mappedServiceName);
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@
 using System;
 using System.ComponentModel;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util.Http;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V7
 {
@@ -21,7 +22,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = ElasticsearchV7Constants.ElasticsearchAssemblyName,
         TypeName = ElasticsearchV7Constants.TransportTypeName,
         MethodName = "Request",
-        ReturnTypeName = "T",
+        ReturnTypeName = "!0",
         ParameterTypeNames = new[] { "Elasticsearch.Net.HttpMethod", ClrNames.String, "Elasticsearch.Net.PostData", "Elasticsearch.Net.IRequestParameters" },
         MinimumVersion = ElasticsearchV7Constants.Version7,
         MaximumVersion = ElasticsearchV7Constants.Version7,
@@ -64,7 +65,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         internal static CallTargetReturn<TResponse> OnMethodEnd<TTarget, TResponse>(TTarget instance, TResponse response, Exception exception, in CallTargetState state)
             where TResponse : IElasticsearchResponse
         {
-            var uri = response?.ApiCall?.Uri?.ToString();
+            var uri = response?.ApiCall?.Uri;
 
             if (uri != null)
             {
@@ -72,7 +73,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
                 if (tags != null)
                 {
-                    tags.Url = uri;
+                    tags.Url = uri.ToString();
+                    tags.Host = HttpRequestUtils.GetNormalizedHost(uri.Host);
                 }
             }
 

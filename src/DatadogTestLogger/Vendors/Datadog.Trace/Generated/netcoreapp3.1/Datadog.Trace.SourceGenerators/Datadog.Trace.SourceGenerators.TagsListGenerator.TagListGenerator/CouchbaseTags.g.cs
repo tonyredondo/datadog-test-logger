@@ -9,25 +9,60 @@
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using System;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     partial class CouchbaseTags
     {
-        // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
-        private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
-        // InstrumentationNameBytes = System.Text.Encoding.UTF8.GetBytes("component");
-        private static readonly byte[] InstrumentationNameBytes = new byte[] { 99, 111, 109, 112, 111, 110, 101, 110, 116 };
-        // OperationCodeBytes = System.Text.Encoding.UTF8.GetBytes("couchbase.operation.code");
-        private static readonly byte[] OperationCodeBytes = new byte[] { 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 99, 111, 100, 101 };
-        // BucketBytes = System.Text.Encoding.UTF8.GetBytes("couchbase.operation.bucket");
-        private static readonly byte[] BucketBytes = new byte[] { 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 98, 117, 99, 107, 101, 116 };
-        // KeyBytes = System.Text.Encoding.UTF8.GetBytes("couchbase.operation.key");
-        private static readonly byte[] KeyBytes = new byte[] { 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 107, 101, 121 };
-        // HostBytes = System.Text.Encoding.UTF8.GetBytes("out.host");
-        private static readonly byte[] HostBytes = new byte[] { 111, 117, 116, 46, 104, 111, 115, 116 };
-        // PortBytes = System.Text.Encoding.UTF8.GetBytes("out.port");
-        private static readonly byte[] PortBytes = new byte[] { 111, 117, 116, 46, 112, 111, 114, 116 };
+        // SpanKindBytes = MessagePack.Serialize("span.kind");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> SpanKindBytes => new byte[] { 169, 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+#else
+        private static readonly byte[] SpanKindBytes = new byte[] { 169, 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+#endif
+        // InstrumentationNameBytes = MessagePack.Serialize("component");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> InstrumentationNameBytes => new byte[] { 169, 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+#else
+        private static readonly byte[] InstrumentationNameBytes = new byte[] { 169, 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+#endif
+        // SeedNodesBytes = MessagePack.Serialize("db.couchbase.seed.nodes");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> SeedNodesBytes => new byte[] { 183, 100, 98, 46, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 115, 101, 101, 100, 46, 110, 111, 100, 101, 115 };
+#else
+        private static readonly byte[] SeedNodesBytes = new byte[] { 183, 100, 98, 46, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 115, 101, 101, 100, 46, 110, 111, 100, 101, 115 };
+#endif
+        // OperationCodeBytes = MessagePack.Serialize("couchbase.operation.code");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> OperationCodeBytes => new byte[] { 184, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 99, 111, 100, 101 };
+#else
+        private static readonly byte[] OperationCodeBytes = new byte[] { 184, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 99, 111, 100, 101 };
+#endif
+        // BucketBytes = MessagePack.Serialize("couchbase.operation.bucket");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> BucketBytes => new byte[] { 186, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 98, 117, 99, 107, 101, 116 };
+#else
+        private static readonly byte[] BucketBytes = new byte[] { 186, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 98, 117, 99, 107, 101, 116 };
+#endif
+        // KeyBytes = MessagePack.Serialize("couchbase.operation.key");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> KeyBytes => new byte[] { 183, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 107, 101, 121 };
+#else
+        private static readonly byte[] KeyBytes = new byte[] { 183, 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 107, 101, 121 };
+#endif
+        // HostBytes = MessagePack.Serialize("out.host");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> HostBytes => new byte[] { 168, 111, 117, 116, 46, 104, 111, 115, 116 };
+#else
+        private static readonly byte[] HostBytes = new byte[] { 168, 111, 117, 116, 46, 104, 111, 115, 116 };
+#endif
+        // PortBytes = MessagePack.Serialize("out.port");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> PortBytes => new byte[] { 168, 111, 117, 116, 46, 112, 111, 114, 116 };
+#else
+        private static readonly byte[] PortBytes = new byte[] { 168, 111, 117, 116, 46, 112, 111, 114, 116 };
+#endif
 
         public override string? GetTag(string key)
         {
@@ -35,6 +70,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
             {
                 "span.kind" => SpanKind,
                 "component" => InstrumentationName,
+                "db.couchbase.seed.nodes" => SeedNodes,
                 "couchbase.operation.code" => OperationCode,
                 "couchbase.operation.bucket" => Bucket,
                 "couchbase.operation.key" => Key,
@@ -48,6 +84,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
         {
             switch(key)
             {
+                case "db.couchbase.seed.nodes": 
+                    SeedNodes = value;
+                    break;
                 case "couchbase.operation.code": 
                     OperationCode = value;
                     break;
@@ -83,6 +122,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
             if (InstrumentationName is not null)
             {
                 processor.Process(new TagItem<string>("component", InstrumentationName, InstrumentationNameBytes));
+            }
+
+            if (SeedNodes is not null)
+            {
+                processor.Process(new TagItem<string>("db.couchbase.seed.nodes", SeedNodes, SeedNodesBytes));
             }
 
             if (OperationCode is not null)
@@ -126,6 +170,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
             {
                 sb.Append("component (tag):")
                   .Append(InstrumentationName)
+                  .Append(',');
+            }
+
+            if (SeedNodes is not null)
+            {
+                sb.Append("db.couchbase.seed.nodes (tag):")
+                  .Append(SeedNodes)
                   .Append(',');
             }
 

@@ -10,6 +10,8 @@
 
 #nullable enable
 using System.Collections.Generic;
+using System.Numerics;
+using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
 
@@ -26,4 +28,12 @@ internal interface IRcmSubscriptionManager
     void Unsubscribe(ISubscription subscription);
 
     List<ApplyDetails> Update(Dictionary<string, List<RemoteConfiguration>> configByProducts, Dictionary<string, List<RemoteConfigurationPath>> removedConfigsByProduct);
+
+    void SetCapability(BigInteger index, bool available);
+
+    byte[] GetCapabilities();
+
+    GetRcmRequest BuildRequest(RcmClientTracer rcmTracer, string? lastPollError);
+
+    void ProcessResponse(GetRcmResponse response);
 }

@@ -23,8 +23,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     [InstrumentMethodAttribute(
         IntegrationName = HotChocolateCommon.IntegrationName,
         MethodName = "ExecuteAsync",
-        ReturnTypeName = "System.Threading.Tasks.Task`1<HotChocolate.Execution.IExecutionResult>",
-        ParameterTypeNames = new string[] { "HotChocolate.Execution.IQueryRequest", ClrNames.CancellationToken },
+        ReturnTypeName = "System.Threading.Tasks.Task`1[HotChocolate.Execution.IExecutionResult]",
+        ParameterTypeNames = new[] { "HotChocolate.Execution.IQueryRequest", ClrNames.CancellationToken },
         AssemblyName = "HotChocolate.Execution",
         TypeName = "HotChocolate.Execution.RequestExecutor",
         MinimumVersion = "13",

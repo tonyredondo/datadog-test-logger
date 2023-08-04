@@ -23,6 +23,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.HttpOverStreams;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.StatsdClient.Transport;
 
@@ -32,11 +33,12 @@ internal class LiveDebuggerFactory
 {
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(LiveDebuggerFactory));
 
-    public static LiveDebugger Create(IDiscoveryService discoveryService, IRcmSubscriptionManager remoteConfigurationManager, ImmutableTracerSettings tracerSettings, string serviceName)
+    public static LiveDebugger Create(IDiscoveryService discoveryService, IRcmSubscriptionManager remoteConfigurationManager, ImmutableTracerSettings tracerSettings, string serviceName, ITelemetryController telemetry)
     {
         var settings = DebuggerSettings.FromDefaultSource();
         if (!settings.Enabled)
         {
+            telemetry.ProductChanged(TelemetryProductType.DynamicInstrumentation, enabled: false, error: null);
             Log.Information("Live Debugger is disabled. To enable it, please set DD_DYNAMIC_INSTRUMENTATION_ENABLED environment variable to 'true'.");
             return LiveDebugger.Create(settings, string.Empty, null, null, null, null, null, null, null);
         }
@@ -46,7 +48,7 @@ internal class LiveDebuggerFactory
         var probeStatusSink = ProbeStatusSink.Create(serviceName, settings);
 
         var apiFactory = AgentTransportStrategy.Get(
-            tracerSettings.Exporter,
+            tracerSettings.ExporterInternal,
             productName: "debugger",
             tcpTimeout: TimeSpan.FromSeconds(15),
             AgentHttpHeaderNames.MinimalHeaders,
@@ -60,11 +62,11 @@ internal class LiveDebuggerFactory
         var lineProbeResolver = LineProbeResolver.Create();
         var probeStatusPoller = ProbeStatusPoller.Create(probeStatusSink, settings);
 
-        var configurationUpdater = ConfigurationUpdater.Create(tracerSettings.Environment, tracerSettings.ServiceVersion);
+        var configurationUpdater = ConfigurationUpdater.Create(tracerSettings.EnvironmentInternal, tracerSettings.ServiceVersionInternal);
 
         IDogStatsd statsd;
         if (FrameworkDescription.Instance.IsWindows()
-            && tracerSettings.Exporter.MetricsTransport == TransportType.UDS)
+            && tracerSettings.ExporterInternal.MetricsTransport == TransportType.UDS)
         {
             Log.Information("Metric probes are not supported on Windows when transport type is UDS");
             statsd = new NoOpStatsd();
@@ -79,6 +81,7 @@ internal class LiveDebuggerFactory
             statsd = TracerManagerFactory.CreateDogStatsdClient(tracerSettings, constantTags, DebuggerSettings.DebuggerMetricPrefix);
         }
 
+        telemetry.ProductChanged(TelemetryProductType.DynamicInstrumentation, enabled: true, error: null);
         return LiveDebugger.Create(settings, serviceName, discoveryService, remoteConfigurationManager, lineProbeResolver, debuggerSink, probeStatusPoller, configurationUpdater, statsd);
     }
 }

@@ -15,6 +15,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
+using Type = System.Type;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions;
 
@@ -49,7 +50,7 @@ internal partial class ProbeExpressionParser<T>
                 ReturnDefaultValueExpression();
             }
 
-            if (!IsSafeCollection(source))
+            if (!IsSafeCollection(source.Type))
             {
                 throw new InvalidOperationException("Source must be an array or implement ICollection or IReadOnlyCollection");
             }
@@ -59,7 +60,7 @@ internal partial class ProbeExpressionParser<T>
             var lambda = Expression.Lambda<Func<string, bool>>(predicate, itParameter);
             var genericPredicateMethod = predicateMethod.MakeGenericMethod(source.Type.GetGenericArguments()[0]);
             callExpression = Expression.Call(null, genericPredicateMethod, source, lambda);
-            if (IsCollection(callExpression))
+            if (IsIEnumerable(callExpression.Type))
             {
                 var toListMethod = ProbeExpressionParserHelper.GetMethodByReflection(typeof(Enumerable), nameof(Enumerable.ToList), null);
                 var genericToListMethod = toListMethod.MakeGenericMethod(source.Type.GetGenericArguments()[0]);
@@ -87,7 +88,7 @@ internal partial class ProbeExpressionParser<T>
                 return ReturnDefaultValueExpression();
             }
 
-            if (!IsTypeSupportIndex(source, out var assignableFrom))
+            if (!IsTypeSupportIndex(source.Type, out var assignableFrom))
             {
                 throw new InvalidOperationException("Source must implement IList or IDictionary");
             }
@@ -176,42 +177,52 @@ internal partial class ProbeExpressionParser<T>
         return Expression.Call(source, countOrLength);
     }
 
-    private bool IsSafeCollection(Expression source)
+    private bool IsSafeCollection(Type type)
     {
-        return source.Type.GetInterface("ICollection") != null ||
-               source.Type.GetInterface("IReadOnlyCollection") != null ||
-               source.Type.IsArray;
+        return IsMicrosoftType(type) &&
+               (type.GetInterface("ICollection") != null ||
+               type.GetInterface("IReadOnlyCollection") != null ||
+               type.IsArray);
     }
 
-    private bool IsCollection(Expression source)
+    private bool IsIEnumerable(Type type)
     {
-        return IsSafeCollection(source) || source.Type.GetInterface("IEnumerable") != null;
+        return IsSafeCollection(type) || type.GetInterface("IEnumerable") != null;
     }
 
     private bool IsTypeSupportCount(Expression source)
     {
-        return source.Type.GetInterface("ICollection") != null ||
-               source.Type.GetInterface("IReadOnlyCollection") != null ||
-               source.Type.IsArray;
+        return IsMicrosoftType(source.Type) &&
+               (source.Type.GetInterface("ICollection") != null ||
+                source.Type.GetInterface("IReadOnlyCollection") != null ||
+                source.Type.IsArray);
     }
 
-    private bool IsTypeSupportIndex(Expression source, out Type assignableFrom)
+    private bool IsTypeSupportIndex(Type type, out Type assignableFrom)
     {
-        if (source.Type.GetInterface("IList") != null)
+        if (!IsMicrosoftType(type))
+        {
+            assignableFrom = null;
+            return false;
+        }
+
+        if (type == typeof(IList) || type.GetInterface(nameof(IList)) != null)
         {
             assignableFrom = typeof(IList);
             return true;
         }
 
-        if (source.Type.GetInterface("IReadOnlyList<>") != null)
+        if (type == typeof(IDictionary) || type.GetInterface(nameof(IDictionary)) != null)
         {
-            assignableFrom = typeof(IReadOnlyList<>);
+            assignableFrom = typeof(IDictionary);
             return true;
         }
 
-        if (source.Type.GetInterface("IDictionary") != null)
+        if (type == typeof(IReadOnlyList<>) ||
+            (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>)) ||
+            type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IReadOnlyList<>)))
         {
-            assignableFrom = typeof(IDictionary);
+            assignableFrom = typeof(IReadOnlyList<>);
             return true;
         }
 

@@ -12,6 +12,9 @@
 
 using System.Collections.Generic;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
@@ -41,10 +44,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// </summary>
         /// <param name="integrationName">The name of the integration.</param>
         /// <returns>The integration-specific settings for the specified integration.</returns>
+        [PublicApi]
         public ImmutableIntegrationSettings this[string integrationName]
         {
             get
             {
+                TelemetryFactory.Metrics.Record(PublicApiUsage.ImmutableIntegrationSettingsCollection_Indexer_Name);
                 if (IntegrationRegistry.TryGetIntegrationId(integrationName, out var integrationId))
                 {
                     return Settings[(int)integrationId];
@@ -71,7 +76,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             for (int i = 0; i < integrations.Length; i++)
             {
                 var existingSettings = allExistingSettings[i];
-                var explicitlyDisabled = disabledIntegrationNames.Contains(existingSettings.IntegrationName);
+                var explicitlyDisabled = disabledIntegrationNames.Contains(existingSettings.IntegrationNameInternal);
 
                 integrations[i] = new ImmutableIntegrationSettings(existingSettings, explicitlyDisabled);
             }

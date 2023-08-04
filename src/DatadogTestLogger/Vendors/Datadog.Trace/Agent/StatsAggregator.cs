@@ -19,6 +19,8 @@ using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.PlatformHelpers;
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
@@ -68,8 +70,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
 
             var header = new ClientStatsPayload
             {
-                Environment = settings.Environment,
-                Version = settings.ServiceVersion,
+                Environment = settings.EnvironmentInternal,
+                Version = settings.ServiceVersionInternal,
                 HostName = HostMetadata.Instance.Hostname
             };
 
@@ -96,7 +98,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
 
         public static IStatsAggregator Create(IApi api, ImmutableTracerSettings settings, IDiscoveryService discoveryService)
         {
-            return settings.StatsComputationEnabled ? new StatsAggregator(api, settings, discoveryService) : new NullStatsAggregator();
+            return settings.StatsComputationEnabledInternal ? new StatsAggregator(api, settings, discoveryService) : new NullStatsAggregator();
         }
 
         public Task DisposeAsync()
@@ -195,6 +197,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
                 {
                     _currentBuffer = (_currentBuffer + 1) % BufferCount;
                 }
+
+                TelemetryFactory.Metrics.RecordGaugeStatsBuckets(buffer.Buckets.Count);
 
                 if (buffer.Buckets.Count > 0)
                 {

@@ -14,9 +14,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
@@ -34,6 +36,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         internal const IntegrationId IntegrationId = Configuration.IntegrationId.Wcf;
 
         public static Func<object> GetCurrentOperationContext => _getCurrentOperationContext.Value;
+
+        public static ConditionalWeakTable<object, Scope> Scopes { get; } = new();
 
         internal static Scope CreateScope<TRequestContext>(TRequestContext requestContext)
             where TRequestContext : IRequestContext
@@ -58,10 +62,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             try
             {
                 SpanContext propagatedContext = null;
-                var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
                 string host = null;
                 string userAgent = null;
                 string httpMethod = null;
+                WebHeadersCollection? headers = null;
 
                 IDictionary<string, object> requestProperties = requestMessage.Properties;
                 if (requestProperties.TryGetValue("httpRequest", out object httpRequestProperty) &&
@@ -80,9 +84,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     {
                         try
                         {
-                            var headers = webHeaderCollection.Wrap();
-                            propagatedContext = SpanContextPropagator.Instance.Extract(headers);
-                            tagsFromHeaders = SpanContextPropagator.Instance.ExtractHeaderTags(headers, tracer.Settings.HeaderTags, SpanContextPropagator.HttpRequestHeadersTagPrefix);
+                            headers = webHeaderCollection.Wrap();
+                            propagatedContext = SpanContextPropagator.Instance.Extract(headers.Value);
                         }
                         catch (Exception ex)
                         {
@@ -91,8 +94,41 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     }
                 }
 
+                if (propagatedContext == null && requestMessage.Headers != null)
+                {
+                    Log.Debug("Extracting from WCF headers if any as http headers hadn't been found.");
+                    try
+                    {
+                        propagatedContext = SpanContextPropagator.Instance.Extract(requestMessage.Headers, GetHeaderValues);
+
+                        static IEnumerable<string> GetHeaderValues(IMessageHeaders headers, string name)
+                        {
+                            try
+                            {
+                                const string ns = "datadog";
+                                var index = headers.FindHeader(name, ns);
+                                if (index >= 0)
+                                {
+                                    return new[] { headers.GetHeader<string>(name, ns) };
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, "Error extracting propagated WCF headers.");
+                            }
+
+                            return Enumerable.Empty<string>();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Error extracting propagated WCF headers.");
+                    }
+                }
+
+                string operationName = tracer.CurrentTraceSettings.Schema.Server.GetOperationNameForComponent("wcf");
                 var tags = new WcfTags();
-                scope = tracer.StartActiveInternal("wcf.request", propagatedContext, tags: tags);
+                scope = tracer.StartActiveInternal(operationName, propagatedContext, tags: tags);
                 var span = scope.Span;
 
                 var requestHeaders = requestMessage.Headers;
@@ -105,8 +141,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     host,
                     httpUrl: requestHeadersTo?.AbsoluteUri,
                     userAgent,
-                    tags,
-                    tagsFromHeaders);
+                    tags);
+
+                if (headers is not null)
+                {
+                    var headerTagsProcessor = new SpanContextPropagator.SpanTagHeaderTagProcessor(span);
+                    SpanContextPropagator.Instance.ExtractHeaderTags(ref headerTagsProcessor, headers.Value, tracer.Settings.HeaderTagsInternal, SpanContextPropagator.HttpRequestHeadersTagPrefix);
+                }
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(IntegrationId);

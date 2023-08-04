@@ -9,6 +9,7 @@
 // </copyright>
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
@@ -32,6 +33,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// </summary>
         /// <param name="operationName">The span's operation name</param>
         /// <returns>A scope wrapping the newly created span</returns>
+        [PublicApi]
         IScope StartActive(string operationName);
 
         /// <summary>

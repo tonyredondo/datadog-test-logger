@@ -10,6 +10,7 @@
 #nullable enable
 
 using System;
+using DatadogTestLogger.Vendors.Datadog.Trace.Iast.Settings;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
@@ -417,6 +418,28 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         public const string MetadataSchemaVersion = "DD_TRACE_SPAN_ATTRIBUTE_SCHEMA";
 
         /// <summary>
+        /// Configuration key for automatically populating the peer.service tag
+        /// from predefined precursor attributes when the span attribute schema is v0.
+        /// This is ignored when the span attribute schema is v1 or later.
+        /// Default value is false
+        /// </summary>
+        public const string PeerServiceDefaultsEnabled = "DD_TRACE_PEER_SERVICE_DEFAULTS_ENABLED";
+
+        /// <summary>
+        /// Configuration key for a map of services to rename.
+        /// </summary>
+        /// <seealso cref="TracerSettings.PeerServiceNameMappings"/>
+        public const string PeerServiceNameMappings = "DD_TRACE_PEER_SERVICE_MAPPING";
+
+        /// <summary>
+        /// Configuration key for unifying client service names when the span
+        /// attribute schema is v0. This is ignored when the span attribute
+        /// schema is v1 or later.
+        /// Default value is false
+        /// </summary>
+        public const string RemoveClientServiceNamesEnabled = "DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED";
+
+        /// <summary>
         /// String constants for CI Visibility configuration keys.
         /// </summary>
         internal static class CIVisibility
@@ -586,6 +609,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             public const string OpenTelemetryEnabled = "DD_TRACE_OTEL_ENABLED";
 
             /// <summary>
+            /// Enables the use of the <see cref="ISpan.OperationName"/> being set to the legacy value.
+            /// This flag defaults to <see langword="false"/> and is intended to allow beta users of OpenTelemetry support
+            /// to toggle on to give them time to upgrade to the new format. This additionally requires that
+            /// the <c>ActivitySource</c> has a <c>Name</c> property which was introduced in .NET 5 and/or v5 of
+            /// <c>System.Diagnostics</c> library.
+            /// Note: This feature flag may be dropped when our OpenTelemetry support becomes generally available.
+            /// </summary>
+            public const string OpenTelemetryLegacyOperationNameEnabled = "DD_TRACE_OTEL_LEGACY_OPERATION_NAME_ENABLED";
+
+            /// <summary>
             /// Enables generating 128-bit trace ids instead of 64-bit trace ids.
             /// Note that a 128-bit trace id may be received from an upstream service or from
             /// an Activity even if we are not generating them ourselves.
@@ -637,6 +670,31 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             /// <see cref="TelemetrySettings.HeartbeatInterval"/>
             /// </summary>
             public const string HeartbeatIntervalSeconds = "DD_TELEMETRY_HEARTBEAT_INTERVAL";
+
+            /// <summary>
+            /// Configuration key for whether dependency data is sent via telemetry.
+            /// Required for some ASM features. Default value is <c>true</c> (enabled).
+            /// <see cref="TelemetrySettings.DependencyCollectionEnabled"/>
+            /// </summary>
+            public const string DependencyCollectionEnabled = "DD_TELEMETRY_DEPENDENCY_COLLECTION_ENABLED";
+
+            /// <summary>
+            /// Configuration key for whether telemetry metrics should be sent.
+            /// <see cref="TelemetrySettings.MetricsEnabled"/>
+            /// </summary>
+            public const string MetricsEnabled = "DD_TELEMETRY_METRICS_ENABLED";
+
+            /// <summary>
+            /// Configuration key for whether to enable v2 of telemetry.
+            /// <see cref="TelemetrySettings.V2Enabled"/>
+            /// </summary>
+            public const string V2Enabled = "DD_INTERNAL_TELEMETRY_V2_ENABLED";
+
+            /// <summary>
+            /// Configuration key for whether to enable debug mode of telemetry.
+            /// <see cref="TelemetrySettings.V2Enabled"/>
+            /// </summary>
+            public const string DebugEnabled = "DD_INTERNAL_TELEMETRY_DEBUG_ENABLED";
         }
 
         internal static class TagPropagation

@@ -15,8 +15,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
-using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 using SD = System.Diagnostics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
@@ -24,6 +24,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
 // Based on: https://github.com/microsoft/vstest/blob/main/src/Microsoft.TestPlatform.Execution.Shared/DebuggerBreakpoint.cs#L25
 internal static class TracerDebugger
 {
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(TracerDebugger));
+
     [Conditional("DEBUG")]
     internal static void WaitForDebugger()
     {
@@ -49,7 +51,7 @@ internal static class TracerDebugger
             Log.Information("Waiting for debugger attach...");
             var currentProcess = Process.GetCurrentProcess();
             Console.WriteLine("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName);
-            Log.Information<int, string>("Process Id: {id}, Name: {name}", currentProcess.Id, currentProcess.ProcessName);
+            Log.Information<int, string>("Process Id: {Id}, Name: {Name}", currentProcess.Id, currentProcess.ProcessName);
             while (!SD.Debugger.IsAttached)
             {
                 Task.Delay(1000).Wait();
@@ -73,7 +75,7 @@ internal static class TracerDebugger
             Log.Information("Waiting for native debugger attach...");
             var currentProcess = Process.GetCurrentProcess();
             Console.WriteLine("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName);
-            Log.Information<int, string>("Process Id: {id}, Name: {name}", currentProcess.Id, currentProcess.ProcessName);
+            Log.Information<int, string>("Process Id: {Id}, Name: {Name}", currentProcess.Id, currentProcess.ProcessName);
             while (!IsDebuggerPresent())
             {
                 Task.Delay(1000).Wait();

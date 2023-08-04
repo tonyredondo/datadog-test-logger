@@ -50,16 +50,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     return null;
                 }
 
-                var tags = new SqlTags
-                           {
-                               DbType = dbType,
-                               InstrumentationName = IntegrationRegistry.GetName(integrationId),
-                               DbName = tagsFromConnectionString.DbName,
-                               DbUser = tagsFromConnectionString.DbUser,
-                               OutHost = tagsFromConnectionString.OutHost,
-                           };
+                SqlTags tags = tracer.CurrentTraceSettings.Schema.Database.CreateSqlTags();
+                tags.DbType = dbType;
+                tags.InstrumentationName = IntegrationRegistry.GetName(integrationId);
+                tags.DbName = tagsFromConnectionString.DbName;
+                tags.DbUser = tagsFromConnectionString.DbUser;
+                tags.OutHost = tagsFromConnectionString.OutHost;
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);
+                tracer.CurrentTraceSettings.Schema.RemapPeerService(tags);
 
                 scope = tracer.StartActiveInternal(operationName, tags: tags, serviceName: serviceName);
                 scope.Span.ResourceName = commandText;
@@ -71,10 +70,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     IastModule.OnSqlQuery(commandText, integrationId);
                 }
 
-                if (tracer.Settings.DbmPropagationMode != DbmPropagationLevel.Disabled && (integrationId == IntegrationId.MySql || integrationId == IntegrationId.Npgsql))
+                if (tracer.Settings.DbmPropagationMode != DbmPropagationLevel.Disabled
+                    && command.CommandType != CommandType.StoredProcedure)
                 {
-                    command.CommandText = $"{DatabaseMonitoringPropagator.PropagateSpanData(tracer.Settings.DbmPropagationMode, tracer.DefaultServiceName, scope.Span.Context)} {commandText}";
-                    tags.DbmDataPropagated = "true";
+                    var propagatedCommand = DatabaseMonitoringPropagator.PropagateSpanData(tracer.Settings.DbmPropagationMode, tracer.DefaultServiceName, scope.Span.Context, integrationId);
+
+                    if (propagatedCommand != string.Empty)
+                    {
+                        command.CommandText = $"{propagatedCommand} {commandText}";
+                        tags.DbmDataPropagated = "true";
+                    }
                 }
             }
             catch (Exception ex)
@@ -223,12 +228,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             private static string GetServiceName(Tracer tracer, string dbTypeName)
             {
-                if (!tracer.Settings.TryGetServiceName(dbTypeName, out string serviceName))
+                if (!tracer.CurrentTraceSettings.ServiceNames.TryGetValue(dbTypeName, out string serviceName))
                 {
                     if (DbTypeName != dbTypeName)
                     {
                         // We cannot cache in the base class
-                        return tracer.Settings.GetServiceName(tracer, dbTypeName);
+                        return tracer.CurrentTraceSettings.GetServiceName(tracer, dbTypeName);
                     }
 
                     var serviceNameCache = _serviceNameCache;
@@ -244,7 +249,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     // We create or replace the cache with the new service name
                     // Slowpath
                     var defaultServiceName = tracer.DefaultServiceName;
-                    serviceName = tracer.Settings.GetServiceName(tracer, dbTypeName);
+                    serviceName = tracer.CurrentTraceSettings.GetServiceName(tracer, dbTypeName);
                     _serviceNameCache = new KeyValuePair<string, string>(defaultServiceName, serviceName);
                 }
 

@@ -8,12 +8,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+using System;
+
 namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
     /// <summary>
     /// Standard span tags used by integrations.
     /// </summary>
-    internal static class Tags
+    internal static partial class Tags
     {
         /// <summary>
         /// The environment of the instrumented service. Its value is usually constant for the lifetime of a process,
@@ -105,6 +107,25 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// The number of rows returned by a query
         /// </summary>
         public const string SqlRows = "sql.rows";
+
+        /// <summary>
+        /// The service name of a remote service.
+        /// </summary>
+        public const string PeerService = "peer.service";
+
+        /// <summary>
+        /// The orignal peer service name before remapping
+        /// </summary>
+        internal const string PeerServiceRemappedFrom = "peer.service.remapped_from";
+
+        /// <summary>
+        /// The name of the attribute that determined the peer.service tag value. Expected values are:
+        /// <ul>
+        ///   <li>{source_attribute} when the tag was set to a default value, using a defined precursor attribute</li>
+        ///   <li>peer.service when the tag was set by the user</li>
+        /// </ul>
+        /// </summary>
+        internal const string PeerServiceSource = "_dd.peer.service.source";
 
         /// <summary>
         /// The hostname of a outgoing server connection.
@@ -288,6 +309,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         internal const string AmqpDeliveryMode = "amqp.delivery_mode";
 
         /// <summary>
+        /// The bootstrap servers as defined in producer or consumer config
+        /// </summary>
+        internal const string KafkaBootstrapServers = "messaging.kafka.bootstrap.servers";
+
+        /// <summary>
         /// The partition associated with a record
         /// </summary>
         internal const string KafkaPartition = "kafka.partition";
@@ -320,7 +346,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// <summary>
         /// The region associated with the AWS SDK span.
         /// </summary>
+        [Obsolete("AwsRegion is a duplicate. Use Region instead.")]
         internal const string AwsRegion = "aws.region";
+
+        /// <summary>
+        /// The region associated with the span.
+        /// </summary>
+        internal const string Region = "region";
 
         /// <summary>
         /// The request ID associated with the AWS SDK span.
@@ -330,12 +362,40 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// <summary>
         /// The service associated with the AWS SDK span.
         /// </summary>
+        [Obsolete("AwsServiceName is a duplicate. Use AwsService instead.")]
         internal const string AwsServiceName = "aws.service";
+
+        /// <summary>
+        /// The AWS service associated with the AWS SDK span.
+        /// </summary>
+        internal const string AwsService = "aws_service";
 
         /// <summary>
         /// The queue name associated with the AWS SDK span.
         /// </summary>
+        [Obsolete("AwsTopicName is a duplicate. Use TopicName instead.")]
+        internal const string AwsTopicName = "aws.topic.name";
+
+        /// <summary>
+        /// The topic name associated with the AWS SDK SNS span.
+        /// </summary>
+        internal const string TopicName = "topicname";
+
+        /// <summary>
+        /// The queue name associated with the AWS SDK SQS span.
+        /// </summary>
+        [Obsolete("AwsQueueName is a duplicate. Use QueueName instead.")]
         internal const string AwsQueueName = "aws.queue.name";
+
+        /// <summary>
+        /// The queue name associated with the span.
+        /// </summary>
+        internal const string QueueName = "queuename";
+
+        /// <summary>
+        /// The topic arn associated with the AWS SDK span.
+        /// </summary>
+        internal const string AwsTopicArn = "aws.topic.arn";
 
         /// <summary>
         /// The queue URL associated with the AWS SDK span.
@@ -539,6 +599,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         internal const string AerospikeUserKey = "aerospike.userkey";
 
+        internal const string CouchbaseSeedNodes = "db.couchbase.seed.nodes";
         internal const string CouchbaseOperationCode = "couchbase.operation.code";
         internal const string CouchbaseOperationBucket = "couchbase.operation.bucket";
         internal const string CouchbaseOperationKey = "couchbase.operation.key";
@@ -550,6 +611,22 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         internal const string GrpcMethodName = "grpc.method.name";
         internal const string GrpcStatusCode = "grpc.status.code";
 
+        // general Service Fabric
+        internal const string ServiceFabricApplicationId = "service-fabric.application-id";
+        internal const string ServiceFabricApplicationName = "service-fabric.application-name";
+        internal const string ServiceFabricPartitionId = "service-fabric.partition-id";
+        internal const string ServiceFabricNodeId = "service-fabric.node-id";
+        internal const string ServiceFabricNodeName = "service-fabric.node-name";
+        internal const string ServiceFabricServiceName = "service-fabric.service-name";
+
+        // Service Remoting
+        internal const string ServiceRemotingUri = "service-fabric.service-remoting.uri";
+        internal const string ServiceRemotingServiceName = "service-fabric.service-remoting.service";
+        internal const string ServiceRemotingMethodName = "service-fabric.service-remoting.method-name";
+        internal const string ServiceRemotingMethodId = "service-fabric.service-remoting.method-id";
+        internal const string ServiceRemotingInterfaceId = "service-fabric.service-remoting.interface-id";
+        internal const string ServiceRemotingInvocationId = "service-fabric.service-remoting.invocation-id";
+
         internal const string ProcessEnvironmentVariables = "cmd.environment_variables";
 
         internal const string TagPropagationError = "_dd.propagation_error";
@@ -558,23 +635,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// Marks a span as injected when DBM data was propagated
         /// </summary>
         internal const string DbmDataPropagated = "_dd.dbm_trace_injected";
-
-        internal static class AppSec
-        {
-            internal const string Events = "appsec.events.";
-
-            internal static string Track(string eventName) => $"{Events}{eventName}.track";
-
-            internal static class EventsUsersLogin
-            {
-                internal const string Success = AppSec.Events + "users.login.success.";
-                internal const string Failure = AppSec.Events + "users.login.failure.";
-                internal const string SuccessTrack = Success + "track";
-                internal const string FailureTrack = Failure + "track";
-                internal const string FailureUserId = Failure + "usr.id";
-                internal const string FailureUserExists = Failure + "usr.exists";
-            }
-        }
 
         internal static class User
         {

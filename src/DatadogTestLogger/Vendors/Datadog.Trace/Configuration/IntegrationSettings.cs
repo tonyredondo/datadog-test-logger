@@ -10,7 +10,10 @@
 
 #nullable enable
 
-using System;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
@@ -18,62 +21,89 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
     /// <summary>
     /// Contains integration-specific settings.
     /// </summary>
-    internal class IntegrationSettings
+    internal partial class IntegrationSettings
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="IntegrationSettings"/> class.
         /// </summary>
         /// <param name="integrationName">The integration name.</param>
         /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
+        [PublicApi]
         public IntegrationSettings(string integrationName, IConfigurationSource? source)
+            : this(integrationName, source, TelemetryFactory.Config)
+        {
+            TelemetryFactory.Metrics.Record(PublicApiUsage.IntegrationSettings_Ctor);
+        }
+
+        internal IntegrationSettings(string integrationName, IConfigurationSource? source, IConfigurationTelemetry telemetry)
         {
             if (integrationName is null)
             {
                 ThrowHelper.ThrowArgumentNullException(nameof(integrationName));
             }
 
-            IntegrationName = integrationName;
+            IntegrationNameInternal = integrationName;
 
             if (source == null)
             {
                 return;
             }
 
-            Enabled = source.GetBool(string.Format(ConfigurationKeys.Integrations.Enabled, integrationName)) ??
-                      source.GetBool(string.Format("DD_{0}_ENABLED", integrationName));
+            var config = new ConfigurationBuilder(source, telemetry);
+            EnabledInternal = config
+                     .WithKeys(
+                          string.Format(ConfigurationKeys.Integrations.Enabled, integrationName),
+                          string.Format("DD_{0}_ENABLED", integrationName))
+                     .AsBool();
 
 #pragma warning disable 618 // App analytics is deprecated, but still used
-            AnalyticsEnabled = source.GetBool(string.Format(ConfigurationKeys.Integrations.AnalyticsEnabled, integrationName)) ??
-                               source.GetBool(string.Format("DD_{0}_ANALYTICS_ENABLED", integrationName));
+            AnalyticsEnabledInternal = config
+                              .WithKeys(
+                                   string.Format(ConfigurationKeys.Integrations.AnalyticsEnabled, integrationName),
+                                   string.Format("DD_{0}_ANALYTICS_ENABLED", integrationName))
+                              .AsBool();
 
-            AnalyticsSampleRate = source.GetDouble(string.Format(ConfigurationKeys.Integrations.AnalyticsSampleRate, integrationName)) ??
-                                  source.GetDouble(string.Format("DD_{0}_ANALYTICS_SAMPLE_RATE", integrationName)) ??
-                                  // default value
-                                  1.0;
+            AnalyticsSampleRateInternal = config
+                                 .WithKeys(
+                                      string.Format(ConfigurationKeys.Integrations.AnalyticsSampleRate, integrationName),
+                                      string.Format("DD_{0}_ANALYTICS_SAMPLE_RATE", integrationName))
+                                 .AsDouble(1.0);
 #pragma warning restore 618
         }
 
         /// <summary>
         /// Gets the name of the integration. Used to retrieve integration-specific settings.
         /// </summary>
-        public string IntegrationName { get; }
+        [GeneratePublicApi(PublicApiUsage.IntegrationSettings_IntegrationName_Get)]
+        internal string IntegrationNameInternal { get; }
 
+#pragma warning disable SA1624 // Documentation summary should begin with "Gets" - the documentation is primarily for public property
         /// <summary>
         /// Gets or sets a value indicating whether
         /// this integration is enabled.
         /// </summary>
-        public bool? Enabled { get; set; }
+        [GeneratePublicApi(
+            PublicApiUsage.IntegrationSettings_Enabled_Get,
+            PublicApiUsage.IntegrationSettings_Enabled_Set)]
+        internal bool? EnabledInternal { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether
         /// Analytics are enabled for this integration.
         /// </summary>
-        public bool? AnalyticsEnabled { get; set; }
+        [GeneratePublicApi(
+            PublicApiUsage.IntegrationSettings_AnalyticsEnabled_Get,
+            PublicApiUsage.IntegrationSettings_AnalyticsEnabled_Set)]
+        internal bool? AnalyticsEnabledInternal { get; private set; }
 
         /// <summary>
         /// Gets or sets a value between 0 and 1 (inclusive)
         /// that determines the sampling rate for this integration.
         /// </summary>
-        public double AnalyticsSampleRate { get; set; }
+        [GeneratePublicApi(
+            PublicApiUsage.IntegrationSettings_AnalyticsSampleRate_Get,
+            PublicApiUsage.IntegrationSettings_AnalyticsSampleRate_Set)]
+        internal double AnalyticsSampleRateInternal { get; private set; }
+#pragma warning restore SA1624
     }
 }

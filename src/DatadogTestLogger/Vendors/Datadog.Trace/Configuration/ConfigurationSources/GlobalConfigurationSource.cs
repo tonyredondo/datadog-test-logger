@@ -13,6 +13,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
@@ -34,19 +36,17 @@ internal class GlobalConfigurationSource
     internal static CompositeConfigurationSource CreateDefaultConfigurationSource()
     {
         // env > AppSettings > datadog.json
-        var configurationSource = new CompositeConfigurationSource
-        {
-            new EnvironmentConfigurationSource(),
+        var configurationSource = new CompositeConfigurationSourceInternal();
+        configurationSource.AddInternal(new EnvironmentConfigurationSourceInternal());
 
 #if NETFRAMEWORK
-            // on .NET Framework only, also read from app.config/web.config
-            new NameValueConfigurationSource(System.Configuration.ConfigurationManager.AppSettings)
+        // on .NET Framework only, also read from app.config/web.config
+        configurationSource.AddInternal(new NameValueConfigurationSource(System.Configuration.ConfigurationManager.AppSettings, ConfigurationOrigins.AppConfig));
 #endif
-        };
 
         if (TryLoadJsonConfigurationFile(configurationSource, null, out var jsonConfigurationSource))
         {
-            configurationSource.Add(jsonConfigurationSource);
+            configurationSource.AddInternal(jsonConfigurationSource);
         }
 
         return configurationSource;
@@ -56,15 +56,19 @@ internal class GlobalConfigurationSource
     {
         try
         {
+            var telemetry = TelemetryFactory.Config;
+
             // if environment variable is not set, look for default file name in the current directory
-            var configurationFileName = configurationSource.GetString(ConfigurationKeys.ConfigurationFileName) ??
-                                        configurationSource.GetString("DD_DOTNET_TRACER_CONFIG_FILE") ??
-                                        Path.Combine(baseDirectory ?? GetCurrentDirectory() ?? Directory.GetCurrentDirectory(), "datadog.json");
+            var configurationFileName = new ConfigurationBuilder(configurationSource, telemetry)
+                                       .WithKeys(ConfigurationKeys.ConfigurationFileName, "DD_DOTNET_TRACER_CONFIG_FILE")
+                                       .AsString(
+                                            getDefaultValue: () => Path.Combine(baseDirectory ?? GetCurrentDirectory(), "datadog.json"),
+                                            validator: null);
 
             if (string.Equals(Path.GetExtension(configurationFileName), ".JSON", StringComparison.OrdinalIgnoreCase) &&
                 File.Exists(configurationFileName))
             {
-                jsonConfigurationSource = JsonConfigurationSource.FromFile(configurationFileName);
+                jsonConfigurationSource = JsonConfigurationSource.FromFile(configurationFileName, ConfigurationOrigins.DdConfig);
                 return true;
             }
         }
@@ -87,8 +91,8 @@ internal class GlobalConfigurationSource
         Instance = CreateDefaultConfigurationSource();
     }
 
-    private static string? GetCurrentDirectory()
+    private static string GetCurrentDirectory()
     {
-        return AppDomain.CurrentDomain.BaseDirectory;
+        return AppDomain.CurrentDomain.BaseDirectory ?? Directory.GetCurrentDirectory();
     }
 }

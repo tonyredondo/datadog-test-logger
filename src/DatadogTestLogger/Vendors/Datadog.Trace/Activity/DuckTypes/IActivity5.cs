@@ -10,6 +10,7 @@
 
 #nullable enable
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.DuckTypes
@@ -25,6 +26,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Activity.DuckTypes
         IEnumerable<KeyValuePair<string, object>> TagObjects { get; }
 
         ActivitySource Source { get; }
+
+        IEnumerable Events { get; }
 
         object AddTag(string key, object value);
     }

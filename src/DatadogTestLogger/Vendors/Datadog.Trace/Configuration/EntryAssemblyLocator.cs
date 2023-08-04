@@ -14,12 +14,14 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security;
-using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 
 internal static class EntryAssemblyLocator
 {
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(EntryAssemblyLocator));
+
     /// <summary>
     /// Gets the entry assembly for the current application domain.
     /// </summary>

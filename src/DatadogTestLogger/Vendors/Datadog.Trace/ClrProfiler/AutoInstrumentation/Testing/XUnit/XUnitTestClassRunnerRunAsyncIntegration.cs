@@ -24,8 +24,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     AssemblyNames = new[] { "xunit.execution.dotnet", "xunit.execution.desktop" },
     TypeName = "Xunit.Sdk.TestClassRunner`1",
     MethodName = "RunAsync",
-    ReturnTypeName = "System.Threading.Tasks.Task`1<Xunit.Sdk.RunSummary>",
-    ParameterTypeNames = new string[] { },
+    ReturnTypeName = "System.Threading.Tasks.Task`1[Xunit.Sdk.RunSummary]",
     MinimumVersion = "2.2.0",
     MaximumVersion = "2.*.*",
     IntegrationName = XUnitIntegration.IntegrationName)]

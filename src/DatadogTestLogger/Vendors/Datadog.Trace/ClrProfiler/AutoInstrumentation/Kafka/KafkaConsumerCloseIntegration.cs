@@ -22,7 +22,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         TypeName = "Confluent.Kafka.Consumer`2",
         MethodName = "Close",
         ReturnTypeName = ClrNames.Void,
-        ParameterTypeNames = new string[0],
         MinimumVersion = "1.4.0",
         MaximumVersion = "2.*.*",
         IntegrationName = KafkaConstants.IntegrationName)]

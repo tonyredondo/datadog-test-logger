@@ -20,7 +20,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
         MetricKind? MetricKind,
         string MetricName,
         bool HasCondition,
-        string[] Tags)
+        string[] Tags,
+        TargetSpan? TargetSpan)
     {
         internal string ProbeId { get; } = ProbeId;
 
@@ -39,5 +40,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Expressions
         internal bool HasCondition { get; } = HasCondition;
 
         internal string[] Tags { get; } = Tags;
+
+        public TargetSpan? TargetSpan { get; } = TargetSpan;
     }
 }

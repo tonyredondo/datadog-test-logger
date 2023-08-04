@@ -21,7 +21,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission
     {
         private static readonly IDatadogLogger Logger = DatadogLogging.GetLoggerFor<DirectLogSubmissionManager>();
 
-        private DirectLogSubmissionManager(ImmutableDirectLogSubmissionSettings settings, IDatadogSink sink, LogFormatter formatter)
+        private DirectLogSubmissionManager(ImmutableDirectLogSubmissionSettings settings, IDirectSubmissionLogSink sink, LogFormatter formatter)
         {
             Settings = settings;
             Sink = sink;
@@ -30,7 +30,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission
 
         public ImmutableDirectLogSubmissionSettings Settings { get; }
 
-        public IDatadogSink Sink { get; }
+        public IDirectSubmissionLogSink Sink { get; }
 
         public LogFormatter Formatter { get; }
 
@@ -54,13 +54,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission
 
             if (!settings.IsEnabled)
             {
-                return new DirectLogSubmissionManager(settings, new NullDatadogSink(), formatter);
+                return new DirectLogSubmissionManager(settings, new NullDirectSubmissionLogSink(), formatter);
             }
 
             var apiFactory = LogsTransportStrategy.Get(settings);
             var logsApi = new LogsApi(settings.ApiKey, apiFactory);
 
-            return new DirectLogSubmissionManager(settings, new DatadogSink(logsApi, formatter, settings.BatchingOptions), formatter);
+            return new DirectLogSubmissionManager(settings, new DirectSubmissionLogSink(logsApi, formatter, settings.BatchingOptions), formatter);
         }
 
         public async Task DisposeAsync()

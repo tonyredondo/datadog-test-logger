@@ -12,6 +12,8 @@ using System;
 using System.ComponentModel;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 {
@@ -40,7 +42,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
                     var parentTracer = parent.DuckCast<IAutomaticTracer>();
 
                     Log.Information("Building manual tracer, connected to {Assembly}", parent.GetType().Assembly);
-
+                    TelemetryFactory.Metrics.RecordCountVersionConflictTracerCreated();
                     Instance = new ManualTracer(parentTracer);
                 }
             }

@@ -9,13 +9,18 @@
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using System;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     partial class AspNetCoreEndpointTags
     {
-        // AspNetCoreEndpointBytes = System.Text.Encoding.UTF8.GetBytes("aspnet_core.endpoint");
-        private static readonly byte[] AspNetCoreEndpointBytes = new byte[] { 97, 115, 112, 110, 101, 116, 95, 99, 111, 114, 101, 46, 101, 110, 100, 112, 111, 105, 110, 116 };
+        // AspNetCoreEndpointBytes = MessagePack.Serialize("aspnet_core.endpoint");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> AspNetCoreEndpointBytes => new byte[] { 180, 97, 115, 112, 110, 101, 116, 95, 99, 111, 114, 101, 46, 101, 110, 100, 112, 111, 105, 110, 116 };
+#else
+        private static readonly byte[] AspNetCoreEndpointBytes = new byte[] { 180, 97, 115, 112, 110, 101, 116, 95, 99, 111, 114, 101, 46, 101, 110, 100, 112, 111, 105, 110, 116 };
+#endif
 
         public override string? GetTag(string key)
         {

@@ -15,8 +15,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     internal static class MsmqConstants
     {
         internal const string IntegrationName = nameof(Configuration.IntegrationId.Msmq);
-        internal const string OperationName = "msmq.command";
-        internal const string ServiceName = "msmq";
+        internal const string MessagingType = "msmq";
         internal const string MsmqCursorHandle = "System.Messaging.Interop.CursorHandle";
         internal const string MsmqMessageQueueTransaction = "System.Messaging.MessageQueueTransaction";
         internal const string MsmqMessageQueueTransactionType = "System.Messaging.MessageQueueTransactionType";
@@ -25,6 +24,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         internal const string MsmqPurgeCommand = "msmq.purge";
         internal const string MsmqSendCommand = "msmq.send";
         internal const string MsmqReceiveCommand = "msmq.receive";
+        internal const string MsmqCommand = "msmq.command";
         internal const string MsmqPeekCommand = "msmq.peek";
         internal const IntegrationId IntegrationId = Configuration.IntegrationId.Msmq;
     }

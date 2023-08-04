@@ -11,15 +11,18 @@
 #nullable enable
 using System;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Transports;
 
 internal class AgentTelemetryTransport : JsonTelemetryTransport
 {
-    public AgentTelemetryTransport(IApiRequestFactory requestFactory)
-        : base(requestFactory)
+    public AgentTelemetryTransport(IApiRequestFactory requestFactory, bool debugEnabled)
+        : base(requestFactory, debugEnabled)
     {
     }
 
     public override string GetTransportInfo() => nameof(AgentTelemetryTransport) + " to " + GetEndpointInfo();
+
+    protected override MetricTags.TelemetryEndpoint GetEndpointMetricTag() => MetricTags.TelemetryEndpoint.Agent;
 }

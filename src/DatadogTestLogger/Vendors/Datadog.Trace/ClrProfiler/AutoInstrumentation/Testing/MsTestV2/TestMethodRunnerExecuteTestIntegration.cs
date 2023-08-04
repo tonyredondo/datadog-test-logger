@@ -30,7 +30,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 [EditorBrowsable(EditorBrowsableState.Never)]
 internal static class TestMethodRunnerExecuteTestIntegration
 {
-    private static SkipTestMethodExecutor _skipTestMethodExecutor;
+    private static ItrSkipTestMethodExecutor _skipTestMethodExecutor;
 
     /// <summary>
     /// OnMethodBegin callback
@@ -44,17 +44,14 @@ internal static class TestMethodRunnerExecuteTestIntegration
         where TTarget : ITestMethodRunner
         where TTestMethod : ITestMethod
     {
-        if (MsTestIntegration.IsEnabled)
+        // Check if the test should be skipped by ITR
+        if (MsTestIntegration.IsEnabled && MsTestIntegration.ShouldSkip(testMethod))
         {
-            // Check if the test should be skipped by ITR
-            if (MsTestIntegration.ShouldSkip(testMethod))
-            {
-                // In order to skip a test we change the Executor to one that returns a valid outcome without calling
-                // the MethodInfo of the test
-                var executor = instance.TestMethodInfo.TestMethodOptions.Executor;
-                _skipTestMethodExecutor ??= new SkipTestMethodExecutor(executor.GetType().Assembly);
-                instance.TestMethodInfo.TestMethodOptions.Executor = DuckType.CreateReverse(executor.GetType(), _skipTestMethodExecutor);
-            }
+            // In order to skip a test we change the Executor to one that returns a valid outcome without calling
+            // the MethodInfo of the test
+            var executor = instance.TestMethodInfo.TestMethodOptions.Executor;
+            _skipTestMethodExecutor ??= new ItrSkipTestMethodExecutor(executor.GetType().Assembly);
+            instance.TestMethodInfo.TestMethodOptions.Executor = DuckType.CreateReverse(executor.GetType(), _skipTestMethodExecutor);
         }
 
         return CallTargetState.GetDefault();

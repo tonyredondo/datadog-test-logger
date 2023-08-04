@@ -21,6 +21,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     [DuckCopy]
     internal struct CallInvocationDetailsStruct
     {
+        public IChannel Channel;
         public string Method;
         public CallOptionsStruct Options;
     }

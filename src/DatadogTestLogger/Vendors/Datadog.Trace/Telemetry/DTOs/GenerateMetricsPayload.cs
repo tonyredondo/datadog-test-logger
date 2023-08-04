@@ -8,12 +8,25 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
+#nullable enable
+
+using System.Collections.Generic;
+
+namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+
+internal class GenerateMetricsPayload : IPayload
 {
-    internal class GenerateMetricsPayload : IPayload
+    public GenerateMetricsPayload(ICollection<MetricData> series)
     {
-        // TODO
-        // Tracer instance count
-        // initialization times etc
+        Series = series;
     }
+
+    /// <summary>
+    /// Gets or sets the default namespace for the metrics.
+    /// Default to assuming that all metrics are for the tracer.
+    /// Can be overwritten on a per-metric basis
+    /// </summary>
+    public string Namespace { get; set; } = MetricNamespaceConstants.Tracer;
+
+    public ICollection<MetricData> Series { get; set; }
 }

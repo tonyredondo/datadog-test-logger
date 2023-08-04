@@ -20,6 +20,8 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation.Collectio
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
 {
@@ -50,6 +52,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
             tags.SetTag("component", "trace");
             var scope = Tracer.Instance.StartActiveInternal(operationName, tags: tags);
             scope.Span.ResourceName = resourceName;
+            TelemetryFactory.Metrics.RecordCountSpanCreated(MetricTags.IntegrationName.DebuggerSpanProbe);
             return new SpanDebuggerState(scope);
         }
 

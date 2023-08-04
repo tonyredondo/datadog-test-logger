@@ -11,6 +11,10 @@
 #nullable enable
 
 using System;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
@@ -20,7 +24,25 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
     /// </summary>
     internal class EnvironmentConfigurationSource : StringConfigurationSource
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnvironmentConfigurationSource"/> class.
+        /// </summary>
+        [PublicApi]
+        public EnvironmentConfigurationSource()
+        {
+            TelemetryFactory.Metrics.Record(PublicApiUsage.EnvironmentConfigurationSource_Ctor);
+        }
+
+        private protected EnvironmentConfigurationSource(bool unusedParamNotToUsePublicApi)
+        {
+            // unused parameter is to give us a non-public API we can use
+        }
+
         /// <inheritdoc />
+        internal override ConfigurationOrigins Origin { get; } = ConfigurationOrigins.EnvVars;
+
+        /// <inheritdoc />
+        [PublicApi]
         public override string? GetString(string key)
         {
             try

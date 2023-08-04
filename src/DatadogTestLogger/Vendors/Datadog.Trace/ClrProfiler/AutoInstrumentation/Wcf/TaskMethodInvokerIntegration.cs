@@ -24,7 +24,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = "System.ServiceModel",
         TypeName = "System.ServiceModel.Dispatcher.TaskMethodInvoker",
         MethodName = "InvokeAsync",
-        ReturnTypeName = "System.Threading.Tasks.Task`1<System.Tuple`2<System.Object, System.Object[]>>",
+        ReturnTypeName = "System.Threading.Tasks.Task`1[System.Tuple`2[System.Object, System.Object[]]]",
         ParameterTypeNames = new[] { ClrNames.Object, "System.Object[]" },
         MinimumVersion = "4.0.0",
         MaximumVersion = "4.*.*",

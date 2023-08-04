@@ -9,6 +9,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
@@ -79,7 +80,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handler
                 Task<TResult> previousTask = FromTReturn<Task<TResult>>(returnValue);
                 if (previousTask.Status == TaskStatus.RanToCompletion)
                 {
-                    return ToTReturn(Task.FromResult(_continuation(instance, previousTask.Result, default, in state)));
+                    var result = _continuation(instance, previousTask.Result, default, in state);
+                    if (EqualityComparer<TResult>.Default.Equals(result, previousTask.Result))
+                    {
+                        return returnValue;
+                    }
+
+                    return ToTReturn(Task.FromResult(result));
                 }
 
                 return ToTReturn(ContinuationAction(previousTask, instance, state));

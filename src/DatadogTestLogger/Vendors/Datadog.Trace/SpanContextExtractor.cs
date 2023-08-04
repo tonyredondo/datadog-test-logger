@@ -14,6 +14,9 @@ using System.Linq;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 #nullable enable
 
@@ -24,9 +27,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<SpanContextExtractor>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpanContextExtractor"/> class
+        /// </summary>
+        [PublicApi]
+        public SpanContextExtractor()
+        {
+            TelemetryFactory.Metrics.Record(PublicApiUsage.SpanContextExtractor_Ctor);
+        }
+
         /// <inheritdoc />
+        [PublicApi]
         public ISpanContext? Extract<TCarrier>(TCarrier carrier, Func<TCarrier, string, IEnumerable<string?>> getter)
         {
+            TelemetryFactory.Metrics.Record(PublicApiUsage.SpanContextExtractor_Extract);
             var spanContext = SpanContextPropagator.Instance.Extract(carrier, getter);
             if (spanContext is not null
              && Tracer.Instance.TracerManager.DataStreamsManager is { IsEnabled: true } dsm

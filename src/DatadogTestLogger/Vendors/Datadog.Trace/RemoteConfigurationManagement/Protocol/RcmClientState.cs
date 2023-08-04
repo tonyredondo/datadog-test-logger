@@ -29,7 +29,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.
         public int RootVersion { get; }
 
         [JsonProperty("targets_version")]
-        public int TargetsVersion { get; }
+        public long TargetsVersion { get; }
 
         [JsonProperty("config_states")]
         public List<RcmConfigState> ConfigStates { get; }

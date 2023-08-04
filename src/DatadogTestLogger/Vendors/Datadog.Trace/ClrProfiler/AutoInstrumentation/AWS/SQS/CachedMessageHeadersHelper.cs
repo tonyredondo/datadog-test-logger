@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
 {
@@ -22,7 +23,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         private const string StringDataType = "String";
 
         private static readonly Func<string, object> _createMessageAttributeValue;
-        private static readonly Func<IDictionary> _createDict;
+        private static readonly ActivatorHelper DictionaryActivator;
 
         static CachedMessageHeadersHelper()
         {
@@ -53,27 +54,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             _createMessageAttributeValue = (Func<string, object>)createMessageAttributeValueMethod.CreateDelegate(typeof(Func<string, object>));
 
             // Initialize delegate for creating a Dictionary<string, MessageAttributeValue> object
-            var genericDictType = typeof(Dictionary<,>);
-            var constructedDictType = genericDictType.MakeGenericType(new Type[] { typeof(string), messageAttributeValueType });
-            ConstructorInfo dictionaryCtor = constructedDictType.GetConstructor(System.Type.EmptyTypes);
-
-            DynamicMethod createDictMethod = new DynamicMethod(
-                $"KafkaCachedMessageHeadersHelpers",
-                constructedDictType,
-                null,
-                typeof(DuckType).Module,
-                true);
-
-            ILGenerator dictIL = createDictMethod.GetILGenerator();
-            dictIL.Emit(OpCodes.Newobj, dictionaryCtor);
-            dictIL.Emit(OpCodes.Ret);
-
-            _createDict = (Func<IDictionary>)createDictMethod.CreateDelegate(typeof(Func<IDictionary>));
+            DictionaryActivator = new ActivatorHelper(typeof(Dictionary<,>).MakeGenericType(typeof(string), messageAttributeValueType));
         }
 
         public static IDictionary CreateMessageAttributes()
         {
-            return _createDict();
+            return (IDictionary)DictionaryActivator.CreateInstance();
         }
 
         public static object CreateMessageAttributeValue(string value)

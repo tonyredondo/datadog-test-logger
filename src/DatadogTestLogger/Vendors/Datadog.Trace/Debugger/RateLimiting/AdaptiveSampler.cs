@@ -10,8 +10,8 @@
 
 using System;
 using System.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
-using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting
 {
@@ -39,6 +39,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.RateLimiting
     /// </summary>
     internal class AdaptiveSampler
     {
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<AdaptiveSampler>();
+
         /// <summary>
         /// Exponential Moving Average (EMA) last element weight.
         /// Check out papers about using EMA for streaming data - eg.
