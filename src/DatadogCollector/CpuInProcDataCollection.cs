@@ -12,16 +12,16 @@ internal class CpuInProcDataCollection : InProcDataCollection
     private readonly ConcurrentDictionary<Guid, List<double>> _currentCpuValues = new();
     private readonly ConcurrentDictionary<Guid, List<double>> _finalValues = new();
     private CancellationTokenSource? _cpuUsageCancellationTokenSource;
+    private Thread? _cpuCollectorThread;
     private double _lastCpuPercentageValue;
 
     public void Initialize(IDataCollectionSink dataCollectionSink)
     {
         _cpuUsageCancellationTokenSource = new CancellationTokenSource();
-        Task.Factory.StartNew(
-            state => StartCollectingCpuUsageForProcess((CancellationToken)state),
-            _cpuUsageCancellationTokenSource.Token,
-            TaskCreationOptions.LongRunning);
-        
+        _cpuCollectorThread = new Thread(state => StartCollectingCpuUsageForProcess((CpuInProcDataCollection?)state));
+        _cpuCollectorThread.IsBackground = true;
+        _cpuCollectorThread.Start(this);
+
         // Let's ensure we start collecting cpu percentage values before everything else.
         var retries = 4;
         while (Interlocked.CompareExchange(ref _lastCpuPercentageValue, 0, 0) == 0 && retries-- > 0)
@@ -36,7 +36,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
 
     public void TestCaseStart(TestCaseStartArgs testCaseStartArgs)
     {
-        if (testCaseStartArgs.TestCase?.Id is { } id)
+        if (testCaseStartArgs?.TestCase?.Id is { } id)
         {
             var values = _currentCpuValues.GetOrAdd(id, new List<double>());
             lock (values)
@@ -48,7 +48,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
 
     public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
     {
-        if (testCaseEndArgs.DataCollectionContext?.TestCase is { } testCase)
+        if (testCaseEndArgs?.DataCollectionContext?.TestCase is { } testCase)
         {
             if (_currentCpuValues.TryRemove(testCase.Id, out var values) &&
                 _finalValues.TryAdd(testCase.Id, values))
@@ -65,13 +65,21 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         try
         {
+            // Cancel collection and current values.
             _cpuUsageCancellationTokenSource?.Cancel();
             _currentCpuValues.Clear();
+        }
+        catch
+        {
+            // .
+        }
+        
+        try
+        {
+            // Try to write the json file.
             using var sw = new StreamWriter($"cpu_values.json", false);
             var serializer = JsonSerializer.CreateDefault();
             serializer.Serialize(sw, _finalValues);
-            _finalValues.Clear();
-            _cpuUsageCancellationTokenSource?.Dispose();
         }
         catch
         {
@@ -79,35 +87,48 @@ internal class CpuInProcDataCollection : InProcDataCollection
         }
     }
     
-    private void StartCollectingCpuUsageForProcess(CancellationToken cancellationToken)
+    private static void StartCollectingCpuUsageForProcess(CpuInProcDataCollection? dataCollection)
     {
         Process? process = null;
-        while (!cancellationToken.IsCancellationRequested)
+        if (dataCollection is null)
         {
-            try
+            return;
+        }
+
+        if (dataCollection._cpuUsageCancellationTokenSource is { Token: { } token })
+        {
+            while (!token.IsCancellationRequested)
             {
-                process ??= Process.GetCurrentProcess();
-                var startTime = DateTime.UtcNow;
-                var startCpuUsage = process.TotalProcessorTime;
-                Thread.Sleep(250);
-                var endTime = DateTime.UtcNow;
-                var endCpuUsage = process.TotalProcessorTime;
-                var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
-                var totalMsPassed = (endTime - startTime).TotalMilliseconds;
-                var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
-                var result = cpuUsageTotal * 100;
-                Interlocked.Exchange(ref _lastCpuPercentageValue, result);
-                foreach(var values in _currentCpuValues.Values)
+                try
                 {
-                    lock (values)
+                    process ??= Process.GetCurrentProcess();
+                    var startTime = DateTime.UtcNow;
+                    var startCpuUsage = process.TotalProcessorTime;
+                    Thread.Sleep(100);
+                    var endTime = DateTime.UtcNow;
+                    var endCpuUsage = process.TotalProcessorTime;
+                    var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+                    var totalMsPassed = (endTime - startTime).TotalMilliseconds;
+                    var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+                    var result = cpuUsageTotal * 100;
+                    Interlocked.Exchange(ref dataCollection._lastCpuPercentageValue, result);
+                    foreach(var values in dataCollection._currentCpuValues.Values)
                     {
-                        values.Add(_lastCpuPercentageValue);
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
+                        lock (values)
+                        {
+                            values.Add(dataCollection._lastCpuPercentageValue);
+                        }
                     }
                 }
-            }
-            catch
-            {
-                // .
+                catch
+                {
+                    Thread.Sleep(100);
+                }
             }
         }
     }
