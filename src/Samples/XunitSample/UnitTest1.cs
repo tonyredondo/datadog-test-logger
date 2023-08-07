@@ -39,8 +39,25 @@ public class UnitTest1
     public void Test5()
     {
         _output.WriteLine("Test 5 message");
-        var k = 0;
-        var y = 18;
-        var z = y / k;
+        for (var i = 0; i < 25_000; i++)
+        {
+            try
+            {
+                ThrowingStuff();
+            }
+            catch
+            {
+                // .
+            }
+        }
+
+        ThrowingStuff();
+
+        static void ThrowingStuff()
+        {
+            var k = 0;
+            var y = 18;
+            var z = y / k;
+        }
     }
 }
