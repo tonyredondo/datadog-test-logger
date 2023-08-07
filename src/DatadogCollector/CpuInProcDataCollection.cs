@@ -18,31 +18,29 @@ internal class CpuInProcDataCollection : InProcDataCollection
     public void Initialize(IDataCollectionSink dataCollectionSink)
     {
         _cpuUsageCancellationTokenSource = new CancellationTokenSource();
-        _cpuCollectorThread = new Thread(state => StartCollectingCpuUsageForProcess((CpuInProcDataCollection?)state));
-        _cpuCollectorThread.IsBackground = true;
-        _cpuCollectorThread.Start(this);
-
-        // Let's ensure we start collecting cpu percentage values before everything else.
-        var retries = 4;
-        while (Interlocked.CompareExchange(ref _lastCpuPercentageValue, 0, 0) == 0 && retries-- > 0)
+        _cpuCollectorThread = new Thread(state => StartCollectingCpuUsageForProcess((CpuInProcDataCollection?)state))
         {
-            Thread.Sleep(250);
-        }
+            IsBackground = true,
+            Name = "CpuCollectorThread"
+        };
+        _cpuCollectorThread.Start(this);
     }
 
     public void TestSessionStart(TestSessionStartArgs testSessionStartArgs)
     {
+        // Let's ensure we start collecting cpu percentage values before everything else.
+        var retries = 4;
+        while (Interlocked.CompareExchange(ref _lastCpuPercentageValue, 0, 0) == 0 && retries-- > 0)
+        {
+            Thread.Sleep(100);
+        }
     }
 
     public void TestCaseStart(TestCaseStartArgs testCaseStartArgs)
     {
         if (testCaseStartArgs?.TestCase?.Id is { } id)
         {
-            var values = _currentCpuValues.GetOrAdd(id, new List<double>());
-            lock (values)
-            {
-                values.Add(_lastCpuPercentageValue);
-            }
+            _currentCpuValues.GetOrAdd(id, new List<double> { _lastCpuPercentageValue });
         }
     }
 
@@ -55,6 +53,12 @@ internal class CpuInProcDataCollection : InProcDataCollection
             {
                 lock (values)
                 {
+                    // Check if the last cpu percentage value was already included.
+                    if (values.Count > 0 && Math.Abs(values[values.Count - 1] - _lastCpuPercentageValue) <= 0.0000001)
+                    {
+                        return;
+                    }
+
                     values.Add(_lastCpuPercentageValue);
                 }
             }
@@ -65,8 +69,15 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         try
         {
-            // Cancel collection and current values.
+            // Cancel cpu collection.
             _cpuUsageCancellationTokenSource?.Cancel();
+            
+            // Move current cpu values to the final values.
+            foreach (var item in _currentCpuValues)
+            {
+                _finalValues.TryAdd(item.Key, item.Value);
+            }
+            
             _currentCpuValues.Clear();
         }
         catch
@@ -89,28 +100,37 @@ internal class CpuInProcDataCollection : InProcDataCollection
     
     private static void StartCollectingCpuUsageForProcess(CpuInProcDataCollection? dataCollection)
     {
-        Process? process = null;
-        if (dataCollection is null)
+        if (dataCollection?._cpuUsageCancellationTokenSource is { Token: { } token })
         {
-            return;
-        }
+            // Get current Process
+            var process = Process.GetCurrentProcess();
+            // Create a high precision clock
+            var watch = new Stopwatch();
 
-        if (dataCollection._cpuUsageCancellationTokenSource is { Token: { } token })
-        {
             while (!token.IsCancellationRequested)
             {
                 try
                 {
-                    process ??= Process.GetCurrentProcess();
-                    var startTime = DateTime.UtcNow;
+                    // Collect values
+                    watch.Restart();
                     var startCpuUsage = process.TotalProcessorTime;
-                    Thread.Sleep(100);
-                    var endTime = DateTime.UtcNow;
+                    Thread.Sleep(40);
                     var endCpuUsage = process.TotalProcessorTime;
-                    var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
-                    var totalMsPassed = (endTime - startTime).TotalMilliseconds;
-                    var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
-                    var result = cpuUsageTotal * 100;
+                    var ticksPassed = watch.Elapsed.Ticks;
+
+                    // Calculation
+                    var cpuUsedTicks = (endCpuUsage - startCpuUsage).Ticks;
+                    var cpuUsageTotal = (double)cpuUsedTicks / (Environment.ProcessorCount * ticksPassed);
+                    var result = Math.Round(cpuUsageTotal * 100, 4, MidpointRounding.AwayFromZero);
+
+                    // If after the calculation we have a value > 100 then we assume the cpu/timer is having a bad time
+                    // due to usage, so we clip the value to a 100%
+                    if (result > 100)
+                    {
+                        result = 100;
+                    }
+
+                    // Add value to current executing tests
                     Interlocked.Exchange(ref dataCollection._lastCpuPercentageValue, result);
                     foreach(var values in dataCollection._currentCpuValues.Values)
                     {
