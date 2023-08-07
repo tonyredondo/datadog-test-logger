@@ -51,8 +51,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             var requestProxy = request.DuckCast<ISendMessageRequest>();
 
-            var scope = AwsSqsCommon.CreateScope(Tracer.Instance, Operation, out AwsSqsTags tags);
+            var scope = AwsSqsCommon.CreateScope(Tracer.Instance, Operation, out AwsSqsTags tags, spanKind: SpanKinds.Producer);
             tags.QueueUrl = requestProxy.QueueUrl;
+            tags.QueueName = AwsSqsCommon.GetQueueName(requestProxy.QueueUrl);
 
             if (scope?.Span.Context != null)
             {

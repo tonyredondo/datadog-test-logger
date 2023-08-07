@@ -27,6 +27,10 @@ internal class Security
     public string? DdlibWafVersion => null;
 
     public bool WafExportsErrorHappened => false;
+
+    public string? InitializationError => null;
+
+    public bool Enabled => false;
 }
 
 internal class BlockException : Exception

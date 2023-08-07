@@ -24,7 +24,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     TypeName = "Xunit.Sdk.TestAssemblyRunner`1",
     MethodName = "BeforeTestAssemblyFinishedAsync",
     ReturnTypeName = ClrNames.Task,
-    ParameterTypeNames = new string[0],
     MinimumVersion = "2.2.0",
     MaximumVersion = "2.*.*",
     IntegrationName = XUnitIntegration.IntegrationName)]
@@ -33,11 +32,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     TypeName = "Xunit.Sdk.TestAssemblyRunner`1",
     MethodName = "BeforeTestAssemblyFinishedAsync",
     ReturnTypeName = ClrNames.Task,
-    ParameterTypeNames = new string[0],
     MinimumVersion = "2.2.0",
     MaximumVersion = "2.*.*",
     IntegrationName = XUnitIntegration.IntegrationName,
-    CallTargetIntegrationType = IntegrationType.Derived)]
+    CallTargetIntegrationKind = CallTargetKind.Derived)]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 internal static class XUnitTestAssemblyRunnerBeforeTestAssemblyFinishedAsyncIntegration

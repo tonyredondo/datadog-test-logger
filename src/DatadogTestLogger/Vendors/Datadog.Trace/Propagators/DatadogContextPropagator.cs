@@ -12,6 +12,8 @@
 
 using System.Globalization;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
@@ -27,6 +29,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
         public void Inject<TCarrier, TCarrierSetter>(SpanContext context, TCarrier carrier, TCarrierSetter carrierSetter)
             where TCarrierSetter : struct, ICarrierSetter<TCarrier>
         {
+            TelemetryFactory.Metrics.RecordCountContextHeaderStyleInjected(MetricTags.ContextHeaderStyle.Datadog);
             var invariantCulture = CultureInfo.InvariantCulture;
 
             // x-datadog-trace-id only supports 64-bit trace ids, truncate by using TraceId128.Lower
@@ -91,6 +94,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Propagators
                               PropagatedTags = traceTags
                           };
 
+            TelemetryFactory.Metrics.RecordCountContextHeaderStyleExtracted(MetricTags.ContextHeaderStyle.Datadog);
             return true;
         }
 

@@ -63,7 +63,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 
             try
             {
-                var span = ServiceRemotingHelpers.CreateSpan(tracer, context: null, SpanKinds.Client, eventArgs, messageHeaders);
+                var tags = tracer.CurrentTraceSettings.Schema.Client.CreateServiceRemotingClientTags();
+                var span = ServiceRemotingHelpers.CreateSpan(tracer, context: null, tags, eventArgs, messageHeaders);
+                tracer.CurrentTraceSettings.Schema.RemapPeerService(tags);
 
                 try
                 {

@@ -339,7 +339,7 @@ public class VendoredDependency
                     
                     return Regex.Replace(
                         result,
-                        @"public(\s+((abstract|sealed|static|unsafe)\s+)*?(partial\s+)?(class|readonly\s+(ref\s+)?struct|struct|interface|enum|delegate))",
+                        @"public(\s+((abstract|sealed|static|unsafe)\s+)*?(partial\s+)?(class|readonly\s+(ref\s+)?struct|struct|interface|enum|delegate|record))",
                         match => $"internal{match.Groups[1]}");
                 });
         }

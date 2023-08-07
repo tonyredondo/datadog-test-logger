@@ -26,7 +26,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         MinimumVersion = "3.6.9",
         MaximumVersion = "6.*.*",
         IntegrationName = RabbitMQConstants.IntegrationName,
-        CallTargetIntegrationType = IntegrationType.Interface)]
+        CallTargetIntegrationKind = CallTargetKind.Interface)]
     [InstrumentMethod(
         AssemblyName = "RabbitMQ.Client",
         TypeName = "RabbitMQ.Client.AsyncDefaultBasicConsumer",
@@ -36,7 +36,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         MinimumVersion = "3.6.9",
         MaximumVersion = "6.*.*",
         IntegrationName = RabbitMQConstants.IntegrationName,
-        CallTargetIntegrationType = IntegrationType.Derived)]
+        CallTargetIntegrationKind = CallTargetKind.Derived)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal class BasicDeliverAsyncIntegration

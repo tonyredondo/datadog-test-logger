@@ -8,6 +8,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Iast
         public void AddIastVulnerabilitiesToSpan(Datadog.Trace.Span span)
         {
         }
+
+        public void AddIastDisabledFlagToSpan(Datadog.Trace.Span span)
+        {
+        }
     }
 
     internal class OverheadController

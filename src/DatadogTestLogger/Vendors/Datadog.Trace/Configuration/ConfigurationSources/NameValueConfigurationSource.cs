@@ -11,6 +11,10 @@
 #nullable enable
 
 using System.Collections.Specialized;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 {
@@ -27,12 +31,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         /// that wraps the specified <see cref="NameValueCollection"/>.
         /// </summary>
         /// <param name="nameValueCollection">The collection that will be wrapped by this configuration source.</param>
+        [PublicApi]
         public NameValueConfigurationSource(NameValueCollection nameValueCollection)
+            : this(nameValueCollection, ConfigurationOrigins.Code)
         {
-            _nameValueCollection = nameValueCollection;
+            TelemetryFactory.Metrics.Record(PublicApiUsage.NameValueConfigurationSource_Ctor);
         }
 
+        internal NameValueConfigurationSource(NameValueCollection nameValueCollection, ConfigurationOrigins origin)
+        {
+            _nameValueCollection = nameValueCollection;
+            Origin = origin;
+        }
+
+        internal override ConfigurationOrigins Origin { get; }
+
         /// <inheritdoc />
+        [PublicApi]
         public override string? GetString(string key)
         {
             return _nameValueCollection[key];

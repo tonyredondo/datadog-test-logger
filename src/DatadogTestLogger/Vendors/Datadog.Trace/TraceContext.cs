@@ -9,15 +9,17 @@
 // </copyright>
 
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
 using DatadogTestLogger.Vendors.Datadog.Trace.Iast;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace
@@ -26,18 +28,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<TraceContext>();
 
-        private readonly DateTimeOffset _utcStart = DateTimeOffset.UtcNow;
-        private readonly long _timestamp = Stopwatch.GetTimestamp();
-        private readonly object _syncRoot = new();
+        private readonly TraceClock _clock;
+
         private IastRequestContext _iastRequestContext;
 
         private ArrayBuilder<Span> _spans;
         private int _openSpans;
         private int? _samplingPriority;
+        private Span _rootSpan;
 
         public TraceContext(IDatadogTracer tracer, TraceTagCollection tags = null)
         {
-            var settings = tracer?.Settings;
+            CurrentTraceSettings = tracer.PerTraceSettings;
+
+            var settings = tracer.Settings;
 
             // TODO: Environment, ServiceVersion, GitCommitSha, and GitRepositoryUrl are stored on the TraceContext
             // even though they likely won't change for the lifetime of the process. We should consider moving them
@@ -45,19 +49,26 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             if (settings is not null)
             {
                 // these could be set from DD_ENV/DD_VERSION or from DD_TAGS
-                Environment = settings.Environment;
-                ServiceVersion = settings.ServiceVersion;
+                Environment = settings.EnvironmentInternal;
+                ServiceVersion = settings.ServiceVersionInternal;
             }
 
             Tracer = tracer;
             Tags = tags ?? new TraceTagCollection();
+            _clock = TraceClock.Instance;
         }
 
-        public Span RootSpan { get; private set; }
+        public Span RootSpan
+        {
+            get => _rootSpan;
+            private set => _rootSpan = value;
+        }
 
-        public DateTimeOffset UtcNow => _utcStart.Add(Elapsed);
+        public TraceClock Clock => _clock;
 
         public IDatadogTracer Tracer { get; }
+
+        public PerTraceSettings CurrentTraceSettings { get; }
 
         /// <summary>
         /// Gets the collection of trace-level tags.
@@ -91,43 +102,35 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// </summary>
         internal IastRequestContext IastRequestContext => _iastRequestContext;
 
-        private TimeSpan Elapsed => StopwatchHelpers.GetElapsed(Stopwatch.GetTimestamp() - _timestamp);
-
         internal void EnableIastInRequest()
         {
-            if (_iastRequestContext is null)
+            if (Volatile.Read(ref _iastRequestContext) is null)
             {
-                lock (_syncRoot)
-                {
-                    _iastRequestContext ??= new();
-                }
+                Interlocked.CompareExchange(ref _iastRequestContext, new(), null);
             }
         }
 
         public void AddSpan(Span span)
         {
-            lock (_syncRoot)
+            // first span added is the local root span
+            if (Interlocked.CompareExchange(ref _rootSpan, span, null) == null)
             {
-                if (RootSpan == null)
+                // if we don't have a sampling priority yet, make a sampling decision now
+                if (_samplingPriority == null)
                 {
-                    // first span added is the local root span
-                    RootSpan = span;
-
-                    // if we don't have a sampling priority yet, make a sampling decision now
-                    if (_samplingPriority == null)
-                    {
-                        var samplingDecision = Tracer.Sampler?.MakeSamplingDecision(span) ?? SamplingDecision.Default;
-                        SetSamplingPriority(samplingDecision);
-                    }
+                    SetSamplingPriority(CurrentTraceSettings?.TraceSampler?.MakeSamplingDecision(span) ?? SamplingDecision.Default);
                 }
+            }
 
+            lock (_rootSpan)
+            {
                 _openSpans++;
             }
         }
 
         public void CloseSpan(Span span)
         {
-            bool ShouldTriggerPartialFlush() => Tracer.Settings.Exporter.PartialFlushEnabled && _spans.Count >= Tracer.Settings.Exporter.PartialFlushMinSpans;
+            bool ShouldTriggerPartialFlush() => Tracer.Settings.ExporterInternal.PartialFlushEnabledInternal && _spans.Count >= Tracer.Settings.ExporterInternal.PartialFlushMinSpansInternal;
 
             ArraySegment<Span> spansToWrite = default;
 
@@ -136,14 +139,21 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             {
                 Profiler.Instance.ContextTracker.SetEndpoint(span.RootSpanId, span.ResourceName);
 
-                if (Iast.Iast.Instance.Settings.Enabled && _iastRequestContext != null)
+                if (Iast.Iast.Instance.Settings.Enabled)
                 {
-                    _iastRequestContext.AddIastVulnerabilitiesToSpan(span);
-                    OverheadController.Instance.ReleaseRequest();
+                    if (_iastRequestContext is { } iastRequestContext)
+                    {
+                        iastRequestContext.AddIastVulnerabilitiesToSpan(span);
+                        OverheadController.Instance.ReleaseRequest();
+                    }
+                    else
+                    {
+                        IastRequestContext.AddIastDisabledFlagToSpan(span);
+                    }
                 }
             }
 
-            lock (_syncRoot)
+            lock (_rootSpan)
             {
                 _spans.Add(span);
                 _openSpans--;
@@ -152,6 +162,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                 {
                     spansToWrite = _spans.GetArray();
                     _spans = default;
+                    TelemetryFactory.Metrics.RecordCountTraceSegmentsClosed();
                 }
                 else if (ShouldTriggerPartialFlush())
                 {
@@ -167,11 +178,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     // the number of remaining spans is probably big as well.
                     // Therefore, we bypass the resize logic and immediately allocate the array to its maximum size
                     _spans = new ArrayBuilder<Span>(spansToWrite.Count);
+                    TelemetryFactory.Metrics.RecordCountTracePartialFlush(MetricTags.PartialFlushReason.LargeTrace);
                 }
             }
 
             if (spansToWrite.Count > 0)
             {
+                RunSpanSampler(spansToWrite);
                 Tracer.Write(spansToWrite);
             }
         }
@@ -181,7 +194,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             ArraySegment<Span> spansToWrite;
 
-            lock (_syncRoot)
+            lock (_rootSpan)
             {
                 spansToWrite = _spans.GetArray();
                 _spans = default;
@@ -189,6 +202,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
             if (spansToWrite.Count > 0)
             {
+                RunSpanSampler(spansToWrite);
                 Tracer.Write(spansToWrite);
             }
         }
@@ -225,9 +239,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
             }
         }
 
-        public TimeSpan ElapsedSince(DateTimeOffset date)
+        private void RunSpanSampler(ArraySegment<Span> spans)
         {
-            return Elapsed + (_utcStart - date);
+            if (CurrentTraceSettings?.SpanSampler is null)
+            {
+                return;
+            }
+
+            if (spans.Array![spans.Offset].Context.TraceContext?.SamplingPriority <= 0)
+            {
+                for (int i = 0; i < spans.Count; i++)
+                {
+                    CurrentTraceSettings.SpanSampler.MakeSamplingDecision(spans.Array[i + spans.Offset]);
+                }
+            }
         }
     }
 }

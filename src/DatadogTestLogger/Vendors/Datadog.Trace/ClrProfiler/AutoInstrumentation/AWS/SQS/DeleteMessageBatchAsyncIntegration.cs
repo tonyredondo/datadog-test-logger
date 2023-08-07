@@ -24,7 +24,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = "AWSSDK.SQS",
         TypeName = "Amazon.SQS.AmazonSQSClient",
         MethodName = "DeleteMessageBatchAsync",
-        ReturnTypeName = "System.Threading.Tasks.Task`1<Amazon.SQS.Model.DeleteMessageBatchResponse>",
+        ReturnTypeName = "System.Threading.Tasks.Task`1[Amazon.SQS.Model.DeleteMessageBatchResponse]",
         ParameterTypeNames = new[] { "Amazon.SQS.Model.DeleteMessageBatchRequest", ClrNames.CancellationToken },
         MinimumVersion = "3.0.0",
         MaximumVersion = "3.*.*",
@@ -54,6 +54,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             var scope = AwsSqsCommon.CreateScope(Tracer.Instance, Operation, out AwsSqsTags tags);
             tags.QueueUrl = request.QueueUrl;
+            tags.QueueName = AwsSqsCommon.GetQueueName(request.QueueUrl);
 
             return new CallTargetState(scope);
         }

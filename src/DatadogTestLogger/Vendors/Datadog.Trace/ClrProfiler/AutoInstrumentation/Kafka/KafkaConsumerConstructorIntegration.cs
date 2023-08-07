@@ -35,16 +35,33 @@ internal class KafkaConsumerConstructorIntegration
     {
         if (Tracer.Instance.Settings.IsIntegrationEnabled(KafkaConstants.IntegrationId))
         {
+            string groupId = null;
+            string bootstrapServers = null;
+
             foreach (var kvp in consumer.Config)
             {
-                if (string.Equals(kvp.Key, "group.id", StringComparison.Ordinal))
+                if (string.Equals(kvp.Key, KafkaHelper.GroupIdKey, StringComparison.Ordinal))
                 {
                     if (!string.IsNullOrEmpty(kvp.Value))
                     {
-                        // Save the map between this consumer and a consumer group
-                        return new CallTargetState(scope: null, state: kvp.Value);
+                        groupId = kvp.Value;
                     }
                 }
+                else if (string.Equals(kvp.Key, KafkaHelper.BootstrapServersKey, StringComparison.Ordinal))
+                {
+                    if (!string.IsNullOrEmpty(kvp.Value))
+                    {
+                        bootstrapServers = kvp.Value;
+                    }
+                }
+            }
+
+            // Only config setting "group.id" is required, so assert that the value is non-null before adding to the ConsumerGroup cache
+            if (groupId is not null)
+            {
+                // Save the map between this consumer and a consumer group
+                ConsumerGroupHelper.SetConsumerGroup(instance, groupId, bootstrapServers);
+                return new CallTargetState(scope: null, state: instance);
             }
         }
 
@@ -55,9 +72,9 @@ internal class KafkaConsumerConstructorIntegration
     {
         // This method is called in the Consumer constructor, so if we have an exception
         // the consumer won't be created, so no point recording it.
-        if (exception is null && state.State is string s)
+        if (exception is not null && state is { State: { } consumer })
         {
-            ConsumerGroupHelper.SetConsumerGroup(instance, s);
+            ConsumerGroupHelper.RemoveConsumerGroup(consumer);
         }
 
         return CallTargetReturn.GetDefault();

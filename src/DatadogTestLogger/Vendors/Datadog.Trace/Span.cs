@@ -10,10 +10,15 @@
 
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
 
@@ -30,7 +35,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<Span>();
         private static readonly bool IsLogLevelDebugEnabled = Log.IsEnabled(LogEventLevel.Debug);
 
-        private readonly object _lock = new();
+        private int _isFinished;
 
         internal Span(SpanContext context, DateTimeOffset? start)
             : this(context, start, null)
@@ -41,15 +46,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             Tags = tags ?? new CommonTags();
             Context = context;
-            StartTime = start ?? Context.TraceContext.UtcNow;
+            StartTime = start ?? Context.TraceContext.Clock.UtcNow;
 
             if (IsLogLevelDebugEnabled)
             {
-                var tagsType = Tags.GetType();
-
-                Log.Debug(
-                    "Span started: [s_id: {SpanId}, p_id: {ParentId}, t_id: {TraceId}] with Tags: [{Tags}], Tags Type: [{TagsType}])",
-                    new object[] { SpanId, Context.ParentId, TraceId, Tags, tagsType });
+                WriteCtorDebugMessage();
             }
         }
 
@@ -80,8 +81,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// </summary>
         internal string ServiceName
         {
-            get => Context.ServiceName;
-            set => Context.ServiceName = value;
+            get => Context.ServiceNameInternal;
+            set => Context.ServiceNameInternal = value;
         }
 
         /// <summary>
@@ -118,11 +119,21 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         internal TimeSpan Duration { get; private set; }
 
-        internal bool IsFinished { get; private set; }
+        internal bool IsFinished
+        {
+            get => _isFinished == 1;
+            private set => _isFinished = value ? 1 : 0;
+        }
 
         internal bool IsRootSpan => Context.TraceContext?.RootSpan == this;
 
-        internal bool IsTopLevel => Context.Parent == null || Context.Parent.SpanId == 0 || Context.Parent.ServiceName != ServiceName;
+        internal bool IsTopLevel => Context.ParentInternal == null
+                                 || Context.ParentInternal.SpanId == 0
+                                 || Context.ParentInternal switch
+                                    {
+                                        SpanContext s => s.ServiceNameInternal != ServiceName,
+                                        { } s => s.ServiceName != ServiceName,
+                                    };
 
         /// <summary>
         /// Record the end time of the span and flushes it to the backend.
@@ -142,17 +153,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         public override string ToString()
         {
             var sb = StringBuilderCache.Acquire(StringBuilderCache.MaxBuilderSize);
-            sb.AppendLine($"TraceId64: {Context.TraceId}");
+            sb.AppendLine($"TraceId64: {Context.TraceId128.Lower}");
             sb.AppendLine($"TraceId128: {Context.TraceId128}");
-            sb.AppendLine($"ParentId: {Context.ParentId}");
+            sb.AppendLine($"RawTraceId: {Context.RawTraceId}");
+            sb.AppendLine($"ParentId: {Context.ParentIdInternal}");
             sb.AppendLine($"SpanId: {Context.SpanId}");
+            sb.AppendLine($"RawSpanId: {Context.RawSpanId}");
             sb.AppendLine($"Origin: {Context.Origin}");
             sb.AppendLine($"ServiceName: {ServiceName}");
             sb.AppendLine($"OperationName: {OperationName}");
             sb.AppendLine($"Resource: {ResourceName}");
             sb.AppendLine($"Type: {Type}");
-            sb.AppendLine($"Start: {StartTime}");
+            sb.AppendLine($"Start: {StartTime.ToString("O")}");
             sb.AppendLine($"Duration: {Duration}");
+            sb.AppendLine($"End: {StartTime.Add(Duration).ToString("O")}");
             sb.AppendLine($"Error: {Error}");
             sb.AppendLine($"Meta: {Tags}");
 
@@ -335,6 +349,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     }
 
                     break;
+                case Trace.Tags.PeerService:
+                    Tags.SetTag(key, value);
+                    Context.TraceContext.CurrentTraceSettings.Schema.RemapPeerService(Tags);
+                    break;
                 default:
                     Tags.SetTag(key, value);
                     break;
@@ -349,7 +367,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// </summary>
         internal void Finish()
         {
-            Finish(Context.TraceContext.ElapsedSince(StartTime));
+            Finish(Context.TraceContext.Clock.ElapsedSince(StartTime));
         }
 
         /// <summary>
@@ -414,34 +432,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         internal void Finish(TimeSpan duration)
         {
-            var shouldCloseSpan = false;
-            lock (_lock)
+            ResourceName ??= OperationName;
+            if (Interlocked.CompareExchange(ref _isFinished, 1, 0) == 0)
             {
-                ResourceName ??= OperationName;
-
-                if (!IsFinished)
+                Duration = duration;
+                if (Duration < TimeSpan.Zero)
                 {
-                    Duration = duration;
-                    if (Duration < TimeSpan.Zero)
-                    {
-                        Duration = TimeSpan.Zero;
-                    }
-
-                    IsFinished = true;
-                    shouldCloseSpan = true;
+                    Duration = TimeSpan.Zero;
                 }
-            }
 
-            if (shouldCloseSpan)
-            {
                 Context.TraceContext.CloseSpan(this);
 
                 if (IsLogLevelDebugEnabled)
                 {
-                    Log.Debug(
-                        "Span closed: [s_id: {SpanId}, p_id: {ParentId}, t_id: {TraceId}] for (Service: {ServiceName}, Resource: {ResourceName}, Operation: {OperationName}, Tags: [{Tags}])",
-                        new object[] { SpanId, Context.ParentId, TraceId, ServiceName, ResourceName, OperationName, Tags });
+                    WriteCloseDebugMessage();
                 }
+
+                TelemetryFactory.Metrics.RecordCountSpanFinished();
             }
         }
 
@@ -459,7 +466,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
         internal void ResetStartTime()
         {
-            StartTime = Context.TraceContext.UtcNow;
+            StartTime = Context.TraceContext.Clock.UtcNow;
         }
 
         internal void SetStartTime(DateTimeOffset startTime)
@@ -470,6 +477,24 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         internal void SetDuration(TimeSpan duration)
         {
             Duration = duration;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void WriteCtorDebugMessage()
+        {
+            var tagsType = Tags.GetType();
+
+            Log.Debug(
+                "Span started: [s_id: {SpanId}, p_id: {ParentId}, t_id: {TraceId}] with Tags: [{Tags}], Tags Type: [{TagsType}])",
+                new object[] { Context.RawSpanId, Context.ParentIdInternal, Context.RawTraceId, Tags, tagsType });
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void WriteCloseDebugMessage()
+        {
+            Log.Debug(
+                "Span closed: [s_id: {SpanId}, p_id: {ParentId}, t_id: {TraceId}] for (Service: {ServiceName}, Resource: {ResourceName}, Operation: {OperationName}, Tags: [{Tags}])\nDetails:{ToString}",
+                new object[] { Context.RawSpanId, Context.ParentIdInternal, Context.RawTraceId, ServiceName, ResourceName, OperationName, Tags, ToString() });
         }
     }
 }

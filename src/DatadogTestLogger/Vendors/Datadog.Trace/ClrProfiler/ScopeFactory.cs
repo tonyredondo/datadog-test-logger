@@ -24,9 +24,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
     /// </summary>
     internal static class ScopeFactory
     {
-        public const string OperationName = "http.request";
-        public const string ServiceName = "http-client";
-
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ScopeFactory));
 
         public static Scope GetActiveHttpScope(Tracer tracer)
@@ -108,10 +105,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
 
                 string resourceUrl = requestUri != null ? UriHelpers.CleanUri(requestUri, removeScheme: true, tryRemoveIds: true) : null;
 
-                tags = new HttpTags();
+                var operationName = tracer.CurrentTraceSettings.Schema.Client.GetOperationNameForProtocol("http");
+                var serviceName = tracer.CurrentTraceSettings.Schema.Client.GetServiceName(component: "http-client");
+                tags = tracer.CurrentTraceSettings.Schema.Client.CreateHttpTags();
 
-                string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                span = tracer.StartSpan(OperationName, tags, serviceName: serviceName, traceId: traceId, spanId: spanId, startTime: startTime, addToTraceContext: addToTraceContext);
+                span = tracer.StartSpan(operationName, tags, serviceName: serviceName, traceId: traceId, spanId: spanId, startTime: startTime, addToTraceContext: addToTraceContext);
 
                 span.Type = SpanTypes.Http;
                 span.ResourceName = $"{httpMethod} {resourceUrl}";
@@ -120,16 +118,18 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler
                 if (requestUri is not null)
                 {
                     tags.HttpUrl = HttpRequestUtils.GetUrl(requestUri, tracer.TracerManager.QueryStringManager);
+                    tags.Host = HttpRequestUtils.GetNormalizedHost(requestUri.Host);
                 }
 
                 tags.InstrumentationName = IntegrationRegistry.GetName(integrationId);
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);
+                tracer.CurrentTraceSettings.Schema.RemapPeerService(tags);
 
                 if (!addToTraceContext && span.Context.TraceContext.SamplingPriority == null)
                 {
                     // If we don't add the span to the trace context, then we need to manually call the sampler
-                    var samplingDecision = tracer.TracerManager.Sampler?.MakeSamplingDecision(span) ?? SamplingDecision.Default;
+                    var samplingDecision = tracer.CurrentTraceSettings.TraceSampler?.MakeSamplingDecision(span) ?? SamplingDecision.Default;
                     span.Context.TraceContext.SetSamplingPriority(samplingDecision);
                 }
             }

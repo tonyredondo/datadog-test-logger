@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
@@ -48,6 +50,7 @@ internal sealed class TestSession
         {
             Command = command ?? string.Empty,
             WorkingDirectory = WorkingDirectory,
+            IntelligentTestRunnerSkippingType = IntelligentTestRunnerTags.SkippingTypeTest,
         };
 
         tags.SetCIEnvironmentValues(environment);
@@ -56,6 +59,7 @@ internal sealed class TestSession
             string.IsNullOrEmpty(framework) ? "test_session" : $"{framework!.ToLowerInvariant()}.test_session",
             tags: tags,
             startTime: startDate);
+        TelemetryFactory.Metrics.RecordCountSpanCreated(MetricTags.IntegrationName.CiAppManual);
 
         span.Type = SpanTypes.TestSession;
         span.ResourceName = $"{span.OperationName}.{command}";
@@ -316,7 +320,7 @@ internal sealed class TestSession
         var span = _span;
 
         // Calculate duration beforehand
-        duration ??= span.Context.TraceContext.ElapsedSince(span.StartTime);
+        duration ??= span.Context.TraceContext.Clock.ElapsedSince(span.StartTime);
 
         // Set status
         switch (status)

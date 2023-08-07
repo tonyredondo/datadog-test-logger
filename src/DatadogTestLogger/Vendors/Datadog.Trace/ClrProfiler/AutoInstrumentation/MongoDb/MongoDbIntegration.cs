@@ -10,6 +10,7 @@
 
 using System;
 using System.Net;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb.BsonSerialization;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
@@ -78,7 +79,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
                     resourceName = $"{mongoOperationName ?? "operation"} {databaseName ?? "database"}";
                     collectionName = firstElement.Value?.ToString();
-                    query = protocolWithCommand.Command.ToString();
+                    query = BsonSerializationHelper.ToShortString(((IDuckType)protocolWithCommand.Command).Instance);
                 }
                 catch (Exception ex)
                 {
@@ -100,14 +101,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 port = dnsEndPoint.Port.ToString();
             }
 
-            string operationName = tracer.Schema.Database.GetOperationName(DatabaseType);
-            string serviceName = tracer.Schema.Database.GetServiceName(DatabaseType);
+            var operationName = tracer.CurrentTraceSettings.Schema.Database.GetOperationName(DatabaseType);
+            var serviceName = tracer.CurrentTraceSettings.Schema.Database.GetServiceName(DatabaseType);
+            var tags = tracer.CurrentTraceSettings.Schema.Database.CreateMongoDbTags();
 
             Scope scope = null;
 
             try
             {
-                var tags = new MongoDbTags();
                 scope = tracer.StartActiveInternal(operationName, serviceName: serviceName, tags: tags);
                 var span = scope.Span;
                 span.Type = SpanTypes.MongoDb;
@@ -119,6 +120,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 tags.Port = port;
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: false);
+                tracer.CurrentTraceSettings.Schema.RemapPeerService(tags);
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(IntegrationId);
             }
             catch (Exception ex)

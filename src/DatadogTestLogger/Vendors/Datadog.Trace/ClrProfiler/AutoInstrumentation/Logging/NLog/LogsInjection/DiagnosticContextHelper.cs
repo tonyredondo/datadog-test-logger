@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
@@ -20,7 +21,22 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(DiagnosticContextHelper));
 
-        public static MappedDiagnosticsLogicalContextSetterProxy GetMdlcProxy(Assembly nlogAssembly)
+        private static IScopeContextSetterProxy GetScopeContextProxy(Assembly nlogAssembly)
+        {
+            var scType = nlogAssembly.GetType("NLog.ScopeContext");
+            if (scType is not null)
+            {
+                var createTypeResult = DuckType.GetOrCreateProxyType(typeof(IScopeContextSetterProxy), scType);
+                if (createTypeResult.Success)
+                {
+                    return createTypeResult.CreateInstance<IScopeContextSetterProxy>(instance: null);
+                }
+            }
+
+            return null;
+        }
+
+        private static MappedDiagnosticsLogicalContextSetterProxy GetMdlcProxy(Assembly nlogAssembly)
         {
             var mdlcType = nlogAssembly.GetType("NLog.MappedDiagnosticsLogicalContext");
             if (mdlcType is not null)
@@ -37,7 +53,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             return null;
         }
 
-        public static MappedDiagnosticsContextSetterProxy GetMdcProxy(Assembly nlogAssembly)
+        private static MappedDiagnosticsContextSetterProxy GetMdcProxy(Assembly nlogAssembly)
         {
             var mdcType = nlogAssembly.GetType("NLog.MappedDiagnosticsContext");
             if (mdcType is not null)
@@ -64,58 +80,30 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             return null;
         }
 
+        public static IDisposable SetScopeContextState(IScopeContextSetterProxy scopeContext, Tracer tracer)
+        {
+            var entries = CreateEntriesList(tracer, out _);
+            var state = scopeContext.PushProperties(entries);
+
+            return state;
+        }
+
         public static bool SetMdcState(MappedDiagnosticsContextSetterProxy mdc, Tracer tracer)
         {
-            var removeSpanId = false;
-            mdc.Set(CorrelationIdentifier.ServiceKey, tracer.DefaultServiceName ?? string.Empty);
-            mdc.Set(CorrelationIdentifier.VersionKey, tracer.Settings.ServiceVersion ?? string.Empty);
-            mdc.Set(CorrelationIdentifier.EnvKey, tracer.Settings.Environment ?? string.Empty);
-
-            var spanContext = tracer.DistributedSpanContext;
-            if (spanContext is not null)
+            var entries = CreateEntriesList(tracer, out var removeTraceIds);
+            foreach (var kvp in entries)
             {
-                // For mismatch version support we need to keep requesting old keys.
-                var hasTraceId = spanContext.TryGetValue(SpanContext.Keys.TraceId, out string traceId) ||
-                                 spanContext.TryGetValue(HttpHeaderNames.TraceId, out traceId);
-                var hasSpanId = spanContext.TryGetValue(SpanContext.Keys.ParentId, out string spanId) ||
-                                spanContext.TryGetValue(HttpHeaderNames.ParentId, out spanId);
-                if (hasTraceId && hasSpanId)
-                {
-                    removeSpanId = true;
-                    mdc.Set(CorrelationIdentifier.TraceIdKey, traceId);
-                    mdc.Set(CorrelationIdentifier.SpanIdKey, spanId);
-                }
+                mdc.Set(kvp.Key, (string)kvp.Value);
             }
 
-            return removeSpanId;
+            return removeTraceIds;
         }
 
         public static IDisposable SetMdlcState(MappedDiagnosticsLogicalContextSetterProxy mdlc, Tracer tracer)
         {
-            var spanContext = tracer.DistributedSpanContext;
-            var array = spanContext is null
-                            ? new KeyValuePair<string, object>[3]
-                            : new KeyValuePair<string, object>[5];
+            var entries = CreateEntriesList(tracer, out _);
+            var state = mdlc.SetScoped(entries);
 
-            array[0] = new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, tracer.DefaultServiceName ?? string.Empty);
-            array[1] = new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, tracer.Settings.ServiceVersion ?? string.Empty);
-            array[2] = new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, tracer.Settings.Environment ?? string.Empty);
-
-            if (spanContext is not null)
-            {
-                // For mismatch version support we need to keep requesting old keys.
-                var hasTraceId = spanContext.TryGetValue(SpanContext.Keys.TraceId, out string traceId) ||
-                                 spanContext.TryGetValue(HttpHeaderNames.TraceId, out traceId);
-                var hasSpanId = spanContext.TryGetValue(SpanContext.Keys.ParentId, out string spanId) ||
-                                spanContext.TryGetValue(HttpHeaderNames.ParentId, out spanId);
-                if (hasTraceId && hasSpanId)
-                {
-                    array[3] = new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, traceId);
-                    array[4] = new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, spanId);
-                }
-            }
-
-            var state = mdlc.SetScoped(array);
             return state;
         }
 
@@ -132,11 +120,51 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             }
         }
 
+        private static IReadOnlyList<KeyValuePair<string, object>> CreateEntriesList(Tracer tracer, out bool hasTraceIds)
+        {
+            hasTraceIds = false;
+            var spanContext = tracer.DistributedSpanContext;
+
+            if (spanContext is not null)
+            {
+                // For mismatch version support we need to keep requesting old keys.
+                var hasTraceId = spanContext.TryGetValue(SpanContext.Keys.TraceId, out string traceId) ||
+                                 spanContext.TryGetValue(HttpHeaderNames.TraceId, out traceId);
+                var hasSpanId = spanContext.TryGetValue(SpanContext.Keys.ParentId, out string spanId) ||
+                                spanContext.TryGetValue(HttpHeaderNames.ParentId, out spanId);
+                if (hasTraceId && hasSpanId)
+                {
+                    hasTraceIds = true;
+                    return new[]
+                    {
+                        new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, tracer.DefaultServiceName ?? string.Empty),
+                        new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, tracer.Settings.ServiceVersionInternal ?? string.Empty),
+                        new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, tracer.Settings.EnvironmentInternal ?? string.Empty),
+                        new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, traceId),
+                        new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, spanId)
+                    };
+                }
+            }
+
+            return new[]
+            {
+                new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, tracer.DefaultServiceName ?? string.Empty),
+                new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, tracer.Settings.ServiceVersionInternal ?? string.Empty),
+                new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, tracer.Settings.EnvironmentInternal ?? string.Empty)
+            };
+        }
+
         internal static class Cache<TMarker>
         {
             static Cache()
             {
                 var nlogAssembly = typeof(TMarker).Assembly;
+
+                if (GetScopeContextProxy(nlogAssembly) is { } scProxy)
+                {
+                    ScopeContext = scProxy;
+                    return;
+                }
 
                 if (GetMdlcProxy(nlogAssembly) is { } mdlcProxy)
                 {
@@ -151,8 +179,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 }
 
                 // Something is very awry, but don't throw, just don't inject logs
-                Log.Warning("Failed to create proxies for both MDLC and MDC using TMarker={TMarker}, TMarker.Assembly={Assembly}. No automatic logs injection will occur for this assembly.", typeof(TMarker), nlogAssembly);
+                Log.Warning("Failed to create proxies for MDLC, MDC and ScopeContext using TMarker={TMarker}, TMarker.Assembly={Assembly}. No automatic logs injection will occur for this assembly.", typeof(TMarker), nlogAssembly);
             }
+
+            public static IScopeContextSetterProxy ScopeContext { get; }
 
             public static MappedDiagnosticsLogicalContextSetterProxy Mdlc { get; }
 

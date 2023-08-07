@@ -25,7 +25,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         TypeName = "Serilog.LoggerConfiguration",
         MethodName = "CreateLogger",
         ReturnTypeName = "Serilog.Core.Logger",
-        ParameterTypeNames = new string[0],
         MinimumVersion = "1.0.0",
         MaximumVersion = "2.*.*",
         IntegrationName = nameof(IntegrationId.Serilog))]

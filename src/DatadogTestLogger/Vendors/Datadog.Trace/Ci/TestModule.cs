@@ -21,10 +21,12 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
-using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
@@ -33,6 +35,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 /// </summary>
 internal sealed class TestModule
 {
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<TestModule>();
+
     private static readonly AsyncLocal<TestModule?> CurrentModule = new();
     private readonly Span _span;
     private readonly Dictionary<string, TestSuite> _suites;
@@ -100,6 +104,7 @@ internal sealed class TestModule
                 SessionId = sessionSpanTags.SessionId,
                 Command = sessionSpanTags.Command,
                 WorkingDirectory = sessionSpanTags.WorkingDirectory,
+                IntelligentTestRunnerSkippingType = IntelligentTestRunnerTags.SkippingTypeTest,
             };
         }
         else
@@ -117,6 +122,7 @@ internal sealed class TestModule
                 OSArchitecture = frameworkDescription.OSArchitecture,
                 OSPlatform = frameworkDescription.OSPlatform,
                 OSVersion = CIVisibility.GetOperatingSystemVersion(),
+                IntelligentTestRunnerSkippingType = IntelligentTestRunnerTags.SkippingTypeTest,
             };
 
             tags.SetCIEnvironmentValues(environment);
@@ -159,6 +165,7 @@ internal sealed class TestModule
             string.IsNullOrEmpty(framework) ? "test_module" : $"{framework!.ToLowerInvariant()}.test_module",
             tags: tags,
             startTime: startDate);
+        TelemetryFactory.Metrics.RecordCountSpanCreated(MetricTags.IntegrationName.CiAppManual);
 
         span.Type = SpanTypes.TestModule;
         span.ResourceName = name;
@@ -348,7 +355,7 @@ internal sealed class TestModule
         var span = _span;
 
         // Calculate duration beforehand
-        duration ??= span.Context.TraceContext.ElapsedSince(span.StartTime);
+        duration ??= span.Context.TraceContext.Clock.ElapsedSince(span.StartTime);
 
         var remainingSuites = Array.Empty<TestSuite>();
         lock (_suites)
@@ -375,7 +382,7 @@ internal sealed class TestModule
             if (!CIVisibility.HasSkippableTests())
             {
                 // Adds the global code coverage percentage to the module
-                span.SetTag(CommonTags.CodeCoverageTotalLines, globalCoverage.Data[0].ToString(CultureInfo.InvariantCulture));
+                span.SetTag(CodeCoverageTags.PercentageOfTotalLines, globalCoverage.Data[0].ToString(CultureInfo.InvariantCulture));
             }
 
             // If the code coverage path environment variable is set, we store the json file
@@ -397,13 +404,21 @@ internal sealed class TestModule
 
         if (CIVisibility.Settings.TestsSkippingEnabled.HasValue)
         {
-            span.SetTag(CommonTags.TestTestsSkippingEnabled, CIVisibility.Settings.TestsSkippingEnabled.Value ? "true" : "false");
-            span.SetTag(CommonTags.TestsSkipped, CIVisibility.HasSkippableTests() ? "true" : "false");
+            span.SetTag(IntelligentTestRunnerTags.TestTestsSkippingEnabled, CIVisibility.Settings.TestsSkippingEnabled.Value ? "true" : "false");
+        }
+
+        if (Tags.IntelligentTestRunnerSkippingCount.HasValue)
+        {
+            span.SetTag(IntelligentTestRunnerTags.TestsSkipped, "true");
+        }
+        else
+        {
+            span.SetTag(IntelligentTestRunnerTags.TestsSkipped, CIVisibility.HasSkippableTests() ? "true" : "false");
         }
 
         if (CIVisibility.Settings.CodeCoverageEnabled.HasValue)
         {
-            span.SetTag(CommonTags.TestCodeCoverageEnabled, CIVisibility.Settings.CodeCoverageEnabled.Value ? "true" : "false");
+            span.SetTag(CodeCoverageTags.Enabled, CIVisibility.Settings.CodeCoverageEnabled.Value ? "true" : "false");
         }
 
         span.Finish(duration.Value);

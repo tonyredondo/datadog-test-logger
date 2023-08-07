@@ -9,35 +9,90 @@
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using System;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 {
     partial class ServiceRemotingTags
     {
-        // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
-        private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
-        // ApplicationIdBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.application-id");
-        private static readonly byte[] ApplicationIdBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 45, 105, 100 };
-        // ApplicationNameBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.application-name");
-        private static readonly byte[] ApplicationNameBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 45, 110, 97, 109, 101 };
-        // PartitionIdBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.partition-id");
-        private static readonly byte[] PartitionIdBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 112, 97, 114, 116, 105, 116, 105, 111, 110, 45, 105, 100 };
-        // NodeIdBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.node-id");
-        private static readonly byte[] NodeIdBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 110, 111, 100, 101, 45, 105, 100 };
-        // NodeNameBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.node-name");
-        private static readonly byte[] NodeNameBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 110, 111, 100, 101, 45, 110, 97, 109, 101 };
-        // ServiceNameBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.service-name");
-        private static readonly byte[] ServiceNameBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 110, 97, 109, 101 };
-        // RemotingUriBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.service-remoting.uri");
-        private static readonly byte[] RemotingUriBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 117, 114, 105 };
-        // RemotingMethodNameBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.service-remoting.method-name");
-        private static readonly byte[] RemotingMethodNameBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 109, 101, 116, 104, 111, 100, 45, 110, 97, 109, 101 };
-        // RemotingMethodIdBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.service-remoting.method-id");
-        private static readonly byte[] RemotingMethodIdBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 109, 101, 116, 104, 111, 100, 45, 105, 100 };
-        // RemotingInterfaceIdBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.service-remoting.interface-id");
-        private static readonly byte[] RemotingInterfaceIdBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 105, 110, 116, 101, 114, 102, 97, 99, 101, 45, 105, 100 };
-        // RemotingInvocationIdBytes = System.Text.Encoding.UTF8.GetBytes("service-fabric.service-remoting.invocation-id");
-        private static readonly byte[] RemotingInvocationIdBytes = new byte[] { 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 105, 110, 118, 111, 99, 97, 116, 105, 111, 110, 45, 105, 100 };
+        // SpanKindBytes = MessagePack.Serialize("span.kind");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> SpanKindBytes => new byte[] { 169, 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+#else
+        private static readonly byte[] SpanKindBytes = new byte[] { 169, 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+#endif
+        // ApplicationIdBytes = MessagePack.Serialize("service-fabric.application-id");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> ApplicationIdBytes => new byte[] { 189, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 45, 105, 100 };
+#else
+        private static readonly byte[] ApplicationIdBytes = new byte[] { 189, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 45, 105, 100 };
+#endif
+        // ApplicationNameBytes = MessagePack.Serialize("service-fabric.application-name");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> ApplicationNameBytes => new byte[] { 191, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 45, 110, 97, 109, 101 };
+#else
+        private static readonly byte[] ApplicationNameBytes = new byte[] { 191, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 45, 110, 97, 109, 101 };
+#endif
+        // PartitionIdBytes = MessagePack.Serialize("service-fabric.partition-id");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> PartitionIdBytes => new byte[] { 187, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 112, 97, 114, 116, 105, 116, 105, 111, 110, 45, 105, 100 };
+#else
+        private static readonly byte[] PartitionIdBytes = new byte[] { 187, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 112, 97, 114, 116, 105, 116, 105, 111, 110, 45, 105, 100 };
+#endif
+        // NodeIdBytes = MessagePack.Serialize("service-fabric.node-id");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> NodeIdBytes => new byte[] { 182, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 110, 111, 100, 101, 45, 105, 100 };
+#else
+        private static readonly byte[] NodeIdBytes = new byte[] { 182, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 110, 111, 100, 101, 45, 105, 100 };
+#endif
+        // NodeNameBytes = MessagePack.Serialize("service-fabric.node-name");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> NodeNameBytes => new byte[] { 184, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 110, 111, 100, 101, 45, 110, 97, 109, 101 };
+#else
+        private static readonly byte[] NodeNameBytes = new byte[] { 184, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 110, 111, 100, 101, 45, 110, 97, 109, 101 };
+#endif
+        // ServiceNameBytes = MessagePack.Serialize("service-fabric.service-name");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> ServiceNameBytes => new byte[] { 187, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 110, 97, 109, 101 };
+#else
+        private static readonly byte[] ServiceNameBytes = new byte[] { 187, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 110, 97, 109, 101 };
+#endif
+        // RemotingUriBytes = MessagePack.Serialize("service-fabric.service-remoting.uri");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RemotingUriBytes => new byte[] { 217, 35, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 117, 114, 105 };
+#else
+        private static readonly byte[] RemotingUriBytes = new byte[] { 217, 35, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 117, 114, 105 };
+#endif
+        // RemotingServiceNameBytes = MessagePack.Serialize("service-fabric.service-remoting.service");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RemotingServiceNameBytes => new byte[] { 217, 39, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 115, 101, 114, 118, 105, 99, 101 };
+#else
+        private static readonly byte[] RemotingServiceNameBytes = new byte[] { 217, 39, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 115, 101, 114, 118, 105, 99, 101 };
+#endif
+        // RemotingMethodNameBytes = MessagePack.Serialize("service-fabric.service-remoting.method-name");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RemotingMethodNameBytes => new byte[] { 217, 43, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 109, 101, 116, 104, 111, 100, 45, 110, 97, 109, 101 };
+#else
+        private static readonly byte[] RemotingMethodNameBytes = new byte[] { 217, 43, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 109, 101, 116, 104, 111, 100, 45, 110, 97, 109, 101 };
+#endif
+        // RemotingMethodIdBytes = MessagePack.Serialize("service-fabric.service-remoting.method-id");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RemotingMethodIdBytes => new byte[] { 217, 41, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 109, 101, 116, 104, 111, 100, 45, 105, 100 };
+#else
+        private static readonly byte[] RemotingMethodIdBytes = new byte[] { 217, 41, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 109, 101, 116, 104, 111, 100, 45, 105, 100 };
+#endif
+        // RemotingInterfaceIdBytes = MessagePack.Serialize("service-fabric.service-remoting.interface-id");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RemotingInterfaceIdBytes => new byte[] { 217, 44, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 105, 110, 116, 101, 114, 102, 97, 99, 101, 45, 105, 100 };
+#else
+        private static readonly byte[] RemotingInterfaceIdBytes = new byte[] { 217, 44, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 105, 110, 116, 101, 114, 102, 97, 99, 101, 45, 105, 100 };
+#endif
+        // RemotingInvocationIdBytes = MessagePack.Serialize("service-fabric.service-remoting.invocation-id");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RemotingInvocationIdBytes => new byte[] { 217, 45, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 105, 110, 118, 111, 99, 97, 116, 105, 111, 110, 45, 105, 100 };
+#else
+        private static readonly byte[] RemotingInvocationIdBytes = new byte[] { 217, 45, 115, 101, 114, 118, 105, 99, 101, 45, 102, 97, 98, 114, 105, 99, 46, 115, 101, 114, 118, 105, 99, 101, 45, 114, 101, 109, 111, 116, 105, 110, 103, 46, 105, 110, 118, 111, 99, 97, 116, 105, 111, 110, 45, 105, 100 };
+#endif
 
         public override string? GetTag(string key)
         {
@@ -51,6 +106,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
                 "service-fabric.node-name" => NodeName,
                 "service-fabric.service-name" => ServiceName,
                 "service-fabric.service-remoting.uri" => RemotingUri,
+                "service-fabric.service-remoting.service" => RemotingServiceName,
                 "service-fabric.service-remoting.method-name" => RemotingMethodName,
                 "service-fabric.service-remoting.method-id" => RemotingMethodId,
                 "service-fabric.service-remoting.interface-id" => RemotingInterfaceId,
@@ -83,6 +139,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
                     break;
                 case "service-fabric.service-remoting.uri": 
                     RemotingUri = value;
+                    break;
+                case "service-fabric.service-remoting.service": 
+                    RemotingServiceName = value;
                     break;
                 case "service-fabric.service-remoting.method-name": 
                     RemotingMethodName = value;
@@ -145,6 +204,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
             if (RemotingUri is not null)
             {
                 processor.Process(new TagItem<string>("service-fabric.service-remoting.uri", RemotingUri, RemotingUriBytes));
+            }
+
+            if (RemotingServiceName is not null)
+            {
+                processor.Process(new TagItem<string>("service-fabric.service-remoting.service", RemotingServiceName, RemotingServiceNameBytes));
             }
 
             if (RemotingMethodName is not null)
@@ -225,6 +289,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
             {
                 sb.Append("service-fabric.service-remoting.uri (tag):")
                   .Append(RemotingUri)
+                  .Append(',');
+            }
+
+            if (RemotingServiceName is not null)
+            {
+                sb.Append("service-fabric.service-remoting.service (tag):")
+                  .Append(RemotingServiceName)
                   .Append(',');
             }
 

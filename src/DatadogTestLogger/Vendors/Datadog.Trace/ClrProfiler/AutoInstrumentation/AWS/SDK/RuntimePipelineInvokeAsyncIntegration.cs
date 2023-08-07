@@ -25,7 +25,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = "AWSSDK.Core",
         TypeName = "Amazon.Runtime.Internal.RuntimePipeline",
         MethodName = "InvokeAsync",
-        ReturnTypeName = ClrNames.GenericParameterTask,
+        ReturnTypeName = ClrNames.GenericTaskWithGenericClassParameter,
         ParameterTypeNames = new[] { "Amazon.Runtime.IExecutionContext" },
         MinimumVersion = "3.0.0",
         MaximumVersion = "3.*.*",

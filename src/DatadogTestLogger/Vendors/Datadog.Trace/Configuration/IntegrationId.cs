@@ -44,6 +44,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         CosmosDb,
         AwsSdk,
         AwsSqs,
+        AwsSns,
         ILogger,
         Aerospike,
         AzureFunctions,
@@ -61,6 +62,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         Process,
         HashAlgorithm,
         SymmetricAlgorithm,
-        OpenTelemetry
+        OpenTelemetry,
+        PathTraversal
     }
 }

@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -694,8 +695,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
         internal void FinalizeSnapshot(string methodName, string typeFullName, string probeFilePath)
         {
             var activeScope = Tracer.Instance.InternalActiveScope;
-            var traceId = activeScope?.Span?.TraceId.ToString();
-            var spanId = activeScope?.Span?.SpanId.ToString();
+
+            // TODO: support 128-bit trace ids?
+            var traceId = activeScope?.Span.TraceId128.Lower.ToString(CultureInfo.InvariantCulture);
+            var spanId = activeScope?.Span.SpanId.ToString(CultureInfo.InvariantCulture);
 
             AddStackInfo()
             .EndSnapshot()
@@ -858,7 +861,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
 
         public DebuggerSnapshotCreator AddMessage()
         {
-            _message ??= GenerateDefaultMessage();
             _jsonWriter.WritePropertyName("message");
             _jsonWriter.WriteValue(_message);
             return this;
@@ -868,15 +870,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Snapshots
         {
             _jsonWriter.WriteEndObject();
             return this;
-        }
-
-        private string GenerateDefaultMessage()
-        {
-            _jsonUnderlyingString.Append("}");
-            var snapshotObject = JsonConvert.DeserializeObject<Snapshot>(_jsonUnderlyingString.ToString());
-            _jsonUnderlyingString.Remove(_jsonUnderlyingString.Length - 1, 1);
-            var message = SnapshotSummary.FormatMessage(snapshotObject);
-            return message;
         }
 
         internal string GetSnapshotJson()

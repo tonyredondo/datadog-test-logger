@@ -11,18 +11,23 @@
 #nullable enable
 
 using System.Collections.Generic;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema
 {
     internal class MessagingSchema
     {
         private readonly SchemaVersion _version;
+        private readonly bool _peerServiceTagsEnabled;
+        private readonly bool _removeClientServiceNamesEnabled;
         private readonly string _defaultServiceName;
-        private readonly IDictionary<string, string>? _serviceNameMappings;
+        private readonly IReadOnlyDictionary<string, string>? _serviceNameMappings;
 
-        public MessagingSchema(SchemaVersion version, string defaultServiceName, IDictionary<string, string>? serviceNameMappings)
+        public MessagingSchema(SchemaVersion version, bool peerServiceTagsEnabled, bool removeClientServiceNamesEnabled, string defaultServiceName, IReadOnlyDictionary<string, string>? serviceNameMappings)
         {
             _version = version;
+            _peerServiceTagsEnabled = peerServiceTagsEnabled;
+            _removeClientServiceNamesEnabled = removeClientServiceNamesEnabled;
             _defaultServiceName = defaultServiceName;
             _serviceNameMappings = serviceNameMappings;
         }
@@ -34,7 +39,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema
                 _ => $"{messagingSystem}.process",
             };
 
-        public string GetInboundServiceName(string messagingSystem)
+        public string GetServiceName(string messagingSystem)
         {
             if (_serviceNameMappings is not null && _serviceNameMappings.TryGetValue(messagingSystem, out var mappedServiceName))
             {
@@ -43,10 +48,17 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema
 
             return _version switch
             {
-                SchemaVersion.V0 => $"{_defaultServiceName}-{messagingSystem}",
+                SchemaVersion.V0 when !_removeClientServiceNamesEnabled => $"{_defaultServiceName}-{messagingSystem}",
                 _ => _defaultServiceName,
             };
         }
+
+        public string GetOutboundCommandOperationName(string messagingSystem)
+            => _version switch
+            {
+                SchemaVersion.V0 => $"{messagingSystem}.command",
+                _ => $"{messagingSystem}.send",
+            };
 
         public string GetOutboundOperationName(string messagingSystem)
             => _version switch
@@ -55,18 +67,37 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema
                 _ => $"{messagingSystem}.send",
             };
 
-        public string GetOutboundServiceName(string messagingSystem)
-        {
-            if (_serviceNameMappings is not null && _serviceNameMappings.TryGetValue(messagingSystem, out var mappedServiceName))
+        public KafkaTags CreateKafkaTags(string spanKind)
+            => _version switch
             {
-                return mappedServiceName;
-            }
-
-            return _version switch
-            {
-                SchemaVersion.V0 => $"{_defaultServiceName}-{messagingSystem}",
-                _ => _defaultServiceName,
+                SchemaVersion.V0 when !_peerServiceTagsEnabled => new KafkaTags(spanKind),
+                _ => new KafkaV1Tags(spanKind),
             };
-        }
+
+        public MsmqTags CreateMsmqTags(string spanKind)
+            => _version switch
+            {
+                SchemaVersion.V0 when !_peerServiceTagsEnabled => new MsmqTags(spanKind),
+                _ => new MsmqV1Tags(spanKind),
+            };
+
+        public AwsSqsTags CreateAwsSqsTags(string spanKind) => _version switch
+        {
+            SchemaVersion.V0 when !_peerServiceTagsEnabled => new AwsSqsTags(),
+            _ => new AwsSqsV1Tags(spanKind),
+        };
+
+        public AwsSnsTags CreateAwsSnsTags(string spanKind) => _version switch
+        {
+            SchemaVersion.V0 when !_peerServiceTagsEnabled => new AwsSnsTags(),
+            _ => new AwsSnsV1Tags(spanKind),
+        };
+
+        public RabbitMQTags CreateRabbitMqTags(string spanKind)
+            => _version switch
+            {
+                SchemaVersion.V0 when !_peerServiceTagsEnabled => new RabbitMQTags(spanKind),
+                _ => new RabbitMQV1Tags(spanKind),
+            };
     }
 }

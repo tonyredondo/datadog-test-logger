@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
+#pragma warning disable SA1402 // File must contain single type
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     internal partial class MsmqTags : InstrumentationTags
@@ -35,6 +36,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
         [Tag(Trace.Tags.InstrumentationName)]
         public string InstrumentationName => "msmq";
 
+        [Tag(Trace.Tags.OutHost)]
+        public string Host { get; set; }
+
         [Tag(Trace.Tags.MsmqQueuePath)]
         public string Path { get; set; }
 
@@ -43,5 +47,50 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 
         [Tag(Trace.Tags.MsmqIsTransactionalQueue)]
         public string IsTransactionalQueue { get; set; }
+    }
+
+    internal partial class MsmqV1Tags : MsmqTags
+    {
+        private string _peerServiceOverride = null;
+
+        // For the sake of unit tests, define a default constructor
+        // though the Kafka integration should use the constructor that takes a spanKind
+        // so the setter is only invoked once
+        [Obsolete("Use constructor that takes a SpanKind")]
+        public MsmqV1Tags()
+        {
+        }
+
+        public MsmqV1Tags(string spanKind)
+            : base(spanKind)
+        {
+        }
+
+        // Use a private setter for setting the "peer.service" tag so we avoid
+        // accidentally setting the value ourselves and instead calculate the
+        // value from predefined precursor attributes.
+        // However, this can still be set from ITags.SetTag so the user can
+        // customize the value if they wish.
+        [Tag(Trace.Tags.PeerService)]
+        public string PeerService
+        {
+            get => _peerServiceOverride ?? (SpanKind.Equals(SpanKinds.Client) || SpanKind.Equals(SpanKinds.Producer) ?
+                                                Host
+                                                : null);
+            private set => _peerServiceOverride = value;
+        }
+
+        [Tag(Trace.Tags.PeerServiceSource)]
+        public string PeerServiceSource
+        {
+            get
+            {
+                return _peerServiceOverride is not null
+                           ? Tags.PeerService
+                           : SpanKind.Equals(SpanKinds.Client) || SpanKind.Equals(SpanKinds.Producer)
+                               ? Tags.OutHost
+                               : null;
+            }
+        }
     }
 }

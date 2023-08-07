@@ -78,7 +78,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ServiceFabric
 
             try
             {
-                var span = ServiceRemotingHelpers.CreateSpan(tracer, spanContext, SpanKinds.Server, eventArgs, messageHeaders);
+                var tags = new ServiceRemotingServerTags();
+                var span = ServiceRemotingHelpers.CreateSpan(tracer, spanContext, tags, eventArgs, messageHeaders);
                 tracer.ActivateSpan(span);
             }
             catch (Exception ex)

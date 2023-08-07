@@ -12,6 +12,7 @@ using System.Linq;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 
+#pragma warning disable SA1402 // File must contain single type
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     internal partial class CouchbaseTags : InstrumentationTags
@@ -21,6 +22,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 
         [Tag(Trace.Tags.InstrumentationName)]
         public string InstrumentationName => nameof(IntegrationId.Couchbase);
+
+        [Tag(Trace.Tags.CouchbaseSeedNodes)]
+        public string SeedNodes { get; set; }
 
         [Tag(Trace.Tags.CouchbaseOperationCode)]
         public string OperationCode { get; set; }
@@ -36,5 +40,35 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 
         [Tag(Trace.Tags.OutPort)]
         public string Port { get; set; }
+    }
+
+    internal partial class CouchbaseV1Tags : CouchbaseTags
+    {
+        private string _peerServiceOverride = null;
+
+        // Use a private setter for setting the "peer.service" tag so we avoid
+        // accidentally setting the value ourselves and instead calculate the
+        // value from predefined precursor attributes.
+        // However, this can still be set from ITags.SetTag so the user can
+        // customize the value if they wish.
+        [Tag(Trace.Tags.PeerService)]
+        public string PeerService
+        {
+            get => _peerServiceOverride ?? SeedNodes ?? Host;
+            private set => _peerServiceOverride = value;
+        }
+
+        [Tag(Trace.Tags.PeerServiceSource)]
+        public string PeerServiceSource
+        {
+            get
+            {
+                return _peerServiceOverride is not null
+                        ? "peer.service"
+                        : SeedNodes is not null
+                            ? Trace.Tags.CouchbaseSeedNodes
+                            : Trace.Tags.OutHost;
+            }
+        }
     }
 }

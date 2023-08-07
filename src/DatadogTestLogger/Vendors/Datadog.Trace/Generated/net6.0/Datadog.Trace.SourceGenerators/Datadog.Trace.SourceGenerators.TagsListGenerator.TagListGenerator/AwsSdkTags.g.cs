@@ -9,29 +9,78 @@
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using System;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     partial class AwsSdkTags
     {
-        // InstrumentationNameBytes = System.Text.Encoding.UTF8.GetBytes("component");
-        private static readonly byte[] InstrumentationNameBytes = new byte[] { 99, 111, 109, 112, 111, 110, 101, 110, 116 };
-        // AgentNameBytes = System.Text.Encoding.UTF8.GetBytes("aws.agent");
-        private static readonly byte[] AgentNameBytes = new byte[] { 97, 119, 115, 46, 97, 103, 101, 110, 116 };
-        // OperationBytes = System.Text.Encoding.UTF8.GetBytes("aws.operation");
-        private static readonly byte[] OperationBytes = new byte[] { 97, 119, 115, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110 };
-        // RegionBytes = System.Text.Encoding.UTF8.GetBytes("aws.region");
-        private static readonly byte[] RegionBytes = new byte[] { 97, 119, 115, 46, 114, 101, 103, 105, 111, 110 };
-        // RequestIdBytes = System.Text.Encoding.UTF8.GetBytes("aws.requestId");
-        private static readonly byte[] RequestIdBytes = new byte[] { 97, 119, 115, 46, 114, 101, 113, 117, 101, 115, 116, 73, 100 };
-        // ServiceBytes = System.Text.Encoding.UTF8.GetBytes("aws.service");
-        private static readonly byte[] ServiceBytes = new byte[] { 97, 119, 115, 46, 115, 101, 114, 118, 105, 99, 101 };
-        // HttpMethodBytes = System.Text.Encoding.UTF8.GetBytes("http.method");
-        private static readonly byte[] HttpMethodBytes = new byte[] { 104, 116, 116, 112, 46, 109, 101, 116, 104, 111, 100 };
-        // HttpUrlBytes = System.Text.Encoding.UTF8.GetBytes("http.url");
-        private static readonly byte[] HttpUrlBytes = new byte[] { 104, 116, 116, 112, 46, 117, 114, 108 };
-        // HttpStatusCodeBytes = System.Text.Encoding.UTF8.GetBytes("http.status_code");
-        private static readonly byte[] HttpStatusCodeBytes = new byte[] { 104, 116, 116, 112, 46, 115, 116, 97, 116, 117, 115, 95, 99, 111, 100, 101 };
+        // InstrumentationNameBytes = MessagePack.Serialize("component");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> InstrumentationNameBytes => new byte[] { 169, 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+#else
+        private static readonly byte[] InstrumentationNameBytes = new byte[] { 169, 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+#endif
+        // AgentNameBytes = MessagePack.Serialize("aws.agent");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> AgentNameBytes => new byte[] { 169, 97, 119, 115, 46, 97, 103, 101, 110, 116 };
+#else
+        private static readonly byte[] AgentNameBytes = new byte[] { 169, 97, 119, 115, 46, 97, 103, 101, 110, 116 };
+#endif
+        // OperationBytes = MessagePack.Serialize("aws.operation");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> OperationBytes => new byte[] { 173, 97, 119, 115, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110 };
+#else
+        private static readonly byte[] OperationBytes = new byte[] { 173, 97, 119, 115, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110 };
+#endif
+        // AwsRegionBytes = MessagePack.Serialize("aws.region");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> AwsRegionBytes => new byte[] { 170, 97, 119, 115, 46, 114, 101, 103, 105, 111, 110 };
+#else
+        private static readonly byte[] AwsRegionBytes = new byte[] { 170, 97, 119, 115, 46, 114, 101, 103, 105, 111, 110 };
+#endif
+        // RegionBytes = MessagePack.Serialize("region");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RegionBytes => new byte[] { 166, 114, 101, 103, 105, 111, 110 };
+#else
+        private static readonly byte[] RegionBytes = new byte[] { 166, 114, 101, 103, 105, 111, 110 };
+#endif
+        // RequestIdBytes = MessagePack.Serialize("aws.requestId");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> RequestIdBytes => new byte[] { 173, 97, 119, 115, 46, 114, 101, 113, 117, 101, 115, 116, 73, 100 };
+#else
+        private static readonly byte[] RequestIdBytes = new byte[] { 173, 97, 119, 115, 46, 114, 101, 113, 117, 101, 115, 116, 73, 100 };
+#endif
+        // AwsServiceBytes = MessagePack.Serialize("aws.service");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> AwsServiceBytes => new byte[] { 171, 97, 119, 115, 46, 115, 101, 114, 118, 105, 99, 101 };
+#else
+        private static readonly byte[] AwsServiceBytes = new byte[] { 171, 97, 119, 115, 46, 115, 101, 114, 118, 105, 99, 101 };
+#endif
+        // ServiceBytes = MessagePack.Serialize("aws_service");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> ServiceBytes => new byte[] { 171, 97, 119, 115, 95, 115, 101, 114, 118, 105, 99, 101 };
+#else
+        private static readonly byte[] ServiceBytes = new byte[] { 171, 97, 119, 115, 95, 115, 101, 114, 118, 105, 99, 101 };
+#endif
+        // HttpMethodBytes = MessagePack.Serialize("http.method");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> HttpMethodBytes => new byte[] { 171, 104, 116, 116, 112, 46, 109, 101, 116, 104, 111, 100 };
+#else
+        private static readonly byte[] HttpMethodBytes = new byte[] { 171, 104, 116, 116, 112, 46, 109, 101, 116, 104, 111, 100 };
+#endif
+        // HttpUrlBytes = MessagePack.Serialize("http.url");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> HttpUrlBytes => new byte[] { 168, 104, 116, 116, 112, 46, 117, 114, 108 };
+#else
+        private static readonly byte[] HttpUrlBytes = new byte[] { 168, 104, 116, 116, 112, 46, 117, 114, 108 };
+#endif
+        // HttpStatusCodeBytes = MessagePack.Serialize("http.status_code");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> HttpStatusCodeBytes => new byte[] { 176, 104, 116, 116, 112, 46, 115, 116, 97, 116, 117, 115, 95, 99, 111, 100, 101 };
+#else
+        private static readonly byte[] HttpStatusCodeBytes = new byte[] { 176, 104, 116, 116, 112, 46, 115, 116, 97, 116, 117, 115, 95, 99, 111, 100, 101 };
+#endif
 
         public override string? GetTag(string key)
         {
@@ -40,9 +89,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 "component" => InstrumentationName,
                 "aws.agent" => AgentName,
                 "aws.operation" => Operation,
-                "aws.region" => Region,
+                "aws.region" => AwsRegion,
+                "region" => Region,
                 "aws.requestId" => RequestId,
-                "aws.service" => Service,
+                "aws.service" => AwsService,
+                "aws_service" => Service,
                 "http.method" => HttpMethod,
                 "http.url" => HttpUrl,
                 "http.status_code" => HttpStatusCode,
@@ -57,13 +108,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 case "aws.operation": 
                     Operation = value;
                     break;
-                case "aws.region": 
+                case "region": 
                     Region = value;
                     break;
                 case "aws.requestId": 
                     RequestId = value;
                     break;
-                case "aws.service": 
+                case "aws_service": 
                     Service = value;
                     break;
                 case "http.method": 
@@ -77,6 +128,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                     break;
                 case "component": 
                 case "aws.agent": 
+                case "aws.region": 
+                case "aws.service": 
                     Logger.Value.Warning("Attempted to set readonly tag {TagName} on {TagType}. Ignoring.", key, nameof(AwsSdkTags));
                     break;
                 default: 
@@ -102,9 +155,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 processor.Process(new TagItem<string>("aws.operation", Operation, OperationBytes));
             }
 
+            if (AwsRegion is not null)
+            {
+                processor.Process(new TagItem<string>("aws.region", AwsRegion, AwsRegionBytes));
+            }
+
             if (Region is not null)
             {
-                processor.Process(new TagItem<string>("aws.region", Region, RegionBytes));
+                processor.Process(new TagItem<string>("region", Region, RegionBytes));
             }
 
             if (RequestId is not null)
@@ -112,9 +170,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                 processor.Process(new TagItem<string>("aws.requestId", RequestId, RequestIdBytes));
             }
 
+            if (AwsService is not null)
+            {
+                processor.Process(new TagItem<string>("aws.service", AwsService, AwsServiceBytes));
+            }
+
             if (Service is not null)
             {
-                processor.Process(new TagItem<string>("aws.service", Service, ServiceBytes));
+                processor.Process(new TagItem<string>("aws_service", Service, ServiceBytes));
             }
 
             if (HttpMethod is not null)
@@ -158,9 +221,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                   .Append(',');
             }
 
-            if (Region is not null)
+            if (AwsRegion is not null)
             {
                 sb.Append("aws.region (tag):")
+                  .Append(AwsRegion)
+                  .Append(',');
+            }
+
+            if (Region is not null)
+            {
+                sb.Append("region (tag):")
                   .Append(Region)
                   .Append(',');
             }
@@ -172,9 +242,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
                   .Append(',');
             }
 
-            if (Service is not null)
+            if (AwsService is not null)
             {
                 sb.Append("aws.service (tag):")
+                  .Append(AwsService)
+                  .Append(',');
+            }
+
+            if (Service is not null)
+            {
+                sb.Append("aws_service (tag):")
                   .Append(Service)
                   .Append(',');
             }

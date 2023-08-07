@@ -20,6 +20,11 @@
 namespace System.Runtime.CompilerServices;
 
 #if !NET5_0_OR_GREATER
+
+internal static class IsExternalInit
+{
+}
+
 /// <summary>
 /// Used to indicate to the compiler that the <c>.locals init</c>
 /// flag should not be set in method headers.
@@ -47,4 +52,5 @@ namespace System.Runtime.CompilerServices;
 internal sealed class SkipLocalsInitAttribute : Attribute
 {
 }
+
 #endif

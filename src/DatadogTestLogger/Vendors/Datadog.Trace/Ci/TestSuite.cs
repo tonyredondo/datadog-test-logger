@@ -13,6 +13,8 @@ using System;
 using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
@@ -35,6 +37,7 @@ internal sealed class TestSuite
             string.IsNullOrEmpty(module.Framework) ? "test_suite" : $"{module.Framework!.ToLowerInvariant()}.test_suite",
             tags: tags,
             startTime: startDate);
+        TelemetryFactory.Metrics.RecordCountSpanCreated(MetricTags.IntegrationName.CiAppManual);
 
         span.Type = SpanTypes.TestSuite;
         span.ResourceName = name;
@@ -149,7 +152,7 @@ internal sealed class TestSuite
         var span = _span;
 
         // Calculate duration beforehand
-        duration ??= span.Context.TraceContext.ElapsedSince(span.StartTime);
+        duration ??= span.Context.TraceContext.Clock.ElapsedSince(span.StartTime);
 
         // Update status
         if (Tags.Status is { } status)
@@ -162,6 +165,11 @@ internal sealed class TestSuite
         else
         {
             Tags.Status = TestTags.StatusPass;
+        }
+
+        if (Tags.IntelligentTestRunnerSkippingCount is { } itrSkippingCount)
+        {
+            Module.Tags.AddIntelligentTestRunnerSkippingCount((int)itrSkippingCount);
         }
 
         span.Finish(duration.Value);

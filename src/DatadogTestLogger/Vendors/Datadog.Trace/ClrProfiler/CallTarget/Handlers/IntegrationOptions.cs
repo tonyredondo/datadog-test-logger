@@ -14,6 +14,8 @@ using System.Runtime.CompilerServices;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handlers
 {
@@ -37,9 +39,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handler
             if (exception is DuckTypeException or TargetInvocationException { InnerException: DuckTypeException })
             {
                 Log.Warning("DuckTypeException has been detected, the integration <{TIntegration}, {TTarget}> will be disabled.", typeof(TIntegration), typeof(TTarget));
-                if (_integrationId.Value is not null)
+                if (_integrationId.Value is { } integrationId)
                 {
-                    Tracer.Instance.TracerManager.Telemetry.IntegrationDisabledDueToError(_integrationId.Value.Value, nameof(DuckTypeException));
+                    TelemetryFactory.Metrics.RecordCountIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.DuckTyping);
+                    Tracer.Instance.TracerManager.Telemetry.IntegrationDisabledDueToError(integrationId, nameof(DuckTypeException));
                 }
 
                 _disableIntegration = true;
@@ -47,12 +50,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handler
             else if (exception is CallTargetInvokerException)
             {
                 Log.Warning("CallTargetInvokerException has been detected, the integration <{TIntegration}, {TTarget}> will be disabled.", typeof(TIntegration), typeof(TTarget));
-                if (_integrationId.Value is not null)
+                if (_integrationId.Value is { } integrationId)
                 {
-                    Tracer.Instance.TracerManager.Telemetry.IntegrationDisabledDueToError(_integrationId.Value.Value, nameof(CallTargetInvokerException));
+                    TelemetryFactory.Metrics.RecordCountIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.Invoker);
+                    Tracer.Instance.TracerManager.Telemetry.IntegrationDisabledDueToError(integrationId, nameof(CallTargetInvokerException));
                 }
 
                 _disableIntegration = true;
+            }
+            else
+            {
+                if (_integrationId.Value is { } integrationId)
+                {
+                    TelemetryFactory.Metrics.RecordCountIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.Execution);
+                }
             }
         }
 

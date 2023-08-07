@@ -12,6 +12,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Core;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog.Events;
@@ -32,12 +33,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Logging
 
             try
             {
-                if (GlobalSettings.Instance.DebugEnabled)
+                if (GlobalSettings.Instance.DebugEnabledInternal)
                 {
                     LoggingLevelSwitch.MinimumLevel = LogEventLevel.Debug;
                 }
 
-                var config = DatadogLoggingFactory.GetConfiguration(GlobalConfigurationSource.Instance);
+                var config = DatadogLoggingFactory.GetConfiguration(GlobalConfigurationSource.Instance, TelemetryFactory.Config);
 
                 if (config.File is { LogFileRetentionDays: > 0 } fileConfig)
                 {

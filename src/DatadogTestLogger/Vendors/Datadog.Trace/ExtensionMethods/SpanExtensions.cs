@@ -13,11 +13,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Headers;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Propagators;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
+using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
-using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
 {
@@ -26,6 +29,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
     /// </summary>
     internal static class SpanExtensions
     {
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SpanExtensions));
+
         /// <summary>
         /// Sets the sampling priority for the trace that contains the specified <see cref="ISpan"/>.
         /// </summary>
@@ -34,8 +39,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
         /// <remarks>
         /// This public extension method is meant for external users only. Internal Datadog calls should
         /// use the methods on <see cref="TraceContext"/> instead.</remarks>
+        [PublicApi]
         public static void SetTraceSamplingPriority(this ISpan span, SamplingPriority samplingPriority)
         {
+            TelemetryFactory.Metrics.Record(PublicApiUsage.SpanExtensions_SetTraceSamplingPriority);
             if (span == null) { ThrowHelper.ThrowArgumentNullException(nameof(span)); }
 
             if (span.Context is SpanContext { TraceContext: { } traceContext })
@@ -51,8 +58,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
             string host,
             string httpUrl,
             string userAgent,
-            WebTags tags,
-            IEnumerable<KeyValuePair<string, string>> tagsFromHeaders)
+            WebTags tags)
         {
             span.Type = SpanTypes.Web;
             span.ResourceName = resourceName?.Trim();
@@ -64,11 +70,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
                 tags.HttpUrl = httpUrl;
                 tags.HttpUserAgent = userAgent;
             }
-
-            foreach (var kvp in tagsFromHeaders)
-            {
-                span.SetTag(kvp.Key, kvp.Value);
-            }
         }
 
         internal static void SetHeaderTags<T>(this ISpan span, T headers, IReadOnlyDictionary<string, string> headerTags, string defaultTagPrefix)
@@ -78,11 +79,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
             {
                 try
                 {
-                    var tagsFromHeaders = SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerTags, defaultTagPrefix);
-                    foreach (KeyValuePair<string, string> kvp in tagsFromHeaders)
-                    {
-                        span.SetTag(kvp.Key, kvp.Value);
-                    }
+                    SpanContextPropagator.Instance.AddHeadersToSpanAsTags(span, headers, headerTags, defaultTagPrefix);
                 }
                 catch (Exception ex)
                 {

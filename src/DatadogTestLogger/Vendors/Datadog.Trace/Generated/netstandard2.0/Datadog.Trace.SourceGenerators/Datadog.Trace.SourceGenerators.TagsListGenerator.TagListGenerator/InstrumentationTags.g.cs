@@ -9,13 +9,18 @@
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Processors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+using System;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Tagging
 {
     partial class InstrumentationTags
     {
-        // AnalyticsSampleRateBytes = System.Text.Encoding.UTF8.GetBytes("_dd1.sr.eausr");
-        private static readonly byte[] AnalyticsSampleRateBytes = new byte[] { 95, 100, 100, 49, 46, 115, 114, 46, 101, 97, 117, 115, 114 };
+        // AnalyticsSampleRateBytes = MessagePack.Serialize("_dd1.sr.eausr");
+#if NETCOREAPP
+        private static ReadOnlySpan<byte> AnalyticsSampleRateBytes => new byte[] { 173, 95, 100, 100, 49, 46, 115, 114, 46, 101, 97, 117, 115, 114 };
+#else
+        private static readonly byte[] AnalyticsSampleRateBytes = new byte[] { 173, 95, 100, 100, 49, 46, 115, 114, 46, 101, 97, 117, 115, 114 };
+#endif
 
         public override double? GetMetric(string key)
         {

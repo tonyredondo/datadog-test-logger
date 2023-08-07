@@ -10,6 +10,7 @@
 
 using System.ComponentModel;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
@@ -26,7 +27,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     MinimumVersion = "3.0.0",
     MaximumVersion = "3.*.*",
     IntegrationName = NUnitIntegration.IntegrationName,
-    CallTargetIntegrationType = IntegrationType.Derived)]
+    CallTargetIntegrationKind = CallTargetKind.Derived)]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 internal static class NUnitWorkItemPerformWorkIntegration
@@ -58,7 +59,7 @@ internal static class NUnitWorkItemPerformWorkIntegration
                     var testMethod = item.Method.MethodInfo;
                     Common.Log.Debug("ITR: Test skipped: {Class}.{Name}", testMethod.DeclaringType?.FullName, testMethod.Name);
                     item.RunState = RunState.Ignored;
-                    item.Properties.Set(NUnitIntegration.SkipReasonKey, "Skipped by the Intelligent Test Runner");
+                    item.Properties.Set(NUnitIntegration.SkipReasonKey, IntelligentTestRunnerTags.SkippedByReason);
                     break;
             }
         }

@@ -33,10 +33,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http
             if (queryStringManager != null)
             {
                 queryString = queryStringManager.TruncateAndObfuscate(queryString);
-                return $"{scheme}://{(string.IsNullOrEmpty(host) ? NoHostSpecified : host)}{(port.HasValue ? $":{port}" : string.Empty)}{pathBase}{path}{queryString}";
+                return $"{scheme}://{GetNormalizedHost(host)}{(port.HasValue ? $":{port}" : string.Empty)}{pathBase}{path}{queryString}";
             }
 
-            return $"{scheme}://{(string.IsNullOrEmpty(host) ? NoHostSpecified : host)}{(port.HasValue ? $":{port}" : string.Empty)}{pathBase}{path}";
+            return $"{scheme}://{GetNormalizedHost(host)}{(port.HasValue ? $":{port}" : string.Empty)}{pathBase}{path}";
         }
+
+        internal static string GetNormalizedHost(string host) => string.IsNullOrEmpty(host) ? NoHostSpecified : host;
     }
 }

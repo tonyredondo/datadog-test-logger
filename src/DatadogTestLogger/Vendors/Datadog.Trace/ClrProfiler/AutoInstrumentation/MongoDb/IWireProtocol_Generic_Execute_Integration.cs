@@ -26,7 +26,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         MaximumVersion = MongoDbIntegration.Major2,
         MethodName = "Execute",
         ParameterTypeNames = new[] { "MongoDB.Driver.Core.Connections.IConnection", ClrNames.CancellationToken },
-        ReturnTypeName = "T",
+        ReturnTypeName = "!0",
         TypeNames = new[]
         {
             "MongoDB.Driver.Core.WireProtocol.CommandUsingQueryMessageWireProtocol`1",

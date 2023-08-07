@@ -27,7 +27,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
         /// <summary>
         /// Gets a disabled state
         /// </summary>
-        private static readonly AsyncMethodDebuggerState _disabledState = new() { IsActive = false };
+        internal static readonly AsyncMethodDebuggerState[] DisabledStates = { new() { IsActive = false } };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AsyncMethodDebuggerState"/> class.
@@ -115,9 +115,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Instrumentation
         /// </summary>
         /// <returns>Invalid live debugger state</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static AsyncMethodDebuggerState[] CreateInvalidatedDebuggerStates()
+        {
+            return DisabledStates;
+        }
+
+        /// <summary>
+        /// Gets invalid live debugger state
+        /// </summary>
+        /// <returns>Invalid live debugger state</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AsyncMethodDebuggerState CreateInvalidatedDebuggerState()
         {
-            return _disabledState;
+            return DisabledStates[0];
         }
 
         /// <summary>

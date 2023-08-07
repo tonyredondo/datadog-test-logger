@@ -39,12 +39,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 return null;
             }
 
-            string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
+            string serviceName = tracer.CurrentTraceSettings.Schema.Database.GetServiceName(ServiceName);
             Scope scope = null;
 
             try
             {
-                var tags = new RedisTags();
+                var tags = tracer.CurrentTraceSettings.Schema.Database.CreateRedisTags();
                 tags.InstrumentationName = integrationName;
 
                 scope = tracer.StartActiveInternal(OperationName, serviceName: serviceName, tags: tags);
@@ -72,6 +72,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 }
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);
+                tracer.CurrentTraceSettings.Schema.RemapPeerService(tags);
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(integrationId);
             }
             catch (Exception ex)

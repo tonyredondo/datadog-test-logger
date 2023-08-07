@@ -15,6 +15,8 @@ using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Formatting;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission.Sink;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmission
 {
@@ -23,19 +25,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     /// </summary>
     internal class DirectSubmissionNLogTarget
     {
-        private readonly IDatadogSink _sink;
+        private readonly IDirectSubmissionLogSink _sink;
         private readonly int _minimumLevel;
         private readonly LogFormatter? _formatter;
         private ITargetWithContextBaseProxy? _baseProxy;
 
-        internal DirectSubmissionNLogTarget(IDatadogSink sink, DirectSubmissionLogLevel minimumLevel)
+        internal DirectSubmissionNLogTarget(IDirectSubmissionLogSink sink, DirectSubmissionLogLevel minimumLevel)
             : this(sink, minimumLevel, formatter: null)
         {
         }
 
         // internal for testing
         internal DirectSubmissionNLogTarget(
-            IDatadogSink sink,
+            IDirectSubmissionLogSink sink,
             DirectSubmissionLogLevel minimumLevel,
             LogFormatter? formatter)
         {
@@ -72,7 +74,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             var logFormatter = _formatter ?? TracerManager.Instance.DirectLogSubmission.Formatter;
             var serializedLog = NLogLogFormatter.FormatLogEvent(logFormatter, logEvent);
 
-            _sink.EnqueueLog(new NLogDatadogLogEvent(serializedLog));
+            TelemetryFactory.Metrics.RecordCountDirectLogLogs(MetricTags.IntegrationName.NLog);
+            _sink.EnqueueLog(new NLogDirectSubmissionLogEvent(serializedLog));
         }
 
         internal void SetBaseProxy(ITargetWithContextBaseProxy baseProxy)

@@ -27,19 +27,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     {
         private readonly Func<string, DirectSubmissionLogger> _createLoggerFunc;
         private readonly ConcurrentDictionary<string, DirectSubmissionLogger> _loggers = new();
-        private readonly IDatadogSink _sink;
+        private readonly IDirectSubmissionLogSink _sink;
         private readonly LogFormatter? _formatter;
         private readonly DirectSubmissionLogLevel _minimumLogLevel;
         private IExternalScopeProvider? _scopeProvider;
 
-        internal DirectSubmissionLoggerProvider(IDatadogSink sink, DirectSubmissionLogLevel minimumLogLevel, IExternalScopeProvider? scopeProvider)
+        internal DirectSubmissionLoggerProvider(IDirectSubmissionLogSink sink, DirectSubmissionLogLevel minimumLogLevel, IExternalScopeProvider? scopeProvider)
             : this(sink, formatter: null, minimumLogLevel, scopeProvider)
         {
         }
 
         // used for testing
         internal DirectSubmissionLoggerProvider(
-            IDatadogSink sink,
+            IDirectSubmissionLogSink sink,
             LogFormatter? formatter,
             DirectSubmissionLogLevel minimumLogLevel,
             IExternalScopeProvider? scopeProvider)

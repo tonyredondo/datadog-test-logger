@@ -25,7 +25,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<TelemetryController>();
         private readonly ConfigurationTelemetryCollector _configuration;
-        private readonly DependencyTelemetryCollector _dependencies;
+        private readonly IDependencyTelemetryCollector _dependencies;
         private readonly IntegrationTelemetryCollector _integrations;
         private readonly TelemetryDataBuilder _dataBuilder = new();
         private readonly TelemetryTransportManager _transportManager;
@@ -39,7 +39,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
 
         internal TelemetryController(
             ConfigurationTelemetryCollector configuration,
-            DependencyTelemetryCollector dependencies,
+            IDependencyTelemetryCollector dependencies,
             IntegrationTelemetryCollector integrations,
             TelemetryTransportManager transportManager,
             TimeSpan flushInterval,
@@ -84,6 +84,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry
         public void Start()
         {
             _tracerInitialized.TrySetResult(true);
+        }
+
+        public void ProductChanged(TelemetryProductType product, bool enabled, ErrorData? error)
+        {
+            // Not implemented in V1 of telemetry
         }
 
         public void RecordSecuritySettings(SecuritySettings settings)

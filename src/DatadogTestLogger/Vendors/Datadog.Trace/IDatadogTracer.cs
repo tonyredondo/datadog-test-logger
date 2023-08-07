@@ -10,7 +10,6 @@
 
 using System;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
-using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
@@ -22,11 +21,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
     {
         string DefaultServiceName { get; }
 
-        ITraceSampler Sampler { get; }
-
         IGitMetadataTagsProvider GitMetadataTagsProvider { get; }
 
         ImmutableTracerSettings Settings { get; }
+
+        PerTraceSettings PerTraceSettings { get; }
 
         void Write(ArraySegment<Span> span);
     }

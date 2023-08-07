@@ -20,7 +20,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     MaximumVersion = "6.*.*",
     IntegrationName = nameof(IntegrationId.MySql),
     DataReaderType = "MySql.Data.MySqlClient.MySqlDataReader",
-    DataReaderTaskType = "System.Threading.Tasks.Task`1<MySql.Data.MySqlClient.MySqlDataReader>",
+    DataReaderTaskType = "System.Threading.Tasks.Task`1[MySql.Data.MySqlClient.MySqlDataReader]",
     TargetMethodAttributes = new[]
     {
         // int MySql.Data.MySqlClient.MySqlCommand.ExecuteNonQuery()
@@ -42,7 +42,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     MaximumVersion = "8.*.*",
     IntegrationName = nameof(IntegrationId.MySql),
     DataReaderType = "MySql.Data.MySqlClient.MySqlDataReader",
-    DataReaderTaskType = "System.Threading.Tasks.Task`1<MySql.Data.MySqlClient.MySqlDataReader>",
+    DataReaderTaskType = "System.Threading.Tasks.Task`1[MySql.Data.MySqlClient.MySqlDataReader]",
     TargetMethodAttributes = new[]
     {
         // int MySql.Data.MySqlClient.MySqlCommand.ExecuteNonQueryAsync(CancellationToken)
@@ -74,7 +74,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     MaximumVersion = "2.*.*",
     IntegrationName = nameof(IntegrationId.MySql),
     DataReaderType = "MySqlConnector.MySqlDataReader",
-    DataReaderTaskType = "System.Threading.Tasks.Task`1<MySqlConnector.MySqlDataReader>",
+    DataReaderTaskType = "System.Threading.Tasks.Task`1[MySqlConnector.MySqlDataReader]",
     TargetMethodAttributes = new[]
     {
         // Task<int> MySqlConnector.MySqlCommand.ExecuteNonQueryAsync(CancellationToken)
@@ -106,7 +106,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     MaximumVersion = "0.*.*",
     IntegrationName = nameof(IntegrationId.MySql),
     DataReaderType = "MySql.Data.MySqlClient.MySqlDataReader",
-    DataReaderTaskType = "System.Threading.Tasks.Task`1<MySql.Data.MySqlClient.MySqlDataReader>",
+    DataReaderTaskType = "System.Threading.Tasks.Task`1[MySql.Data.MySqlClient.MySqlDataReader]",
     TargetMethodAttributes = new[]
     {
         // Task<int> MySql.Data.MySqlClient.MySqlCommand.ExecuteNonQueryAsync(CancellationToken)

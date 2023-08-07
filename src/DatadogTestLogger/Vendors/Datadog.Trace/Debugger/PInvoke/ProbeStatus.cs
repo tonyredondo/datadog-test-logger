@@ -23,6 +23,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.PInvoke
             Status = status;
         }
 
+        public static ProbeStatus Default { get; } = new(string.Empty, Sink.Models.Status.BLOCKED, string.Empty);
+
         public string ProbeId { get; }
 
         public string ErrorMessage { get; }

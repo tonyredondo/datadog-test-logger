@@ -18,19 +18,30 @@ internal class ConsumerGroupHelper
 {
     // A map between Kafka Consumer<TKey,TValue> and the corresponding consumer group
     private static readonly ConditionalWeakTable<object, string> ConsumerToGroupIdMap = new();
+    private static readonly ConditionalWeakTable<object, string> ConsumerToBootstrapServersMap = new();
 
-    public static void SetConsumerGroup(object consumer, string groupId)
+    public static void SetConsumerGroup(object consumer, string groupId, string bootstrapServers)
     {
 #if NETCOREAPP3_1_OR_GREATER
         ConsumerToGroupIdMap.AddOrUpdate(consumer, groupId);
+        ConsumerToBootstrapServersMap.AddOrUpdate(consumer, bootstrapServers);
 #else
         ConsumerToGroupIdMap.GetValue(consumer, x => groupId);
+        ConsumerToBootstrapServersMap.GetValue(consumer, x => bootstrapServers);
 #endif
     }
 
-    public static bool TryGetConsumerGroup(object consumer, out string? groupId)
-        => ConsumerToGroupIdMap.TryGetValue(consumer, out groupId);
+    public static bool TryGetConsumerGroup(object consumer, out string? groupId, out string? bootstrapServers)
+    {
+        groupId = null;
+        bootstrapServers = null;
 
-    public static bool RemoveConsumerGroup(object consumer)
-        => ConsumerToGroupIdMap.Remove(consumer);
+        return ConsumerToGroupIdMap.TryGetValue(consumer, out groupId) && ConsumerToBootstrapServersMap.TryGetValue(consumer, out bootstrapServers);
+    }
+
+    public static void RemoveConsumerGroup(object consumer)
+    {
+        ConsumerToGroupIdMap.Remove(consumer);
+        ConsumerToBootstrapServersMap.Remove(consumer);
+    }
 }

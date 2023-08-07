@@ -20,7 +20,7 @@ using static DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumenta
     MaximumVersion = "7.*.*",
     IntegrationName = nameof(IntegrationId.Npgsql),
     DataReaderType = "Npgsql.NpgsqlDataReader",
-    DataReaderTaskType = "System.Threading.Tasks.Task`1<Npgsql.NpgsqlDataReader>",
+    DataReaderTaskType = "System.Threading.Tasks.Task`1[Npgsql.NpgsqlDataReader]",
     TargetMethodAttributes = new[]
     {
         // Task<int> Npgsql.NpgsqlCommand.ExecuteNonQueryAsync(CancellationToken)

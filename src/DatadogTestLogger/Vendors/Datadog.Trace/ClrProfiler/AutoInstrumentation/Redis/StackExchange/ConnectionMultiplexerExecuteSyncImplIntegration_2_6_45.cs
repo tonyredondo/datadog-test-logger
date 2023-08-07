@@ -22,7 +22,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = "StackExchange.Redis",
         TypeName = "StackExchange.Redis.ConnectionMultiplexer",
         MethodName = "ExecuteSyncImpl",
-        ReturnTypeName = "T",
+        ReturnTypeName = "!!0",
         ParameterTypeNames = new[] { "StackExchange.Redis.Message", "StackExchange.Redis.ResultProcessor`1[!!0]", "StackExchange.Redis.ServerEndPoint", "!!0" },
         MinimumVersion = "2.0.0", // 2.6.45, but dll uses 2.0.0
         MaximumVersion = "2.*.*",
@@ -31,7 +31,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = "StackExchange.Redis.StrongName",
         TypeName = "StackExchange.Redis.ConnectionMultiplexer",
         MethodName = "ExecuteSyncImpl",
-        ReturnTypeName = "T",
+        ReturnTypeName = "!!0",
         ParameterTypeNames = new[] { "StackExchange.Redis.Message", "StackExchange.Redis.ResultProcessor`1[!!0]", "StackExchange.Redis.ServerEndPoint", "!!0" },
         MinimumVersion = "2.0.0", // 2.6.45, but dll uses 2.0.0
         MaximumVersion = "2.*.*",

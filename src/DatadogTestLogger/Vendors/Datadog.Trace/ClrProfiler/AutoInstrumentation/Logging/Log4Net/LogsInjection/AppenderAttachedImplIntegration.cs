@@ -43,12 +43,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         {
             var tracer = Tracer.Instance;
 
-            if (tracer.Settings.LogsInjectionEnabled &&
+            if (tracer.Settings.LogsInjectionEnabledInternal &&
                 !loggingEvent.Properties.Contains(CorrelationIdentifier.ServiceKey))
             {
                 loggingEvent.Properties[CorrelationIdentifier.ServiceKey] = tracer.DefaultServiceName ?? string.Empty;
-                loggingEvent.Properties[CorrelationIdentifier.VersionKey] = tracer.Settings.ServiceVersion ?? string.Empty;
-                loggingEvent.Properties[CorrelationIdentifier.EnvKey] = tracer.Settings.Environment ?? string.Empty;
+                loggingEvent.Properties[CorrelationIdentifier.VersionKey] = tracer.Settings.ServiceVersionInternal ?? string.Empty;
+                loggingEvent.Properties[CorrelationIdentifier.EnvKey] = tracer.Settings.EnvironmentInternal ?? string.Empty;
 
                 var spanContext = tracer.DistributedSpanContext;
                 if (spanContext is not null)

@@ -9,6 +9,8 @@
 // </copyright>
 
 using System;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace
 {
@@ -37,6 +39,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             get
             {
+                TelemetryFactory.Metrics.Record(PublicApiUsage.Correlation_Identifier_Service_Get);
                 return Tracer.Instance.DefaultServiceName ?? string.Empty;
             }
         }
@@ -48,7 +51,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             get
             {
-                return Tracer.Instance.Settings.ServiceVersion ?? string.Empty;
+                TelemetryFactory.Metrics.Record(PublicApiUsage.Correlation_Identifier_Version_Get);
+                return Tracer.Instance.Settings.ServiceVersionInternal ?? string.Empty;
             }
         }
 
@@ -59,7 +63,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             get
             {
-                return Tracer.Instance.Settings.Environment ?? string.Empty;
+                TelemetryFactory.Metrics.Record(PublicApiUsage.Correlation_Identifier_Env_Get);
+                return Tracer.Instance.Settings.EnvironmentInternal ?? string.Empty;
             }
         }
 
@@ -71,6 +76,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             get
             {
+                TelemetryFactory.Metrics.Record(PublicApiUsage.Correlation_Identifier_TraceId_Get);
                 return Tracer.Instance.ActiveScope?.Span?.TraceId ?? 0;
             }
         }
@@ -83,6 +89,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         {
             get
             {
+                TelemetryFactory.Metrics.Record(PublicApiUsage.Correlation_Identifier_SpanId_Get);
                 return Tracer.Instance.ActiveScope?.Span?.SpanId ?? 0;
             }
         }

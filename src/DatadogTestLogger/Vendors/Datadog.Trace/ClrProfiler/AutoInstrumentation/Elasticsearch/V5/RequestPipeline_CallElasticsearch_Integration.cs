@@ -22,7 +22,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         AssemblyName = ElasticsearchV5Constants.ElasticsearchAssemblyName,
         TypeName = ElasticsearchV5Constants.RequestPipelineTypeName,
         MethodName = "CallElasticsearch",
-        ReturnTypeName = "Elasticsearch.Net.ElasticsearchResponse`1<T>",
+        ReturnTypeName = "Elasticsearch.Net.ElasticsearchResponse`1[!0]",
         ParameterTypeNames = new[] { "Elasticsearch.Net.RequestData" },
         MinimumVersion = ElasticsearchV5Constants.Version5,
         MaximumVersion = ElasticsearchV5Constants.Version5,

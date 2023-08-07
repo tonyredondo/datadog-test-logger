@@ -23,7 +23,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     TypeName = "NUnit.Framework.Internal.Execution.CompositeWorkItem",
     MethodName = "SkipChildren",
     ReturnTypeName = ClrNames.Void,
-    ParameterTypeNames = new[] { "_", "NUnit.Framework.Interfaces.ResultState", ClrNames.String },
+    ParameterTypeNames = new[] { ClrNames.Ignore, "NUnit.Framework.Interfaces.ResultState", ClrNames.String },
     MinimumVersion = "3.0.0",
     MaximumVersion = "3.*.*",
     IntegrationName = NUnitIntegration.IntegrationName)]

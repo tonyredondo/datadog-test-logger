@@ -19,7 +19,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 {
     internal class AerospikeCommon
     {
-        private const string ServiceName = "aerospike";
+        private const string DatabaseType = "aerospike";
         private const string OperationName = "aerospike.command";
         public const string IntegrationName = nameof(Configuration.IntegrationId.Aerospike);
         internal const IntegrationId IntegrationId = Configuration.IntegrationId.Aerospike;
@@ -38,8 +38,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
             try
             {
-                var tags = new AerospikeTags();
-                var serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
+                var serviceName = tracer.CurrentTraceSettings.Schema.Database.GetServiceName(DatabaseType);
+                var tags = tracer.CurrentTraceSettings.Schema.Database.CreateAerospikeTags();
+
                 scope = tracer.StartActiveInternal(OperationName, tags: tags, serviceName: serviceName);
                 var span = scope.Span;
 
@@ -54,11 +55,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 }
                 else if (target.TryDuckCast<HasKeys>(out var hasKeys))
                 {
+                    bool isFirstKey = true;
                     var sb = StringBuilderCache.Acquire(0);
 
                     foreach (var obj in hasKeys.Keys)
                     {
                         var key = obj.DuckCast<Key>();
+
+                        // All keys will be in the same namespace (namespace > set > record > key), so we can apply the namespace from the first key we see
+                        if (isFirstKey)
+                        {
+                            tags.Namespace = key.Ns;
+                            isFirstKey = false;
+                        }
 
                         if (sb.Length != 0)
                         {
@@ -81,6 +90,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 span.ResourceName = ExtractResourceName(target.GetType());
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: false);
+                tracer.CurrentTraceSettings.Schema.RemapPeerService(tags);
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(IntegrationId);
             }
             catch (Exception ex)

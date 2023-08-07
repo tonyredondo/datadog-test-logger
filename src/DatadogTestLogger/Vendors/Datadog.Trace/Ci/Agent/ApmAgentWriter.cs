@@ -9,12 +9,12 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.EventModel;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
-using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent
 {
@@ -29,19 +29,19 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent
         private static Span[] _spanArray;
         private readonly AgentWriter _agentWriter;
 
-        public ApmAgentWriter(ImmutableTracerSettings settings, ITraceSampler sampler, IDiscoveryService discoveryService, int maxBufferSize = DefaultMaxBufferSize)
+        public ApmAgentWriter(ImmutableTracerSettings settings, Action<Dictionary<string, float>> updateSampleRates, IDiscoveryService discoveryService, int maxBufferSize = DefaultMaxBufferSize)
         {
-            var partialFlushEnabled = settings.Exporter.PartialFlushEnabled;
-            var apiRequestFactory = TracesTransportStrategy.Get(settings.Exporter);
-            var api = new Api(apiRequestFactory, null, rates => sampler.SetDefaultSampleRates(rates), partialFlushEnabled);
+            var partialFlushEnabled = settings.ExporterInternal.PartialFlushEnabledInternal;
+            var apiRequestFactory = TracesTransportStrategy.Get(settings.ExporterInternal);
+            var api = new Api(apiRequestFactory, null, updateSampleRates, partialFlushEnabled);
             var statsAggregator = StatsAggregator.Create(api, settings, discoveryService);
 
-            _agentWriter = new AgentWriter(api, statsAggregator, null, null, maxBufferSize: maxBufferSize);
+            _agentWriter = new AgentWriter(api, statsAggregator, null, maxBufferSize: maxBufferSize);
         }
 
         public ApmAgentWriter(IApi api, int maxBufferSize = DefaultMaxBufferSize)
         {
-            _agentWriter = new AgentWriter(api, null, null, null, maxBufferSize: maxBufferSize);
+            _agentWriter = new AgentWriter(api, null, null, maxBufferSize: maxBufferSize);
         }
 
         public void WriteEvent(IEvent @event)

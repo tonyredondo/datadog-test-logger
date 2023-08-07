@@ -12,7 +12,7 @@
 using System;
 using System.Linq;
 using DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations.Models;
-using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Serilog;
+using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations
 {
@@ -21,6 +21,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations
         private const int MaxAllowedLogProbes = 100;
         private const int MaxAllowedMetricProbes = 100;
         private const int MaxAllowedSpanProbes = 100;
+        private const int MaxAllowedSpanDecorationProbes = 100;
+
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<ConfigurationUpdater>();
+
         private readonly string? _env;
         private readonly string? _version;
 
@@ -87,7 +91,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger.Configurations
                 ServiceConfiguration = configuration.ServiceConfiguration,
                 LogProbes = Filter(configuration.LogProbes, MaxAllowedLogProbes),
                 MetricProbes = Filter(configuration.MetricProbes, MaxAllowedMetricProbes),
-                SpanProbes = Filter(configuration.SpanProbes, MaxAllowedSpanProbes)
+                SpanProbes = Filter(configuration.SpanProbes, MaxAllowedSpanProbes),
+                SpanDecorationProbes = Filter(configuration.SpanDecorationProbes, MaxAllowedSpanDecorationProbes)
             };
 
             T[] Filter<T>(T[] probes, int maxAllowedProbes)
