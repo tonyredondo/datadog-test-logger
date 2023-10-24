@@ -415,6 +415,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Agent
                 if (shouldSendTrace)
                 {
                     TelemetryFactory.Metrics.RecordCountTraceChunkEnqueued(MetricTags.TraceChunkEnqueueReason.P0Keep);
+                    TelemetryFactory.Metrics.RecordCountSpanEnqueuedForSerialization(MetricTags.SpanEnqueueReason.P0Keep, spans.Count);
                 }
                 else
                 {

@@ -37,18 +37,18 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Util.Http.QueryStringObfuscati
             _timeout = timeout;
             _logger = logger;
 
-            var options =
-                    RegexOptions.IgnoreCase
-                    | RegexOptions.Compiled;
+            var options = RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnorePatternWhitespace;
 
 #if NETCOREAPP3_1_OR_GREATER
             options |= RegexOptions.NonBacktracking;
 #endif
 
-            _regex =
-                new(pattern, options, _timeout);
+            _regex = new(pattern, options, _timeout);
         }
 
+        /// <summary>
+        /// WARNING: This regex cause crashes under netcoreapp2.1 / linux / arm64, dont use on manual instrumentation in this environment
+        /// </summary>
         internal override string Obfuscate(string queryString)
         {
             if (string.IsNullOrEmpty(queryString))

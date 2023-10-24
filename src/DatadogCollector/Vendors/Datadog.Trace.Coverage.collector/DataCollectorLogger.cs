@@ -51,6 +51,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
             }
         }
 
+        public bool IsDebugEnabled => _isDebugEnabled;
+
         public void Error(string? text)
         {
             _logger.LogWarning(_collectionContext, text ?? string.Empty);

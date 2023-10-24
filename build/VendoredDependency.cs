@@ -28,6 +28,7 @@ public class VendoredDependency
             {
                 "AppSec/**/*.*",
                 "IAST/**/*.*",
+                "Iast/**/*.*",
                 "AspNet/**/*.*",
                 "ClrProfiler/AutoInstrumentation/AspNet/**/*.*",
                 "ClrProfiler/AutoInstrumentation/AspNetCore/**/*.*",
@@ -44,6 +45,8 @@ public class VendoredDependency
                 "SpanExtensions.Core.cs",
                 "SpanExtensions.Framework.cs",
                 "Generated/**/Datadog.Trace.SourceGenerators/Datadog.Trace.SourceGenerators.TagsListGenerator.TagListGenerator/IastTags.g.cs",
+                "Activity/Handlers/AzureServiceBusActivityHandler.cs",
+                "Generated/**/Datadog.Trace.SourceGenerators/TagListGenerator/IastTags.g.cs"
             },
             Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
                 targetNamespacePrefix: TestLoggerNamespace,
@@ -278,6 +281,8 @@ public class VendoredDependency
                         "#if !NETCOREAPP2_0_OR_GREATER && !NET461_OR_GREATER && !NETSTANDARD2_0");
                     builder.Replace("NET7_0_OR_GREATER", "NET8_0_OR_GREATER");
 
+                    builder.Replace("new AzureServiceBusActivityHandler(),", string.Empty);
+
                     // MOAR HACKS
                     if (filePath.Contains("AsyncManualResetEvent.cs"))
                     {
@@ -307,6 +312,13 @@ public class VendoredDependency
                     {
                         builder.Replace("if (string.IsNullOrEmpty(_tracerHome) || !Directory.Exists(_tracerHome))", "if (false)");
                         builder.Replace("if (_tracerHome is null)", "if (false)");
+                    }
+
+                    if (filePath.Contains("ConfigTelemetryData.cs"))
+                    {
+                        builder.Replace(
+                            $"#else{Environment.NewLine}#error Unexpected TFM",
+                            $"#elif NETCOREAPP2_1\n        public const string ManagedTracerTfmValue = \"netcoreapp2.1\";\n#elif NETCOREAPP2_2\n        public const string ManagedTracerTfmValue = \"netcoreapp2.2\";\n#elif NETCOREAPP3_0\n        public const string ManagedTracerTfmValue = \"netcoreapp3.0\";\n#elif NET5_0\n        public const string ManagedTracerTfmValue = \"net5.0\";\n#elif NET7_0\n        public const string ManagedTracerTfmValue = \"net7.0\";\n#else\n#error Unexpected TFM");
                     }
 
                     // Fix namespace conflicts in `using alias` directives. For example, transform:

@@ -9,12 +9,15 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Text;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.Transports;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage.Models.Tests;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
@@ -22,11 +25,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
     internal class CICodeCoveragePayload : MultipartPayload
     {
         private readonly IFormatterResolver _formatterResolver;
+        private readonly Stopwatch _serializationWatch;
 
         public CICodeCoveragePayload(CIVisibilitySettings settings, int maxItemsPerPayload = DefaultMaxItemsPerPayload, int maxBytesPerPayload = DefaultMaxBytesPerPayload, IFormatterResolver formatterResolver = null)
             : base(settings, maxItemsPerPayload, maxBytesPerPayload, formatterResolver)
         {
             _formatterResolver = formatterResolver ?? CIFormatterResolver.Instance;
+            _serializationWatch = new Stopwatch();
 
             // We call reset here to add the dummy event
             Reset();
@@ -35,6 +40,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
         public override string EventPlatformSubdomain => "citestcov-intake";
 
         public override string EventPlatformPath => "api/v2/citestcov";
+
+        public override MetricTags.CIVisibilityEndpoints TelemetryEndpoint => MetricTags.CIVisibilityEndpoints.CodeCoverage;
 
         public override bool CanProcessEvent(IEvent @event)
         {
@@ -48,6 +55,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
             var eventInBytes = MessagePackSerializer.Serialize(new CoveragePayload(eventsBuffer), _formatterResolver);
             CIVisibility.Log.Debug<int, int>("CICodeCoveragePayload: Serialized {Count} test code coverage as a single multipart item with {Size} bytes.", eventsBuffer.Count, eventInBytes.Length);
             return new MultipartFormItem($"coverage{index}", MimeTypes.MsgPack, $"filecoverage{index}.msgpack", new ArraySegment<byte>(eventInBytes));
+        }
+
+        public override bool TryProcessEvent(IEvent @event)
+        {
+            _serializationWatch.Restart();
+            var success = base.TryProcessEvent(@event);
+            TelemetryFactory.Metrics.RecordDistributionCIVisibilityEndpointEventsSerializationMs(TelemetryEndpoint, _serializationWatch.Elapsed.TotalMilliseconds);
+            return success;
         }
 
         public override void Reset()

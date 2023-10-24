@@ -9,8 +9,11 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
+using System.IO;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.MessagePack;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
@@ -19,11 +22,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
     {
         private readonly EventsBuffer<IEvent> _events;
         private readonly IFormatterResolver _formatterResolver;
+        private readonly Stopwatch _serializationWatch;
 
         public CIVisibilityProtocolPayload(CIVisibilitySettings settings, IFormatterResolver formatterResolver = null)
             : base(settings)
         {
             _formatterResolver = formatterResolver ?? CIFormatterResolver.Instance;
+            _serializationWatch = new Stopwatch();
 
             // Because we don't know the size of the events array envelope we left 500kb for that.
             _events = new EventsBuffer<IEvent>(settings.MaximumAgentlessPayloadSize - (500 * 1024), _formatterResolver);
@@ -35,10 +40,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
 
         internal EventsBuffer<IEvent> Events => _events;
 
-        public override bool TryProcessEvent(IEvent @event) => _events.TryWrite(@event);
+        public override bool TryProcessEvent(IEvent @event)
+        {
+            _serializationWatch.Restart();
+            var success = _events.TryWrite(@event);
+            TelemetryFactory.Metrics.RecordDistributionCIVisibilityEndpointEventsSerializationMs(TelemetryEndpoint, _serializationWatch.Elapsed.TotalMilliseconds);
+            return success;
+        }
 
         public override void Reset() => _events.Clear();
 
         public byte[] ToArray() => MessagePackSerializer.Serialize(this, _formatterResolver);
+
+        public int WriteTo(Stream stream)
+        {
+            var buffer = MessagePackSerializer.SerializeUnsafe(this, _formatterResolver);
+            stream.Write(buffer.Array, buffer.Offset, buffer.Count);
+            return buffer.Count;
+        }
     }
 }

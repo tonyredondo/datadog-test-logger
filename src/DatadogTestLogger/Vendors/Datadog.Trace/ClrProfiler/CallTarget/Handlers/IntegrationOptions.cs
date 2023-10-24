@@ -41,7 +41,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handler
                 Log.Warning("DuckTypeException has been detected, the integration <{TIntegration}, {TTarget}> will be disabled.", typeof(TIntegration), typeof(TTarget));
                 if (_integrationId.Value is { } integrationId)
                 {
-                    TelemetryFactory.Metrics.RecordCountIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.DuckTyping);
+                    TelemetryFactory.Metrics.RecordCountSharedIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.DuckTyping);
                     Tracer.Instance.TracerManager.Telemetry.IntegrationDisabledDueToError(integrationId, nameof(DuckTypeException));
                 }
 
@@ -52,7 +52,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handler
                 Log.Warning("CallTargetInvokerException has been detected, the integration <{TIntegration}, {TTarget}> will be disabled.", typeof(TIntegration), typeof(TTarget));
                 if (_integrationId.Value is { } integrationId)
                 {
-                    TelemetryFactory.Metrics.RecordCountIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.Invoker);
+                    TelemetryFactory.Metrics.RecordCountSharedIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.Invoker);
                     Tracer.Instance.TracerManager.Telemetry.IntegrationDisabledDueToError(integrationId, nameof(CallTargetInvokerException));
                 }
 
@@ -62,7 +62,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget.Handler
             {
                 if (_integrationId.Value is { } integrationId)
                 {
-                    TelemetryFactory.Metrics.RecordCountIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.Execution);
+                    TelemetryFactory.Metrics.RecordCountSharedIntegrationsError(integrationId.GetMetricTag(), MetricTags.InstrumentationError.Execution);
                 }
             }
         }

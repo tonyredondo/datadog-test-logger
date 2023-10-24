@@ -45,6 +45,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         AwsSdk,
         AwsSqs,
         AwsSns,
+        AwsLambda,
         ILogger,
         Aerospike,
         AzureFunctions,
@@ -63,6 +64,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         HashAlgorithm,
         SymmetricAlgorithm,
         OpenTelemetry,
-        PathTraversal
+        PathTraversal,
+        Ldap,
+        Ssrf,
+        AwsKinesis,
+        AzureServiceBus,
+        SystemRandom,
+        AwsDynamoDb,
+        // If you add an integration here, please don't forget to impact the allow / block list of telemetry config
+        // In the telemetry repository. (and keep that comment at the bottom :))
     }
 }

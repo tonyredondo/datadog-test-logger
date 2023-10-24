@@ -68,6 +68,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
                 proxyMemberReturnType,
                 proxyParameterTypes);
 
+            var isValueWithType = false;
+            var originalProxyMemberReturnType = proxyMemberReturnType;
+            if (proxyMemberReturnType.IsGenericType && proxyMemberReturnType.GetGenericTypeDefinition() == typeof(ValueWithType<>))
+            {
+                proxyMemberReturnType = proxyMemberReturnType.GenericTypeArguments[0];
+                isValueWithType = true;
+            }
+
             LazyILGenerator il = new LazyILGenerator(proxyMethod?.GetILGenerator());
             Type returnType = targetProperty.PropertyType;
 
@@ -192,6 +200,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
                 il.WriteTypeConversion(returnType, proxyMemberReturnType);
             }
 
+            if (isValueWithType)
+            {
+                il.Emit(OpCodes.Ldtoken, returnType);
+                il.EmitCall(OpCodes.Call, GetTypeFromHandleMethodInfo, null!);
+                il.EmitCall(OpCodes.Call, originalProxyMemberReturnType.GetMethod("Create", BindingFlags.Static | BindingFlags.Public)!, null!);
+            }
+
             il.Emit(OpCodes.Ret);
             il.Flush();
             if (proxyMethod is not null)
@@ -264,11 +279,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
                 Type proxyParamType = proxyParameterTypes[pIndex];
                 Type targetParamType = targetParametersTypes[pIndex];
 
+                var isValueWithType = false;
+                var originalProxyParamType = proxyParamType;
+                if (proxyParamType.IsGenericType && proxyParamType.GetGenericTypeDefinition() == typeof(ValueWithType<>))
+                {
+                    proxyParamType = proxyParamType.GenericTypeArguments[0];
+                    isValueWithType = true;
+                }
+
                 // Check if the type can be converted of if we need to enable duck chaining
                 if (needsDuckChaining(targetParamType, proxyParamType))
                 {
                     // Load the argument and cast it as Duck type
                     il.WriteLoadArgument(pIndex, false);
+                    if (isValueWithType)
+                    {
+                        il.Emit(OpCodes.Ldfld, originalProxyParamType.GetField("Value")!);
+                    }
 
                     // If this is a forward duck type, we need to cast to IDuckType and extract the original instance
                     // and set the targetParamType to object
@@ -278,6 +305,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
                 else
                 {
                     il.WriteLoadArgument(pIndex, false);
+                    if (isValueWithType)
+                    {
+                        il.Emit(OpCodes.Ldfld, originalProxyParamType.GetField("Value")!);
+                    }
                 }
 
                 // If the target parameter type is public or if it's by ref we have to actually use the original target type.

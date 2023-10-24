@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Telemetry;
 using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
@@ -32,15 +33,24 @@ internal sealed class Test
     private int _finished;
 
     internal Test(TestSuite suite, string name, DateTimeOffset? startDate)
+        : this(suite, name, startDate, default, 0)
+    {
+    }
+
+    internal Test(TestSuite suite, string name, DateTimeOffset? startDate, TraceId traceId, ulong spanId)
     {
         Suite = suite;
         var module = suite.Module;
 
         var tags = new TestSpanTags(Suite.Tags, name);
-        var scope = Tracer.Instance.StartActiveInternal(
+        var tracer = Tracer.Instance;
+        var span = tracer.StartSpan(
             string.IsNullOrEmpty(module.Framework) ? "test" : $"{module.Framework!.ToLowerInvariant()}.test",
             tags: tags,
-            startTime: startDate);
+            startTime: startDate,
+            traceId: traceId,
+            spanId: spanId);
+        var scope = tracer.TracerManager.ScopeManager.Activate(span, true);
 
         scope.Span.Type = SpanTypes.Test;
         scope.Span.ResourceName = $"{suite.Name}.{name}";
@@ -52,7 +62,7 @@ internal sealed class Test
 
         if (CIVisibility.Settings.CodeCoverageEnabled == true)
         {
-            Coverage.CoverageReporter.Handler.StartSession();
+            Coverage.CoverageReporter.Handler.StartSession(module.Framework);
         }
 
         CurrentTest.Value = this;
@@ -62,6 +72,14 @@ internal sealed class Test
         {
             // If a test doesn't have a fixed start time we reset it before running the test code
             scope.Span.ResetStartTime();
+        }
+
+        // Record EventCreate telemetry metric
+        if (TelemetryHelper.GetEventTypeWithCodeOwnerAndSupportedCiAndBenchmark(
+                MetricTags.CIVisibilityTestingEventType.Test,
+                module.Framework == CommonTags.TestingFrameworkNameBenchmarkDotNet) is { } eventTypeWithMetadata)
+        {
+            TelemetryFactory.Metrics.RecordCountCIVisibilityEventCreated(TelemetryHelper.GetTelemetryTestingFrameworkEnum(module.Framework), eventTypeWithMetadata);
         }
     }
 
@@ -329,14 +347,22 @@ internal sealed class Test
         duration ??= _scope.Span.Context.TraceContext.Clock.ElapsedSince(scope.Span.StartTime);
 
         // Set coverage
-        if (CIVisibility.Settings.CodeCoverageEnabled == true && Coverage.CoverageReporter.Handler.EndSession() is Coverage.Models.Tests.TestCoverage testCoverage)
+        if (CIVisibility.Settings.CodeCoverageEnabled == true)
         {
-            testCoverage.SessionId = tags.SessionId;
-            testCoverage.SuiteId = tags.SuiteId;
-            testCoverage.SpanId = _scope.Span.SpanId;
+            if (Coverage.CoverageReporter.Handler.EndSession() is Coverage.Models.Tests.TestCoverage testCoverage)
+            {
+                testCoverage.SessionId = tags.SessionId;
+                testCoverage.SuiteId = tags.SuiteId;
+                testCoverage.SpanId = _scope.Span.SpanId;
 
-            CIVisibility.Log.Debug("Coverage data for SessionId={SessionId}, SuiteId={SuiteId} and SpanId={SpanId} processed.", testCoverage.SessionId, testCoverage.SuiteId, testCoverage.SpanId);
-            CIVisibility.Manager?.WriteEvent(testCoverage);
+                CIVisibility.Log.Debug("Coverage data for SessionId={SessionId}, SuiteId={SuiteId} and SpanId={SpanId} processed.", testCoverage.SessionId, testCoverage.SuiteId, testCoverage.SpanId);
+                CIVisibility.Manager?.WriteEvent(testCoverage);
+            }
+            else if (status != TestStatus.Skip)
+            {
+                var testName = scope.Span.ResourceName;
+                CIVisibility.Log.Warning("Coverage data for test: {TestName} with Status: {Status} is empty. File: {File}", testName, status, tags.SourceFile);
+            }
         }
 
         // Set status
@@ -356,6 +382,7 @@ internal sealed class Test
                 {
                     tags.SkippedByIntelligentTestRunner = "true";
                     Suite.Tags.AddIntelligentTestRunnerSkippingCount(1);
+                    TelemetryFactory.Metrics.RecordCountCIVisibilityITRSkipped(MetricTags.CIVisibilityTestingEventType.Test);
                 }
                 else
                 {
@@ -365,9 +392,27 @@ internal sealed class Test
                 break;
         }
 
+        if (tags.Unskippable is not null && string.Equals(tags.Unskippable, "true", StringComparison.OrdinalIgnoreCase))
+        {
+            TelemetryFactory.Metrics.RecordCountCIVisibilityITRUnskippable(MetricTags.CIVisibilityTestingEventType.Test);
+        }
+
+        if (tags.ForcedRun is not null && string.Equals(tags.ForcedRun, "true", StringComparison.OrdinalIgnoreCase))
+        {
+            TelemetryFactory.Metrics.RecordCountCIVisibilityITRForcedRun(MetricTags.CIVisibilityTestingEventType.Test);
+        }
+
         // Finish
         scope.Span.Finish(duration.Value);
         scope.Dispose();
+
+        // Record EventFinished telemetry metric
+        if (TelemetryHelper.GetEventTypeWithCodeOwnerAndSupportedCiAndBenchmark(
+                MetricTags.CIVisibilityTestingEventType.Test,
+                tags.Type == TestTags.TypeBenchmark) is { } eventTypeWithMetadata)
+        {
+            TelemetryFactory.Metrics.RecordCountCIVisibilityEventFinished(TelemetryHelper.GetTelemetryTestingFrameworkEnum(tags.Framework), eventTypeWithMetadata);
+        }
 
         Current = null;
         CIVisibility.Log.Debug("######### Test Closed: {Name} ({Suite} | {Module}) | {Status}", Name, Suite.Name, Suite.Module.Name, tags.Status);

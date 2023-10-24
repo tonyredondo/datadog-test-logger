@@ -16,6 +16,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     internal interface IMessage
     {
         /// <summary>
+        /// Gets the key of the message
+        /// </summary>
+        public object Key { get; }
+
+        /// <summary>
         /// Gets the value of the message
         /// </summary>
         public object Value { get; }

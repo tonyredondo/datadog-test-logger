@@ -36,6 +36,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         private static readonly bool IsLogLevelDebugEnabled = Log.IsEnabled(LogEventLevel.Debug);
 
         private int _isFinished;
+        private bool _baseServiceTagSet;
 
         internal Span(SpanContext context, DateTimeOffset? start)
             : this(context, start, null)
@@ -82,7 +83,17 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         internal string ServiceName
         {
             get => Context.ServiceNameInternal;
-            set => Context.ServiceNameInternal = value;
+            set
+            {
+                // Ignore case because service name and _dd.base_service are normalized in the agent and backend
+                if (!_baseServiceTagSet && !string.Equals(value, Context.ServiceNameInternal, StringComparison.OrdinalIgnoreCase))
+                {
+                    Tags.SetTag(Trace.Tags.BaseService, Context.ServiceNameInternal);
+                    _baseServiceTagSet = true;
+                }
+
+                Context.ServiceNameInternal = value;
+            }
         }
 
         /// <summary>
@@ -387,7 +398,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         internal void SetException(Exception exception)
         {
             Error = true;
+            SetExceptionTags(exception);
+        }
 
+        /// <summary>
+        /// Add the StackTrace and other exception metadata to the span,
+        /// but does not mark the span as an error.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        internal void SetExceptionTags(Exception exception)
+        {
             if (exception != null)
             {
                 // for AggregateException, use the first inner exception until we can support multiple errors.

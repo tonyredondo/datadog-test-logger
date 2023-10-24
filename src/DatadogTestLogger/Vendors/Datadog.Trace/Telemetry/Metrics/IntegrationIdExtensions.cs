@@ -46,6 +46,7 @@ internal static class IntegrationIdExtensions
             IntegrationId.AwsSdk => MetricTags.IntegrationName.AwsSdk,
             IntegrationId.AwsSns => MetricTags.IntegrationName.AwsSns,
             IntegrationId.AwsSqs => MetricTags.IntegrationName.AwsSqs,
+            IntegrationId.AwsLambda => MetricTags.IntegrationName.AwsLambda,
             IntegrationId.ILogger => MetricTags.IntegrationName.ILogger,
             IntegrationId.Aerospike => MetricTags.IntegrationName.Aerospike,
             IntegrationId.AzureFunctions => MetricTags.IntegrationName.AzureFunctions,
@@ -65,6 +66,12 @@ internal static class IntegrationIdExtensions
             IntegrationId.SymmetricAlgorithm => MetricTags.IntegrationName.SymmetricAlgorithm,
             IntegrationId.OpenTelemetry => MetricTags.IntegrationName.OpenTelemetry,
             IntegrationId.PathTraversal => MetricTags.IntegrationName.PathTraversal,
+            IntegrationId.Ssrf => MetricTags.IntegrationName.Ssrf,
+            IntegrationId.Ldap => MetricTags.IntegrationName.Ldap,
+            IntegrationId.AwsKinesis => MetricTags.IntegrationName.AwsKinesis,
+            IntegrationId.AzureServiceBus => MetricTags.IntegrationName.AzureServiceBus,
+            IntegrationId.SystemRandom => MetricTags.IntegrationName.SystemRandom,
+            IntegrationId.AwsDynamoDb => MetricTags.IntegrationName.AwsDynamoDb,
             _ => throw new InvalidOperationException($"Unknown IntegrationID {integrationId}"), // dangerous, but we test it will never be called
         };
 }

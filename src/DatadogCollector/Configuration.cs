@@ -20,7 +20,7 @@ public class Configuration
     public Configuration()
     {
         CpuUsageEnabled =
-            (EnvironmentHelpers.GetEnvironmentVariable("DD_COLLECTOR_CPU_USAGE", "1") ?? "1").ToBoolean() == true;
+            (EnvironmentHelpers.GetEnvironmentVariable("DD_COLLECTOR_CPU_USAGE", "0") ?? "0").ToBoolean() == true;
 
         CoverageEnabled =
             (EnvironmentHelpers.GetEnvironmentVariable("DD_COLLECTOR_COVERAGE", "0") ?? "0").ToBoolean() == true;

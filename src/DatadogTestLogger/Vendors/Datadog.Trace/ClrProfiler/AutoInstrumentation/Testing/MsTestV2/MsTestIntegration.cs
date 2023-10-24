@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
@@ -38,7 +39,7 @@ internal static class MsTestIntegration
 
         if (TestSuite.Current is { } suite)
         {
-            var test = suite.CreateTest(testName);
+            var test = suite.InternalCreateTest(testName);
 
             // Get test parameters
             var methodParameters = testMethod.GetParameters();
@@ -66,7 +67,22 @@ internal static class MsTestIntegration
             // Get traits
             if (GetTraits(testMethod) is { } testTraits)
             {
+                // Unskippable tests
+                if (CIVisibility.Settings.IntelligentTestRunnerEnabled)
+                {
+                    ShouldSkip(testMethodInfo, out var isUnskippable, out var isForcedRun, testTraits);
+                    test.SetTag(IntelligentTestRunnerTags.UnskippableTag, isUnskippable ? "true" : "false");
+                    test.SetTag(IntelligentTestRunnerTags.ForcedRunTag, isForcedRun ? "true" : "false");
+                    testTraits.Remove(IntelligentTestRunnerTags.UnskippableTraitName);
+                }
+
                 test.SetTraits(testTraits);
+            }
+            else if (CIVisibility.Settings.IntelligentTestRunnerEnabled)
+            {
+                // Unskippable tests
+                test.SetTag(IntelligentTestRunnerTags.UnskippableTag, "false");
+                test.SetTag(IntelligentTestRunnerTags.ForcedRunTag, "false");
             }
 
             // Set test method
@@ -156,9 +172,12 @@ internal static class MsTestIntegration
         return testProperties;
     }
 
-    internal static bool ShouldSkip<TTestMethod>(TTestMethod testMethodInfo)
+    internal static bool ShouldSkip<TTestMethod>(TTestMethod testMethodInfo, out bool isUnskippable, out bool isForcedRun, Dictionary<string, List<string>> traits = null)
         where TTestMethod : ITestMethod
     {
+        isUnskippable = false;
+        isForcedRun = false;
+
         if (CIVisibility.Settings.IntelligentTestRunnerEnabled != true)
         {
             return false;
@@ -166,6 +185,10 @@ internal static class MsTestIntegration
 
         var testClass = testMethodInfo.TestClassName;
         var testMethod = testMethodInfo.MethodInfo;
-        return Common.ShouldSkip(testClass ?? string.Empty, testMethod?.Name ?? string.Empty, testMethodInfo.Arguments, testMethod?.GetParameters());
+        var itrShouldSkip = Common.ShouldSkip(testClass ?? string.Empty, testMethod?.Name ?? string.Empty, testMethodInfo.Arguments, testMethod?.GetParameters());
+        traits ??= GetTraits(testMethod);
+        isUnskippable = traits?.TryGetValue(IntelligentTestRunnerTags.UnskippableTraitName, out _) == true;
+        isForcedRun = itrShouldSkip && isUnskippable;
+        return itrShouldSkip && !isUnskippable;
     }
 }

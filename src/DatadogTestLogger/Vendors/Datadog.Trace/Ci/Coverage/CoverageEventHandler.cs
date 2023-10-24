@@ -11,6 +11,9 @@
 
 using System.Runtime.CompilerServices;
 using System.Threading;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Coverage;
 
@@ -24,7 +27,7 @@ internal abstract class CoverageEventHandler
 
     protected CoverageEventHandler()
     {
-        _asyncContext = new(obj => CoverageReporter.FireContextContainerChangeAction(obj.CurrentValue));
+        _asyncContext = new();
         _globalContainer = new CoverageContextContainer();
     }
 
@@ -42,9 +45,11 @@ internal abstract class CoverageEventHandler
     /// Start session
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void StartSession()
+    public void StartSession(string? testingFramework = null)
     {
-        var context = new CoverageContextContainer();
+        var telemetryTestingFramework = TelemetryHelper.GetTelemetryTestingFrameworkEnum(testingFramework);
+        TelemetryFactory.Metrics.RecordCountCIVisibilityCodeCoverageStarted(telemetryTestingFramework, MetricTags.CIVisibilityCoverageLibrary.Custom);
+        var context = new CoverageContextContainer(telemetryTestingFramework);
         OnSessionStart(context);
         _asyncContext.Value = context;
     }
@@ -59,7 +64,13 @@ internal abstract class CoverageEventHandler
         if (_asyncContext.Value is { } context)
         {
             _asyncContext.Value = null;
-            return OnSessionFinished(context);
+            var sessionEndData = OnSessionFinished(context);
+            if (context.State is MetricTags.CIVisibilityTestFramework { } telemetryTestingFramework)
+            {
+                TelemetryFactory.Metrics.RecordCountCIVisibilityCodeCoverageFinished(telemetryTestingFramework, MetricTags.CIVisibilityCoverageLibrary.Custom);
+            }
+
+            return sessionEndData;
         }
 
         return null;

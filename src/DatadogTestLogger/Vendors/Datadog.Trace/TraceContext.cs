@@ -153,6 +153,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                 }
             }
 
+            if (!string.Equals(span.ServiceName, Tracer.DefaultServiceName, StringComparison.OrdinalIgnoreCase))
+            {
+                ExtraServicesProvider.Instance.AddService(span.ServiceName);
+            }
+
             lock (_rootSpan)
             {
                 _spans.Add(span);

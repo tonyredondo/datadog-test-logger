@@ -46,7 +46,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 key = activity.Id;
             }
 
-            if (DefaultActivityHandler.ActivityMappingById.TryGetValue(key, out var activityMapping))
+            if (ActivityHandlerCommon.ActivityMappingById.TryGetValue(key, out var activityMapping))
             {
                 if (baseProcessor.ParentProvider is not null)
                 {

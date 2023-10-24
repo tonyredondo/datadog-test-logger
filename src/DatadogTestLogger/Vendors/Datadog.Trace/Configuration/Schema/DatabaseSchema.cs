@@ -99,5 +99,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema
                 SchemaVersion.V0 when !_peerServiceTagsEnabled => new AerospikeTags(),
                 _ => new AerospikeV1Tags(),
             };
+
+        public AwsDynamoDbTags CreateAwsDynamoDbTags() => _version switch
+        {
+            SchemaVersion.V0 when !_peerServiceTagsEnabled => new AwsDynamoDbTags(),
+            _ => new AwsDynamoDbV1Tags(),
+        };
     }
 }

@@ -10,7 +10,6 @@
 #nullable enable
 
 using System;
-using DatadogTestLogger.Vendors.Datadog.Trace.Iast.Settings;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
@@ -278,11 +277,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         public const string ApiKey = "DD_API_KEY";
 
         /// <summary>
-        /// Configuration key for setting the Application key, used by the ITR.
-        /// </summary>
-        public const string ApplicationKey = "DD_APPLICATION_KEY";
-
-        /// <summary>
         /// Configuration key for setting the default Datadog destination site.
         /// Defaults to "datadoghq.com".
         /// </summary>
@@ -377,7 +371,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
         /// <summary>
         /// Configuration key for specifying a custom regex to obfuscate query strings.
-        /// Default value is in TracerSettings
+        /// Default value is in TracerSettingsConstants
+        ///  WARNING: This regex cause crashes under netcoreapp2.1 / linux / arm64, dont use on manual instrumentation in this environment
         /// </summary>
         /// <seealso cref="TracerSettings.ObfuscationQueryStringRegex"/>
         public const string ObfuscationQueryStringRegex = "DD_TRACE_OBFUSCATION_QUERY_STRING_REGEXP";
@@ -633,6 +628,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             /// Default value is <c>false</c> (disabled).
             /// </summary>
             public const string TraceId128BitLoggingEnabled = "DD_TRACE_128_BIT_TRACEID_LOGGING_ENABLED";
+
+            /// <summary>
+            /// Configuration key to enabling or disabling the collection of shell commands executions.
+            /// Default value is <c>false</c> (disabled). Will change in the future to <c>true</c>
+            /// when an obfuscation mechanism will be implemented in the agent.
+            /// </summary>
+            internal const string CommandsCollectionEnabled = "DD_TRACE_COMMANDS_COLLECTION_ENABLED";
         }
 
         internal static class Telemetry
