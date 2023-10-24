@@ -113,7 +113,7 @@ internal class TestSuiteSerializer
                             output.AppendLine("CpuValues File: " + cpuValuesPath);
                             var jsonCpuValues = File.ReadAllText(cpuValuesPath);
                             cpuValues = JsonConvert.DeserializeObject<Dictionary<Guid, List<double>>>(jsonCpuValues);
-                            output.AppendLine("CpuValues file loaded with " + cpuValues.Count + " test cases.");
+                            output.AppendLine("CpuValues file loaded with " + (cpuValues?.Count ?? -1) + " test cases.");
                         }
                     }
                     catch (Exception ex)

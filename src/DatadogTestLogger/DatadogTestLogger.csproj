@@ -19,6 +19,7 @@
         <PackageId>DatadogTestLogger</PackageId>
         <CheckEolTargetFramework>false</CheckEolTargetFramework>
         <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+        <NoWarn>$(NoWarn);NU1903;NU1902</NoWarn>
     </PropertyGroup>
 
     <!--Datadog.Trace properties/references-->
