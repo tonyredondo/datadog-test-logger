@@ -28,13 +28,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             AppenderElementType = typeof(TResponseArray).GetElementType()!;
         }
 
-        public static TResponseArray AddAppenderToResponse<TAppender>(TResponseArray originalResponseArray, TAppender appender)
+        public static bool TryAddAppenderToResponse<TAppender>(TResponseArray originalResponseArray, TAppender appender, out TResponseArray updatedResponseArray)
         {
             try
             {
                 if (originalResponseArray is null)
                 {
-                    return originalResponseArray;
+                    updatedResponseArray = originalResponseArray;
+                    return false;
                 }
 
                 var originalArray = (Array)(object)originalResponseArray;
@@ -51,19 +52,22 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     if (appender is null)
                     {
                         Log.Error("Error adding Log4Net appender to response: appender is null");
-                        return originalResponseArray;
+                        updatedResponseArray = originalResponseArray;
+                        return false;
                     }
 
                     _appenderProxy = appender.DuckImplement(AppenderElementType);
                 }
 
                 finalArray.SetValue(_appenderProxy, finalArray.Length - 1);
-                return (TResponseArray)(object)finalArray;
+                updatedResponseArray = (TResponseArray)(object)finalArray;
+                return true;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error adding Log4Net appender to response");
-                return originalResponseArray;
+                updatedResponseArray = originalResponseArray;
+                return false;
             }
         }
     }

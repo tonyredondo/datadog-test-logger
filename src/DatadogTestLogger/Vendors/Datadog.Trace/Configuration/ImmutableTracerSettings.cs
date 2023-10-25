@@ -13,8 +13,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Telemetry;
 using DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging.DirectSubmission;
@@ -157,8 +160,15 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
             IsRunningInAzureAppService = settings.IsRunningInAzureAppService;
             AzureAppServiceMetadata = settings.AzureAppServiceMetadata;
 
+            IsRunningInAzureFunctionsConsumptionPlan = settings.IsRunningInAzureFunctionsConsumptionPlan;
+
+            IsRunningInGCPFunctions = settings.IsRunningInGCPFunctions;
+            LambdaMetadata = settings.LambdaMetadata;
+
             TraceId128BitGenerationEnabled = settings.TraceId128BitGenerationEnabled;
             TraceId128BitLoggingEnabled = settings.TraceId128BitLoggingEnabled;
+
+            CommandsCollectionEnabled = settings.CommandsCollectionEnabled;
 
             static string? GetExplicitSettingOrTag(string? explicitSetting, IDictionary<string, string> globalTags, string tag)
             {
@@ -412,6 +422,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets a value indicating the regex to apply to obfuscate http query strings.
+        ///  WARNING: This regex cause crashes under netcoreapp2.1 / linux / arm64, dont use on manual instrumentation in this environment
         /// </summary>
         /// <seealso cref="ConfigurationKeys.ObfuscationQueryStringRegex"/>
         internal string ObfuscationQueryStringRegex { get; }
@@ -498,6 +509,22 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         internal bool IsRunningInAzureAppService { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the tracer is running in Azure Functions
+        /// on a consumption plan
+        /// </summary>
+        internal bool IsRunningInAzureFunctionsConsumptionPlan { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the tracer is running in Google Cloud Functions
+        /// </summary>
+        internal bool IsRunningInGCPFunctions { get; }
+
+        /// <summary>
+        /// Gets the AWS Lambda settings, including whether we're currently running in Lambda
+        /// </summary>
+        internal LambdaMetadata LambdaMetadata { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the tracer should propagate service data in db queries
         /// </summary>
         internal DbmPropagationLevel DbmPropagationMode { get; }
@@ -516,9 +543,20 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         internal bool TraceId128BitLoggingEnabled { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the tracer will send the shell commands of
+        /// the "command_execution" integration to the agent.
+        /// </summary>
+        internal bool CommandsCollectionEnabled { get; }
+
+        /// <summary>
         /// Gets the AAS settings. Guaranteed not <c>null</c> when <see cref="IsRunningInAzureAppService"/> is not <c>null</c>
         /// </summary>
         internal ImmutableAzureAppServiceSettings? AzureAppServiceMetadata { get; }
+
+        /// <summary>
+        /// Gets the GCP Function settings
+        /// </summary>
+        internal ImmutableGCPFunctionSettings? GCPFunctionSettings { get; }
 
         /// <summary>
         /// Gets a value indicating whether to calculate the peer.service tag from predefined precursor attributes when using the v0 schema.
@@ -555,6 +593,26 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Configuration
         {
             TelemetryFactory.Metrics.Record(PublicApiUsage.ImmutableTracerSettings_FromDefaultSources);
             return new ImmutableTracerSettings(TracerSettings.FromDefaultSourcesInternal(), true);
+        }
+
+        // Overriding the default "record" behaviour here
+        // This type _shouldn't_ be treated as a record generally, we only made it a record
+        // so we could use with {} expressions, but these access public properties by default
+        // (rather than only the internal ones)
+
+        /// <inheritdoc />
+        // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
+        public override int GetHashCode() => base.GetHashCode();
+
+        /// <inheritdoc />
+        // ReSharper disable once BaseObjectEqualsIsObjectEquals
+        public virtual bool Equals(ImmutableTracerSettings? other) => base.Equals(other);
+
+        /// <inheritdoc />
+        public override string? ToString()
+        {
+            TelemetryFactory.Metrics.Record(PublicApiUsage.ImmutableTracerSettings_ToString);
+            return base.ToString();
         }
 
         internal bool IsErrorStatusCode(int statusCode, bool serverStatusCode)

@@ -19,4 +19,5 @@ internal static class MetricNamespaceConstants
     public const string Telemetry = "telemetry";
     public const string ASM = "appsec";
     public const string Iast = "iast";
+    public const string CIVisibility = "civisibility";
 }

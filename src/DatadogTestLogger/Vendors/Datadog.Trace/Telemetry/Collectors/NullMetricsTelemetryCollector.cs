@@ -9,6 +9,7 @@
 // </copyright>
 
 #nullable enable
+using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
@@ -21,9 +22,7 @@ internal partial class NullMetricsTelemetryCollector : IMetricsTelemetryCollecto
     {
     }
 
-    public void AggregateMetrics()
-    {
-    }
+    public Task DisposeAsync() => Task.CompletedTask;
 
     public MetricResults GetMetrics() => new(null, null);
 

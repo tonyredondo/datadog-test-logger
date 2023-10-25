@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
 
@@ -60,7 +61,7 @@ internal static class TestAssemblyInfoRunAssemblyInitializeIntegration
             instance.AssemblyCleanupMethod ??= EmptyCleanUpMethodInfo;
 
             CIVisibility.WaitForSkippableTaskToFinish();
-            var module = TestModule.Create(assemblyName, "MSTestV2", frameworkVersion);
+            var module = TestModule.InternalCreate(assemblyName, CommonTags.TestingFrameworkNameMsTestV2, frameworkVersion);
             TestAssemblyInfos.Add(instance.Instance, module);
             return new CallTargetState(null, module);
         }

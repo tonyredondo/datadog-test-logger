@@ -10,6 +10,7 @@
 
 using System;
 using System.ComponentModel;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.CallTarget;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.NUnit;
@@ -43,6 +44,9 @@ internal static class NUnitWorkItemWorkItemCompleteIntegration
         {
             case "Assembly" when NUnitIntegration.GetTestModuleFrom(item) is { } module:
                 module.Close();
+                // Because we are auto-instrumenting a VSTest testhost process we need to manually call the shutdown process
+                CIVisibility.Close();
+
                 break;
             case "TestFixture" when NUnitIntegration.GetTestSuiteFrom(item) is { } suite:
                 suite.Close();

@@ -10,6 +10,7 @@
 
 using System;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
@@ -42,6 +43,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
         /// Gets Event-Platform path
         /// </summary>
         public abstract string EventPlatformPath { get; }
+
+        /// <summary>
+        /// Gets the Telemetry endpoint enum
+        /// </summary>
+        public abstract MetricTags.CIVisibilityEndpoints TelemetryEndpoint { get; }
 
         /// <summary>
         /// Gets or sets the Payload url

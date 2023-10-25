@@ -90,4 +90,10 @@ internal partial class TestSpanTags : TestSuiteSpanTags
 
     [Tag(IntelligentTestRunnerTags.SkippedBy)]
     public string SkippedByIntelligentTestRunner { get; set; }
+
+    [Tag(IntelligentTestRunnerTags.UnskippableTag)]
+    public string Unskippable { get; set; }
+
+    [Tag(IntelligentTestRunnerTags.ForcedRunTag)]
+    public string ForcedRun { get; set; }
 }

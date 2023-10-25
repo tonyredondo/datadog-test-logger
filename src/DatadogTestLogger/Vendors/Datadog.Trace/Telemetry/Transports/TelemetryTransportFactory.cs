@@ -37,7 +37,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Transports
 
         private static ITelemetryTransport GetAgentlessFactory(TelemetrySettings.AgentlessSettings agentlessSettings, bool debugEnabled)
             => new AgentlessTelemetryTransport(
-                TelemetryTransportStrategy.GetDirectIntakeFactory(agentlessSettings.AgentlessUri, agentlessSettings.ApiKey),
+                TelemetryTransportStrategy.GetDirectIntakeFactory(agentlessSettings),
                 debugEnabled: debugEnabled);
     }
 }

@@ -11,6 +11,7 @@
 using System;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.EventModel;
+using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
@@ -25,6 +26,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Agent.Payloads
         public override string EventPlatformSubdomain => "citestcycle-intake";
 
         public override string EventPlatformPath => "api/v2/citestcycle";
+
+        public override MetricTags.CIVisibilityEndpoints TelemetryEndpoint => MetricTags.CIVisibilityEndpoints.TestCycle;
 
         public override bool CanProcessEvent(IEvent @event)
         {

@@ -18,6 +18,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Agent;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
 using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler;
+using DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Schema;
 using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
@@ -208,6 +209,9 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
         /// </summary>
         internal void Start()
         {
+            // Start the Serverless Mini Agent in GCP Functions & Azure Consumption Plan Functions.
+            ServerlessMiniAgent.StartServerlessMiniAgent(Settings);
+
             // Must be idempotent and thread safe
             DirectLogSubmission?.Sink.Start();
             Telemetry?.Start();
@@ -444,7 +448,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     writer.WritePropertyName("obfuscation_querystring_size");
                     writer.WriteValue(instanceSettings.QueryStringReportingSize);
 
-                    if (string.Compare(instanceSettings.ObfuscationQueryStringRegex, TracerSettings.DefaultObfuscationQueryStringRegex, StringComparison.Ordinal) != 0)
+                    if (string.Compare(instanceSettings.ObfuscationQueryStringRegex, TracerSettingsConstants.DefaultObfuscationQueryStringRegex, StringComparison.Ordinal) != 0)
                     {
                         writer.WritePropertyName("obfuscation_querystring_regex");
                         writer.WriteValue(instanceSettings.ObfuscationQueryStringRegex);

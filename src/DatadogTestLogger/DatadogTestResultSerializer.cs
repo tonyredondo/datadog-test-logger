@@ -61,15 +61,15 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
     {
         string[] ciEnvironmentVariables = typeof(Vendors.Datadog.Trace.Ci.CIEnvironmentValues.Constants)
             .GetFields()
-            .Select(f => f.GetValue(null)?.ToString())
-            .Where(f => f is not null)
+            .Select(f => f.GetValue(null)?.ToString() ?? string.Empty)
+            .Where(f => !string.IsNullOrEmpty(f))
             .ToArray();
 
         builder.AppendLine(title);
         var curatedEnvironmentVariables = new List<KeyValuePair<string, string>>();
-        foreach (DictionaryEntry envVars in (environmentVariables ?? Environment.GetEnvironmentVariables()))
+        foreach (DictionaryEntry? envVars in (environmentVariables ?? Environment.GetEnvironmentVariables()))
         {
-            var key = envVars.Key?.ToString().ToUpperInvariant();
+            var key = envVars?.Key?.ToString()?.ToUpperInvariant();
             if (key is null)
             {
                 continue;
@@ -78,13 +78,13 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
             // We allow keys starting with DD_, COR_ and CORECLR_
             if (key.StartsWith("DD_") || key.StartsWith("COR_") || key.StartsWith("CORECLR_"))
             {
-                curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars.Value?.ToString() ?? string.Empty));
+                curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars?.Value?.ToString() ?? string.Empty));
             }
 
             // We also allow keys from CI providers
             if (ciEnvironmentVariables.Any(env => string.Equals(env, key, StringComparison.OrdinalIgnoreCase)))
             {
-                curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars.Value?.ToString() ?? string.Empty));
+                curatedEnvironmentVariables.Add(new KeyValuePair<string, string>(key, envVars?.Value?.ToString() ?? string.Empty));
             }
         }
 

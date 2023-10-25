@@ -8,6 +8,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 {
     /// <summary>
@@ -15,6 +17,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
     /// </summary>
     internal interface IHeaders
     {
+        /// <summary>
+        /// Gets number of headers
+        /// </summary>
+        public int Count { get; }
+
+        /// <summary>
+        /// Gets the header at the specified index
+        /// </summary>
+        public IHeader this[int index] { get;  }
+
         /// <summary>
         /// Adds a header to the collection
         /// </summary>

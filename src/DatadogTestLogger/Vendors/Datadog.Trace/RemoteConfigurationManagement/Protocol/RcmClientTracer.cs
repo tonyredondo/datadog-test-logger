@@ -11,11 +11,13 @@
 using System.Collections.Generic;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
+#nullable enable
+
 namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.Protocol
 {
     internal class RcmClientTracer
     {
-        public RcmClientTracer(string runtimeId, string tracerVersion, string service, string env, string appVersion, List<string> tags)
+        public RcmClientTracer(string runtimeId, string tracerVersion, string service, string env, string? appVersion, List<string> tags)
         {
             RuntimeId = runtimeId;
             Language = TracerConstants.Language;
@@ -38,11 +40,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.RemoteConfigurationManagement.
         [JsonProperty("service")]
         public string Service { get; }
 
+        [JsonProperty("extra_services")]
+        public string[]? ExtraServices { get; set; }
+
         [JsonProperty("env")]
         public string Env { get; }
 
         [JsonProperty("app_version")]
-        public string AppVersion { get; }
+        public string? AppVersion { get; }
 
         [JsonProperty("tags")]
         public List<string> Tags { get; }

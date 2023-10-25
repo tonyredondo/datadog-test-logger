@@ -37,6 +37,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
                 proxyMemberReturnType,
                 Type.EmptyTypes);
 
+            var isValueWithType = false;
+            var originalProxyMemberReturnType = proxyMemberReturnType;
+            if (proxyMemberReturnType.IsGenericType && proxyMemberReturnType.GetGenericTypeDefinition() == typeof(ValueWithType<>))
+            {
+                proxyMemberReturnType = proxyMemberReturnType.GenericTypeArguments[0];
+                isValueWithType = true;
+            }
+
             LazyILGenerator il = new LazyILGenerator(proxyMethod?.GetILGenerator());
             Type returnType = targetField.FieldType;
 
@@ -126,6 +134,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
                 il.WriteTypeConversion(returnType, proxyMemberReturnType);
             }
 
+            if (isValueWithType)
+            {
+                il.Emit(OpCodes.Ldtoken, returnType);
+                il.EmitCall(OpCodes.Call, GetTypeFromHandleMethodInfo, null!);
+                il.EmitCall(OpCodes.Call, originalProxyMemberReturnType.GetMethod("Create", BindingFlags.Static | BindingFlags.Public)!, null!);
+            }
+
             il.Emit(OpCodes.Ret);
             il.Flush();
             if (proxyMethod is not null)
@@ -165,11 +180,25 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
                 }
             }
 
+            var isValueWithType = false;
+            var originalproxyMemberReturnType = proxyMemberReturnType;
+            if (proxyMemberReturnType.IsGenericType && proxyMemberReturnType.GetGenericTypeDefinition() == typeof(ValueWithType<>))
+            {
+                proxyMemberReturnType = proxyMemberReturnType.GenericTypeArguments[0];
+                currentValueType = proxyMemberReturnType;
+                isValueWithType = true;
+            }
+
             // Check if the type can be converted of if we need to enable duck chaining
             if (NeedsDuckChaining(targetField.FieldType, proxyMemberReturnType))
             {
                 // Load the argument and convert it to Duck type
                 il.Emit(OpCodes.Ldarg_1);
+                if (isValueWithType)
+                {
+                    il.Emit(OpCodes.Ldfld, originalproxyMemberReturnType.GetField("Value")!);
+                }
+
                 il.WriteTypeConversion(proxyMemberReturnType, typeof(IDuckType));
 
                 // Call IDuckType.Instance property to get the actual value
@@ -181,6 +210,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping
             {
                 // Load the value into the stack
                 il.Emit(OpCodes.Ldarg_1);
+                if (isValueWithType)
+                {
+                    il.Emit(OpCodes.Ldfld, originalproxyMemberReturnType.GetField("Value")!);
+                }
             }
 
             // We set the field value

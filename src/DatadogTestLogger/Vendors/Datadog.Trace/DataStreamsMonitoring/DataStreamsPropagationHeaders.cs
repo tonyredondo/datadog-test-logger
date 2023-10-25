@@ -13,6 +13,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
 internal static class DataStreamsPropagationHeaders
 {
     public const string PropagationKey = "dd-pathway-ctx";
+    public const string PropagationKeyBase64 = "dd-pathway-ctx-base64";
     public const string TemporaryEdgeTags = "x-datadog-temp-edge-tags";
     public const string TemporaryBase64PathwayContext = "x-datadog-temp-base64-context";
 }

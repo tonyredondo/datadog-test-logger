@@ -110,7 +110,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
 
                     if (basicProperties != null)
                     {
-                        RabbitMQIntegration.SetDataStreamsCheckpointOnConsume(Tracer.Instance, scope.Span, tags, basicProperties.Headers);
+                        RabbitMQIntegration.SetDataStreamsCheckpointOnConsume(
+                            Tracer.Instance,
+                            scope.Span,
+                            tags,
+                            basicProperties.Headers,
+                            basicGetResult.Body?.Length ?? 0,
+                            basicProperties.Timestamp.UnixTime != 0 ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - basicProperties.Timestamp.UnixTime : 0);
                     }
                 }
             }

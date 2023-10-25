@@ -54,7 +54,11 @@ internal class LoggerFactoryConstructorNet7Integration
         var scopeProvider = state.State is { } rawScopeProvider
             ? rawScopeProvider.DuckCast<IExternalScopeProvider>()
             : null;
-        LoggerFactoryIntegrationCommon<TTarget>.AddDirectSubmissionLoggerProvider(instance, scopeProvider);
+        if (LoggerFactoryIntegrationCommon<TTarget>.TryAddDirectSubmissionLoggerProvider(instance, scopeProvider))
+        {
+            TracerManager.Instance.Telemetry.IntegrationGeneratedSpan(IntegrationId.ILogger);
+        }
+
         return CallTargetReturn.GetDefault();
     }
 }

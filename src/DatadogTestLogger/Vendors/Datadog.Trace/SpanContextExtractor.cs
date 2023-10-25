@@ -51,7 +51,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
                 var edgeTags = edgeTagString.Split(',');
                 spanContext.MergePathwayContext(pathwayContext);
-                spanContext.SetCheckpoint(dsm, CheckpointKind.Consume, edgeTags);
+                spanContext.SetCheckpoint(dsm, CheckpointKind.Consume, edgeTags, 0, 0);
             }
 
             return spanContext;

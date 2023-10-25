@@ -10,7 +10,6 @@
 
 #nullable enable
 using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using DatadogTestLogger.Vendors.Datadog.Trace.Agent.DiscoveryService;
@@ -106,6 +105,51 @@ internal class DataStreamsManager
         Log.Debug("Attempted to inject null pathway context");
     }
 
+    public void TrackBacklog(string tags, long value)
+    {
+        if (!IsEnabled)
+        {
+            return;
+        }
+
+        var writer = Volatile.Read(ref _writer);
+        var point = new BacklogPoint(tags, value, DateTimeOffset.UtcNow.ToUnixTimeNanoseconds());
+        writer?.AddBacklog(point);
+    }
+
+    /// <summary>
+    /// Trys to extract a <see cref="PathwayContext"/>, from the provided <paramref name="headers"/>
+    /// If data streams is disabled, or no pathway is present, returns null.
+    /// </summary>
+    public PathwayContext? ExtractPathwayContextAsBase64String<TCarrier>(TCarrier headers)
+        where TCarrier : IHeadersCollection
+        => IsEnabled ? DataStreamsContextPropagator.Instance.ExtractAsBase64String(headers) : null;
+
+    /// <summary>
+    /// Injects a <see cref="PathwayContext"/> into headers
+    /// </summary>
+    /// <param name="context">The pathway context to inject</param>
+    /// <param name="headers">The header collection to inject the headers into</param>
+    public void InjectPathwayContextAsBase64String<TCarrier>(PathwayContext? context, TCarrier headers)
+        where TCarrier : IHeadersCollection
+    {
+        if (!IsEnabled)
+        {
+            return;
+        }
+
+        if (context is not null)
+        {
+            DataStreamsContextPropagator.Instance.InjectAsBase64String(context.Value, headers);
+            return;
+        }
+
+        // This shouldn't happen normally, as you should call SetCheckpoint before calling InjectPathwayContext
+        // But if data streams was disabled, you call SetCheckpoint, and then data streams is enabled
+        // you will hit this code path
+        Log.Debug("Attempted to inject null pathway context");
+    }
+
     /// <summary>
     /// Sets a checkpoint using the provided <see cref="PathwayContext"/>
     /// NOTE: <paramref name="edgeTags"/> must be in correct sort order
@@ -113,8 +157,15 @@ internal class DataStreamsManager
     /// <param name="parentPathway">The current pathway</param>
     /// <param name="checkpointKind">Is this a Produce or Consume operation?</param>
     /// <param name="edgeTags">Edge tags to set for the new pathway. MUST be sorted in alphabetical order</param>
+    /// <param name="payloadSizeBytes">Payload size in bytes</param>
+    /// <param name="timeInQueueMs">Edge start time extracted from the message metadata. Used only if this is start of the pathway</param>
     /// <returns>If disabled, returns <c>null</c>. Otherwise returns a new <see cref="PathwayContext"/></returns>
-    public PathwayContext? SetCheckpoint(in PathwayContext? parentPathway, CheckpointKind checkpointKind, string[] edgeTags)
+    public PathwayContext? SetCheckpoint(
+        in PathwayContext? parentPathway,
+        CheckpointKind checkpointKind,
+        string[] edgeTags,
+        long payloadSizeBytes,
+        long timeInQueueMs)
     {
         if (!IsEnabled)
         {
@@ -129,7 +180,11 @@ internal class DataStreamsManager
                 previousContext = PreviousCheckpoint.Value.Context;
             }
 
-            var edgeStartNs = DateTimeOffset.UtcNow.ToUnixTimeNanoseconds();
+            var nowNs = DateTimeOffset.UtcNow.ToUnixTimeNanoseconds();
+            // We should use timeInQueue to offset the edge / pathway start if this is a beginning of a pathway
+            // This allows tracking edge / pathway latency for pipelines starting with a queue (no producer instrumented upstream)
+            // by relying on the message timestamp.
+            var edgeStartNs = previousContext == null && timeInQueueMs > 0 ? nowNs - (timeInQueueMs * 1_000_000) : nowNs;
             var pathwayStartNs = previousContext?.PathwayStart ?? edgeStartNs;
 
             var nodeHash = HashHelper.CalculateNodeHash(_nodeHashBase, edgeTags);
@@ -142,9 +197,10 @@ internal class DataStreamsManager
                     edgeTags: edgeTags,
                     hash: pathwayHash,
                     parentHash: parentHash,
-                    timestampNs: edgeStartNs,
-                    pathwayLatencyNs: edgeStartNs - pathwayStartNs,
-                    edgeLatencyNs: edgeStartNs - (previousContext?.EdgeStart ?? edgeStartNs)));
+                    timestampNs: nowNs,
+                    pathwayLatencyNs: nowNs - pathwayStartNs,
+                    edgeLatencyNs: nowNs - (previousContext?.EdgeStart ?? edgeStartNs),
+                    payloadSizeBytes));
 
             var pathway = new PathwayContext(
                 hash: pathwayHash,

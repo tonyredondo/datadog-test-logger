@@ -9,6 +9,7 @@
 // </copyright>
 
 using System;
+using System.Runtime.CompilerServices;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
@@ -133,6 +134,11 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ExtensionMethods
 
             normalizedTagName = StringBuilderCache.GetStringAndRelease(sb);
             return true;
+        }
+
+        public static string SanitizeNulls(this string txt)
+        {
+            return txt?.Replace("\0", string.Empty);
         }
     }
 }
