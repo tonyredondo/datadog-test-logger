@@ -30,7 +30,7 @@ public class DatadogCoverageCollector : DataCollector
     public override void Initialize(XmlElement? configurationElement, DataCollectionEvents events, DataCollectionSink dataSink,
         DataCollectionLogger logger, DataCollectionEnvironmentContext? environmentContext)
     {
-        _coverageCollector?.Initialize(configurationElement, events, dataSink, logger, environmentContext);
+        _coverageCollector?.Initialize(configurationElement!, events, dataSink, logger, environmentContext!);
     }
 
     protected override void Dispose(bool disposing)
