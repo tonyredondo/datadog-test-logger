@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -40,6 +41,8 @@ internal class TestSuiteSerializer
             var targetFrameworkAttribute = Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>();
             output.AppendLine($"\tLogger TargetFramework = {targetFrameworkAttribute?.FrameworkName}");
             output.AppendLine($"\tLogger TargetFramework(Display) = {targetFrameworkAttribute?.FrameworkDisplayName}");
+            output.AppendLine($"\tLogger BCL = {typeof(int).Assembly.FullName}");
+            output.AppendLine($"\tLogger AssemblyBuilder assembly = {typeof(AssemblyBuilder).Assembly.FullName}");
             
             var runtimeName = string.Empty;
             var runtimeVersion = string.Empty;
