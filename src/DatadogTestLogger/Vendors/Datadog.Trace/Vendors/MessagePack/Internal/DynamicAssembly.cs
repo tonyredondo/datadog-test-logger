@@ -27,11 +27,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
 
         public DynamicAssembly(string moduleName)
         {
-#if NETFRAMEWORK
-            this.moduleName = moduleName;
-            this.assemblyBuilder = System.AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.RunAndSave);
-            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
-#else
 #if NETSTANDARD || NETFRAMEWORK || NETCOREAPP
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
 #else
@@ -39,7 +34,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.MessagePack.Internal
 #endif
 
             this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
-#endif
         }
 
         // requires lock on mono environment. see: https://github.com/neuecc/MessagePack-CSharp/issues/161
