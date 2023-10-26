@@ -32,7 +32,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
         var retries = 4;
         while (Interlocked.CompareExchange(ref _lastCpuPercentageValue, 0, 0) == 0 && retries-- > 0)
         {
-            Thread.Sleep(100);
+            Thread.Sleep(500);
         }
     }
 
@@ -54,7 +54,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
                 lock (values)
                 {
                     // Check if the last cpu percentage value was already included.
-                    if (values.Count > 0 && Math.Abs(values[values.Count - 1] - _lastCpuPercentageValue) <= 0.0000001)
+                    if (values.Count > 0 && Math.Abs(values[values.Count - 1] - _lastCpuPercentageValue) <= 0.000001)
                     {
                         return;
                     }
@@ -114,14 +114,15 @@ internal class CpuInProcDataCollection : InProcDataCollection
                     // Collect values
                     watch.Restart();
                     var startCpuUsage = process.TotalProcessorTime;
-                    Thread.Sleep(40);
-                    var endCpuUsage = process.TotalProcessorTime;
+                    Thread.Sleep(500);
                     var ticksPassed = watch.Elapsed.Ticks;
+                    var endCpuUsage = process.TotalProcessorTime;
 
                     // Calculation
                     var cpuUsedTicks = (endCpuUsage - startCpuUsage).Ticks;
-                    var cpuUsageTotal = (double)cpuUsedTicks / (Environment.ProcessorCount * ticksPassed);
-                    var result = Math.Round(cpuUsageTotal * 100, 4, MidpointRounding.AwayFromZero);
+                    var cpuUsagePercent = ((double)cpuUsedTicks / (double)ticksPassed) * 100;
+                    cpuUsagePercent = cpuUsagePercent / Environment.ProcessorCount;
+                    var result = Math.Round(cpuUsagePercent, 1, MidpointRounding.AwayFromZero);
 
                     // If after the calculation we have a value > 100 then we assume the cpu/timer is having a bad time
                     // due to usage, so we clip the value to a 100%
