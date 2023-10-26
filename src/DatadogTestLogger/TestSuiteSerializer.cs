@@ -3,6 +3,8 @@
 // </copyright>
 
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 using DatadogTestLogger.Vendors.Datadog.Trace;
@@ -27,7 +29,7 @@ internal class TestSuiteSerializer
     public string Serialize(List<TestResultInfo> results, List<TestMessageInfo> messages)
     { 
         var output = new StringBuilder();
-
+        
         try
         {
             output.AppendLine("**************************************************");
@@ -35,6 +37,12 @@ internal class TestSuiteSerializer
             output.AppendLine($"\tDate = {DateTimeOffset.Now}");
             output.AppendLine($"\tResults count = {results?.Count ?? 0}");
             output.AppendLine($"\tMessages count = {messages?.Count ?? 0}");
+
+            var targetFrameworkAttribute = Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>();
+            output.AppendLine($"\tLogger TargetFramework = {targetFrameworkAttribute?.FrameworkName}");
+            output.AppendLine($"\tLogger TargetFramework(Display) = {targetFrameworkAttribute?.FrameworkDisplayName}");
+            output.AppendLine($"\tLogger BCL = {typeof(int).Assembly.FullName}");
+            output.AppendLine($"\tLogger AssemblyBuilder assembly = {typeof(AssemblyBuilder).Assembly.FullName}");
             
             var runtimeName = string.Empty;
             var runtimeVersion = string.Empty;
@@ -61,17 +69,22 @@ internal class TestSuiteSerializer
             }
             else
             {
-                runtimeName = _runConfiguration.TargetFramework.IndexOf("NETFramework") != -1
+                runtimeName = _runConfiguration.TargetFramework.IndexOf("NETFramework", StringComparison.InvariantCultureIgnoreCase) != -1
                     ? ".NET Framework"
                     : ".NET";
                 runtimeVersion = _runConfiguration.TargetFramework switch
                 {
                     "NETCoreApp21" => "2.1.x",
+                    "NETCoreApp22" => "2.2.x",
                     "NETCoreApp30" => "3.0.x",
                     "NETCoreApp31" => "3.1.x",
                     "NETCoreApp50" => "5.0.x",
                     "NETCoreApp60" => "6.0.x",
+                    "NETCoreApp70" => "7.0.x",
+                    "NETCoreApp80" => "8.0.x",
                     "NETFramework461" => "4.6.1",
+                    "NETFramework472" => "4.7.2",
+                    "NETFramework48" => "4.8",
                     _ => _runConfiguration.TargetFramework
                 };
             }

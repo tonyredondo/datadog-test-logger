@@ -8,6 +8,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+#nullable enable
+
 using System;
 using System.Text;
 using DatadogTestLogger.Vendors.Datadog.Trace.DataStreamsMonitoring;
@@ -29,14 +31,14 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
         private static bool _headersInjectionEnabled = true;
         private static string[] defaultProduceEdgeTags = new[] { "direction:out", "type:kafka" };
 
-        internal static Scope CreateProducerScope(
+        internal static Scope? CreateProducerScope(
             Tracer tracer,
             object producer,
             ITopicPartition topicPartition,
             bool isTombstone,
             bool finishOnClose)
         {
-            Scope scope = null;
+            Scope? scope = null;
 
             try
             {
@@ -130,7 +132,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             return size;
         }
 
-        internal static Scope CreateConsumerScope(
+        internal static Scope? CreateConsumerScope(
             Tracer tracer,
             DataStreamsManager dataStreamsManager,
             object consumer,
@@ -139,7 +141,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             Offset? offset,
             IMessage message)
         {
-            Scope scope = null;
+            Scope? scope = null;
 
             try
             {
@@ -158,7 +160,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                     return null;
                 }
 
-                SpanContext propagatedContext = null;
+                SpanContext? propagatedContext = null;
                 PathwayContext? pathwayContext = null;
 
                 // Try to extract propagated context from headers
@@ -274,7 +276,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                             dataStreamsManager,
                             CheckpointKind.Consume,
                             edgeTags,
-                            GetMessageSize(message),
+                            message is null ? 0 : GetMessageSize(message),
                             tags.MessageQueueTimeMs == null ? 0 : (long)tags.MessageQueueTimeMs);
                     }
                 }
@@ -307,7 +309,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
                 }
 
                 // TODO: record end-to-end time?
-                activeScope.Dispose();
+                activeScope!.Dispose();
             }
             catch (Exception ex)
             {
@@ -331,7 +333,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentatio
             TMessage message)
             where TMessage : IMessage
         {
-            if (!_headersInjectionEnabled)
+            if (!_headersInjectionEnabled || message.Instance is null)
             {
                 return;
             }

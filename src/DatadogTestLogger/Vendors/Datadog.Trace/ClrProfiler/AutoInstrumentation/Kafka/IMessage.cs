@@ -8,12 +8,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+using DatadogTestLogger.Vendors.Datadog.Trace.DuckTyping;
+
 namespace DatadogTestLogger.Vendors.Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 {
     /// <summary>
     /// Message interface for duck-typing
     /// </summary>
-    internal interface IMessage
+    internal interface IMessage : IDuckType
     {
         /// <summary>
         /// Gets the key of the message

@@ -46,7 +46,8 @@ public class VendoredDependency
                 "SpanExtensions.Framework.cs",
                 "Generated/**/Datadog.Trace.SourceGenerators/Datadog.Trace.SourceGenerators.TagsListGenerator.TagListGenerator/IastTags.g.cs",
                 "Activity/Handlers/AzureServiceBusActivityHandler.cs",
-                "Generated/**/Datadog.Trace.SourceGenerators/TagListGenerator/IastTags.g.cs"
+                "Generated/**/Datadog.Trace.SourceGenerators/TagListGenerator/IastTags.g.cs",
+                "Vendors/MessagePack/Internal/DynamicAssembly.cs",
             },
             Transform = filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Datadog.Trace",
                 targetNamespacePrefix: TestLoggerNamespace,
