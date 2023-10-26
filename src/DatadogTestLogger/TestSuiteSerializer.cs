@@ -101,6 +101,7 @@ internal class TestSuiteSerializer
                     .GroupBy(g => g.AssemblyPath).ToArray();
 
                 Dictionary<Guid, List<double>>? cpuValues = null;
+                Dictionary<Guid, TestCaseMetadata>? testCaseMetadatas = null;
 
                 foreach (var resultByAssembly in groupedResults)
                 {
@@ -123,15 +124,39 @@ internal class TestSuiteSerializer
                     {
                         if (File.Exists(cpuValuesPath))
                         {
-                            output.AppendLine("CpuValues File: " + cpuValuesPath);
+                            output.AppendLine("CpuValues file: " + cpuValuesPath);
                             var jsonCpuValues = File.ReadAllText(cpuValuesPath);
                             cpuValues = JsonConvert.DeserializeObject<Dictionary<Guid, List<double>>>(jsonCpuValues);
                             output.AppendLine("CpuValues file loaded with " + (cpuValues?.Count ?? -1) + " test cases.");
+                        }
+                        else
+                        {
+                            output.AppendLine("CpuValues file doesn't exist!: " + cpuValuesPath);
                         }
                     }
                     catch (Exception ex)
                     {
                         output.AppendLine("Error reading CpuValues json file: " + ex);
+                    }
+                    
+                    var testCaseMetadataPath = Path.Combine(folderPath, "testcase_metadata.json");
+                    try
+                    {
+                        if (File.Exists(testCaseMetadataPath))
+                        {
+                            output.AppendLine("TestCase Metadata file: " + testCaseMetadataPath);
+                            var testCaseMetadataJson = File.ReadAllText(testCaseMetadataPath);
+                            testCaseMetadatas = JsonConvert.DeserializeObject<Dictionary<Guid, TestCaseMetadata>>(testCaseMetadataJson);
+                            output.AppendLine("TestCase Metadata file loaded with " + (testCaseMetadatas?.Count ?? -1) + " test cases.");
+                        }
+                        else
+                        {
+                            output.AppendLine("TestCase Metadata file doesn't exist!: " + testCaseMetadataPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        output.AppendLine("Error reading TestCase Metadata json file: " + ex);
                     }
                     
                     var testFramework = string.Empty;
@@ -222,6 +247,7 @@ internal class TestSuiteSerializer
                                     }
                                 }
 
+                                output.AppendLine("**************************************************");
                                 output.AppendLine("Creating test module: " + testModuleName);
                                 moduleStartTime = result.StartTime;
                                 module = TestModule.Create(testModuleName, testFramework, testFrameworkVersion,
@@ -252,7 +278,18 @@ internal class TestSuiteSerializer
                                 output.AppendLine("      Parameters: " + testParameters);
                             }
 
-                            var test = suite.CreateTest(testName, result.StartTime);
+                            TestCaseMetadata? testCaseMetadata = null;
+
+                            var startTime = result.StartTime;
+                            
+                            // StartTime in metadata
+                            if (testCaseMetadatas is not null &&
+                                testCaseMetadatas.TryGetValue(result.TestCase.Id, out testCaseMetadata))
+                            {
+                                startTime = testCaseMetadata.Start;
+                            }
+                            
+                            var test = suite.CreateTest(testName, startTime);
                             
                             // Cpu values
                             if (cpuValues is not null && cpuValues.TryGetValue(result.TestCase.Id, out var values))
@@ -424,6 +461,14 @@ internal class TestSuiteSerializer
                             }
 
                             var endTime = result.StartTime.Add(duration);
+
+                            // If we have data with precision we use that.
+                            if (testCaseMetadata is not null)
+                            {
+                                endTime = testCaseMetadata.End;
+                                duration = endTime - startTime;
+                            }
+                            
                             if (suiteEndTime < endTime)
                             {
                                 suiteEndTime = endTime;
@@ -657,5 +702,13 @@ internal class TestSuiteSerializer
         public ulong SpanId => _context.SpanId;
 
         public string ServiceName => _context.ServiceName;
+    }
+
+    internal class TestCaseMetadata
+    {
+        [JsonProperty("start")]
+        public DateTime Start { get; set; }
+        [JsonProperty("end")]
+        public DateTime End { get; set; }
     }
 }

@@ -322,6 +322,13 @@ public class VendoredDependency
                             $"#elif NETCOREAPP2_1\n        public const string ManagedTracerTfmValue = \"netcoreapp2.1\";\n#elif NETCOREAPP2_2\n        public const string ManagedTracerTfmValue = \"netcoreapp2.2\";\n#elif NETCOREAPP3_0\n        public const string ManagedTracerTfmValue = \"netcoreapp3.0\";\n#elif NET5_0\n        public const string ManagedTracerTfmValue = \"net5.0\";\n#elif NET7_0\n        public const string ManagedTracerTfmValue = \"net7.0\";\n#else\n#error Unexpected TFM");
                     }
 
+                    if (filePath.Contains("CoverageCollector.cs"))
+                    {
+                        builder.Replace(
+                            "_logger?.Error(\"Tracer home (DD_DOTNET_TRACER_HOME environment variable) is not defined or folder doesn't exist, coverage has been disabled.\");\n\n                    // By not register a handler to SessionStart and SessionEnd the coverage gets disabled (assemblies are not being processed).\n                    return false;", 
+                            string.Empty);
+                    }
+
                     // Fix namespace conflicts in `using alias` directives. For example, transform:
                     //      using Foo = dnlib.A.B.C;
                     // To:

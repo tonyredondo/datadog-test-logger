@@ -18,6 +18,7 @@ public class DatadogInProcCollector : InProcDataCollection
 {
     private readonly CpuInProcDataCollection? _cpuInProcDataCollection;
     private readonly InProcCoverageCollector? _coverageCollector;
+    private readonly TestCaseInProcDataCollection _testCaseInProcDataCollection;
 
     public DatadogInProcCollector()
     {
@@ -30,34 +31,41 @@ public class DatadogInProcCollector : InProcDataCollection
         {
             _coverageCollector = new();
         }
+
+        _testCaseInProcDataCollection = new TestCaseInProcDataCollection();
     }
     
     public void Initialize(IDataCollectionSink dataCollectionSink)
     {
+        _testCaseInProcDataCollection.Initialize(dataCollectionSink);
         _cpuInProcDataCollection?.Initialize(dataCollectionSink);
         _coverageCollector?.Initialize(dataCollectionSink);
     }
 
     public void TestSessionStart(TestSessionStartArgs testSessionStartArgs)
     {
+        _testCaseInProcDataCollection.TestSessionStart(testSessionStartArgs);
         _cpuInProcDataCollection?.TestSessionStart(testSessionStartArgs);
         _coverageCollector?.TestSessionStart(testSessionStartArgs);
     }
 
     public void TestCaseStart(TestCaseStartArgs testCaseStartArgs)
     {
+        _testCaseInProcDataCollection.TestCaseStart(testCaseStartArgs);
         _cpuInProcDataCollection?.TestCaseStart(testCaseStartArgs);
         _coverageCollector?.TestCaseStart(testCaseStartArgs);
     }
 
     public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
     {
+        _testCaseInProcDataCollection.TestCaseEnd(testCaseEndArgs);
         _cpuInProcDataCollection?.TestCaseEnd(testCaseEndArgs);
         _coverageCollector?.TestCaseEnd(testCaseEndArgs);
     }
 
     public void TestSessionEnd(TestSessionEndArgs testSessionEndArgs)
     {
+        _testCaseInProcDataCollection.TestSessionEnd(testSessionEndArgs);
         _cpuInProcDataCollection?.TestSessionEnd(testSessionEndArgs);
         _coverageCollector?.TestSessionEnd(testSessionEndArgs);
     }
