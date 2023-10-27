@@ -31,6 +31,7 @@ internal class DatadogTestResultSerializer : ITestResultSerializer
 
             var builder = new StringBuilder();
             builder.AppendLine($"ProcessId: {Process.GetCurrentProcess().Id}");
+            builder.AppendLine($"Current Directory: {Environment.CurrentDirectory}");
             builder.AppendLine($"CommandLine: {Environment.CommandLine}");
             builder.AppendLine();
             ShowEnvironmentVariables(builder, "ORIGINAL ENVIRONMENT VARIABLES");
