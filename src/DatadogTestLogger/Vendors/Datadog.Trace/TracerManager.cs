@@ -251,13 +251,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
                     oldManager.Statsd?.Dispose();
                 }
 
-                var telemetryReplaced = false;
-                if (oldManager.Telemetry != newManager.Telemetry && oldManager.Telemetry is not null)
-                {
-                    telemetryReplaced = true;
-                    await oldManager.Telemetry.DisposeAsync(sendAppClosingTelemetry: false).ConfigureAwait(false);
-                }
-
                 var discoveryReplaced = false;
                 if (oldManager.DiscoveryService != newManager.DiscoveryService && oldManager.DiscoveryService is not null)
                 {
@@ -288,8 +281,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace
 
                 Log.Information(
                     exception: null,
-                    "Replaced global instances. AgentWriter: {AgentWriterReplaced}, StatsD: {StatsDReplaced}, RuntimeMetricsWriter: {RuntimeMetricsWriterReplaced}, Telemetry: {TelemetryReplaced}, Discovery: {DiscoveryReplaced}, DataStreamsManager: {DataStreamsManagerReplaced}, RemoteConfigurationManager: {ConfigurationManagerReplaced}, DynamicConfigurationManager: {DynamicConfigurationManagerReplaced}",
-                    new object[] { agentWriterReplaced, statsdReplaced, runtimeMetricsWriterReplaced, telemetryReplaced, discoveryReplaced, dataStreamsReplaced, configurationManagerReplaced, dynamicConfigurationManagerReplaced });
+                    "Replaced global instances. AgentWriter: {AgentWriterReplaced}, StatsD: {StatsDReplaced}, RuntimeMetricsWriter: {RuntimeMetricsWriterReplaced}, Discovery: {DiscoveryReplaced}, DataStreamsManager: {DataStreamsManagerReplaced}, RemoteConfigurationManager: {ConfigurationManagerReplaced}, DynamicConfigurationManager: {DynamicConfigurationManagerReplaced}",
+                    new object[] { agentWriterReplaced, statsdReplaced, runtimeMetricsWriterReplaced, discoveryReplaced, dataStreamsReplaced, configurationManagerReplaced, dynamicConfigurationManagerReplaced });
             }
             catch (Exception ex)
             {

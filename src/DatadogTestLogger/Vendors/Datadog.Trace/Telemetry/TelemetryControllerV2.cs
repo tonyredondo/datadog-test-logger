@@ -14,11 +14,9 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using DatadogTestLogger.Vendors.Datadog.Trace.AppSec;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration;
 using DatadogTestLogger.Vendors.Datadog.Trace.Configuration.Telemetry;
 using DatadogTestLogger.Vendors.Datadog.Trace.ContinuousProfiler;
-using DatadogTestLogger.Vendors.Datadog.Trace.Iast.Settings;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Collectors;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
@@ -100,16 +98,6 @@ internal class TelemetryControllerV2 : ITelemetryController
     public void ProductChanged(TelemetryProductType product, bool enabled, ErrorData? error)
         => _products.ProductChanged(product, enabled, error);
 
-    public void RecordSecuritySettings(SecuritySettings settings)
-    {
-        // Nothing to record, remove this method when telemetry V1 is removed
-    }
-
-    public void RecordIastSettings(IastSettings settings)
-    {
-        // Nothing to record, remove this method when telemetry V1 is removed
-    }
-
     public void RecordProfilerSettings(Profiler profiler)
     {
         _configuration.Record(ConfigTelemetryData.ProfilerLoaded, profiler.Status.IsProfilerReady, ConfigurationOrigins.Default);
@@ -127,11 +115,6 @@ internal class TelemetryControllerV2 : ITelemetryController
 
     public void IntegrationDisabledDueToError(IntegrationId integrationId, string error)
         => _integrations.IntegrationDisabledDueToError(integrationId, error);
-
-    public Task DisposeAsync(bool sendAppClosingTelemetry)
-    {
-        return Task.CompletedTask;
-    }
 
     public async Task DisposeAsync()
     {

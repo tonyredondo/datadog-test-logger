@@ -653,7 +653,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
         {
             try
             {
-                // Get the Datadog.Trace path
+                // Get the Datadog.Trace Path
+                if (string.IsNullOrEmpty(_settings.TracerHome))
+                {
+                    // If tracer home is empty then we try to load the Datadog.Trace.dll in the current folder.
+                    return Path.Combine(Path.GetDirectoryName(FilePath), "Datadog.testlogger.dll");
+                }
+                
                 string targetFolder = "net461";
                 switch (tracerTarget)
                 {
