@@ -24,14 +24,22 @@ public static class TotalCpuUsage
         return null;
     });
 
+    private static long _totalErrors;
+
     public static double GetUsage()
     {
         try
         {
+            if (Interlocked.Read(ref _totalErrors) > 10)
+            {
+                return -1;
+            }
+
             return LazyUsage.Value?.GetUsage() ?? 0;
         }
         catch
         {
+            Interlocked.Increment(ref _totalErrors);
             return -1;
         }
     }
