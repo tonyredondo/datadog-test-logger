@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using DatadogTestLogger.Vendors.Datadog.Trace.Util;
+using DatadogTestLogger.Vendors.Datadog.Trace;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
@@ -13,7 +13,7 @@ internal class TestCaseInProcDataCollection : InProcDataCollection
 
     public void Initialize(IDataCollectionSink dataCollectionSink)
     {
-        _ = Clock.UtcNow;
+        _ = TraceClock.Instance.UtcNow.DateTime;
     }
 
     public void TestSessionStart(TestSessionStartArgs testSessionStartArgs)
@@ -25,7 +25,7 @@ internal class TestCaseInProcDataCollection : InProcDataCollection
         if (testCaseStartArgs?.TestCase?.Id is { } id)
         {
             var metadata = _testCaseMetadatas.GetOrAdd(id, _ => new TestCaseMetadata());
-            metadata.Start = Clock.UtcNow;
+            metadata.Start = TraceClock.Instance.UtcNow.DateTime;
         }
     }
 
@@ -34,7 +34,7 @@ internal class TestCaseInProcDataCollection : InProcDataCollection
         if (testCaseEndArgs?.DataCollectionContext?.TestCase is { } testCase && testCase.Id is { } id)
         {
             var metadata = _testCaseMetadatas.GetOrAdd(id, _ => new TestCaseMetadata());
-            metadata.End = Clock.UtcNow;
+            metadata.End = TraceClock.Instance.UtcNow.DateTime;
         }
     }
 
