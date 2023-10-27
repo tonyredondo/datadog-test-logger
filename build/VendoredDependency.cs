@@ -329,6 +329,13 @@ public class VendoredDependency
                             string.Empty);
                     }
 
+                    if (filePath.Contains("AssemblyProcessor.cs"))
+                    {
+                        builder.Replace(
+                            "try\n            {\n                // Get the Datadog.Trace path",
+                            "try\n            {\n                // Get the Datadog.Trace Path\n                if (string.IsNullOrEmpty(_settings.TracerHome))\n                {\n                    // If tracer home is empty then we try to load the Datadog.Trace.dll in the current folder.\n                    return Path.Combine(Path.GetDirectoryName(FilePath), \"Datadog.testlogger.dll\");\n                }\n                ");
+                    }
+
                     // Fix namespace conflicts in `using alias` directives. For example, transform:
                     //      using Foo = dnlib.A.B.C;
                     // To:
