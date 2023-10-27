@@ -41,7 +41,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         if (testCaseStartArgs?.TestCase?.Id is { } id)
         {
-            _currentCpuValues.GetOrAdd(id, new List<CpuUsagePair> { new(_lastCpuPercentageValue, TotalCpuUsage.GetUsage()) });
+            _currentCpuValues.GetOrAdd(id, new List<CpuUsagePair> { new(_lastCpuPercentageValue, GetTotalCpuUsage()) });
         }
     }
 
@@ -54,7 +54,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
             {
                 lock (values)
                 {
-                    values.Add(new(_lastCpuPercentageValue, TotalCpuUsage.GetUsage()));
+                    values.Add(new(_lastCpuPercentageValue, GetTotalCpuUsage()));
                 }
             }
         }
@@ -139,7 +139,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
 
                         lock (values)
                         {
-                            values.Add(new CpuUsagePair(dataCollection._lastCpuPercentageValue, TotalCpuUsage.GetUsage()));
+                            values.Add(new CpuUsagePair(dataCollection._lastCpuPercentageValue, GetTotalCpuUsage()));
                         }
                     }
                 }
@@ -149,6 +149,11 @@ internal class CpuInProcDataCollection : InProcDataCollection
                 }
             }
         }
+    }
+
+    private static double GetTotalCpuUsage()
+    {
+        return Math.Round(TotalCpuUsage.GetUsage(), 1, MidpointRounding.AwayFromZero);
     }
 
     private readonly struct CpuUsagePair
