@@ -22,19 +22,21 @@ internal class TestCaseInProcDataCollection : InProcDataCollection
 
     public void TestCaseStart(TestCaseStartArgs testCaseStartArgs)
     {
+        var time = TraceClock.Instance.UtcNow.DateTime;
         if (testCaseStartArgs?.TestCase?.Id is { } id)
         {
             var metadata = _testCaseMetadatas.GetOrAdd(id, _ => new TestCaseMetadata());
-            metadata.Start = TraceClock.Instance.UtcNow.DateTime;
+            metadata.Start = time;
         }
     }
 
     public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
     {
+        var time = TraceClock.Instance.UtcNow.DateTime;
         if (testCaseEndArgs?.DataCollectionContext?.TestCase is { } testCase && testCase.Id is { } id)
         {
             var metadata = _testCaseMetadatas.GetOrAdd(id, _ => new TestCaseMetadata());
-            metadata.End = TraceClock.Instance.UtcNow.DateTime;
+            metadata.End = time;
         }
     }
 
