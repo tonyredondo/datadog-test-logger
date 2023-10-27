@@ -100,7 +100,7 @@ internal class TestSuiteSerializer
                     .ThenBy(i => i.EndTime)
                     .GroupBy(g => g.AssemblyPath).ToArray();
 
-                Dictionary<Guid, List<double>>? cpuValues = null;
+                Dictionary<Guid, List<CpuUsagePair>>? cpuValues = null;
                 Dictionary<Guid, TestCaseMetadata>? testCaseMetadatas = null;
 
                 foreach (var resultByAssembly in groupedResults)
@@ -118,45 +118,58 @@ internal class TestSuiteSerializer
                     output.AppendLine("AppDomain.CurrentDomain.IsFullyTrusted: " +
                                       AppDomain.CurrentDomain.IsFullyTrusted);
 
-                    var folderPath = Path.GetDirectoryName(moduleFile) ?? string.Empty;
-                    var cpuValuesPath = Path.Combine(folderPath, "cpu_values.json");
-                    try
+                    foreach (var folderPath in new[] { Path.GetDirectoryName(moduleFile) ?? string.Empty, Environment.CurrentDirectory })
                     {
-                        if (File.Exists(cpuValuesPath))
+                        if (cpuValues is null)
                         {
-                            output.AppendLine("CpuValues file: " + cpuValuesPath);
-                            var jsonCpuValues = File.ReadAllText(cpuValuesPath);
-                            cpuValues = JsonConvert.DeserializeObject<Dictionary<Guid, List<double>>>(jsonCpuValues);
-                            output.AppendLine("CpuValues file loaded with " + (cpuValues?.Count ?? -1) + " test cases.");
+                            var cpuValuesPath = Path.Combine(folderPath, "cpu_values.json");
+                            try
+                            {
+                                if (File.Exists(cpuValuesPath))
+                                {
+                                    output.AppendLine("CpuValues file: " + cpuValuesPath);
+                                    var jsonCpuValues = File.ReadAllText(cpuValuesPath);
+                                    cpuValues = JsonConvert
+                                        .DeserializeObject<Dictionary<Guid, List<CpuUsagePair>>>(jsonCpuValues);
+                                    output.AppendLine("CpuValues file loaded with " + (cpuValues?.Count ?? -1) +
+                                                      " test cases.");
+                                }
+                                else
+                                {
+                                    output.AppendLine("CpuValues file doesn't exist!: " + cpuValuesPath);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                output.AppendLine("Error reading CpuValues json file: " + ex);
+                            }
                         }
-                        else
+
+                        if (testCaseMetadatas is null)
                         {
-                            output.AppendLine("CpuValues file doesn't exist!: " + cpuValuesPath);
+                            var testCaseMetadataPath = Path.Combine(folderPath, "testcase_metadata.json");
+                            try
+                            {
+                                if (File.Exists(testCaseMetadataPath))
+                                {
+                                    output.AppendLine("TestCase Metadata file: " + testCaseMetadataPath);
+                                    var testCaseMetadataJson = File.ReadAllText(testCaseMetadataPath);
+                                    testCaseMetadatas =
+                                        JsonConvert.DeserializeObject<Dictionary<Guid, TestCaseMetadata>>(
+                                            testCaseMetadataJson);
+                                    output.AppendLine("TestCase Metadata file loaded with " +
+                                                      (testCaseMetadatas?.Count ?? -1) + " test cases.");
+                                }
+                                else
+                                {
+                                    output.AppendLine("TestCase Metadata file doesn't exist!: " + testCaseMetadataPath);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                output.AppendLine("Error reading TestCase Metadata json file: " + ex);
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        output.AppendLine("Error reading CpuValues json file: " + ex);
-                    }
-                    
-                    var testCaseMetadataPath = Path.Combine(folderPath, "testcase_metadata.json");
-                    try
-                    {
-                        if (File.Exists(testCaseMetadataPath))
-                        {
-                            output.AppendLine("TestCase Metadata file: " + testCaseMetadataPath);
-                            var testCaseMetadataJson = File.ReadAllText(testCaseMetadataPath);
-                            testCaseMetadatas = JsonConvert.DeserializeObject<Dictionary<Guid, TestCaseMetadata>>(testCaseMetadataJson);
-                            output.AppendLine("TestCase Metadata file loaded with " + (testCaseMetadatas?.Count ?? -1) + " test cases.");
-                        }
-                        else
-                        {
-                            output.AppendLine("TestCase Metadata file doesn't exist!: " + testCaseMetadataPath);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        output.AppendLine("Error reading TestCase Metadata json file: " + ex);
                     }
                     
                     var testFramework = string.Empty;
@@ -174,6 +187,16 @@ internal class TestSuiteSerializer
                         DateTime suiteEndTime = DateTime.MinValue;
                         foreach (var result in resultBySuite)
                         {
+                            TestCaseMetadata? testCaseMetadata = null;
+                            var startTime = result.StartTime;
+
+                            // StartTime in metadata
+                            if (testCaseMetadatas is not null &&
+                                testCaseMetadatas.TryGetValue(result.TestCase.Id, out testCaseMetadata))
+                            {
+                                startTime = testCaseMetadata.Start;
+                            }
+
                             if (module is null)
                             {
                                 var folder = Path.GetDirectoryName(result.TestCase.Source);
@@ -249,7 +272,7 @@ internal class TestSuiteSerializer
 
                                 output.AppendLine("**************************************************");
                                 output.AppendLine("Creating test module: " + testModuleName);
-                                moduleStartTime = result.StartTime;
+                                moduleStartTime = startTime;
                                 module = TestModule.Create(testModuleName, testFramework, testFrameworkVersion,
                                     moduleStartTime);
                                 module.SetTag("runtime.name", runtimeName);
@@ -259,7 +282,7 @@ internal class TestSuiteSerializer
                             if (suite is null)
                             {
                                 output.AppendLine("  Creating test suite: " + testSuite);
-                                suite = module.GetOrCreateSuite(testSuite, result.StartTime);
+                                suite = module.GetOrCreateSuite(testSuite, startTime);
                             }
 
                             var displayName = result.Method ?? string.Empty;
@@ -277,32 +300,34 @@ internal class TestSuiteSerializer
                                 output.AppendLine("      Test name has been modified (parameters): " + testName);
                                 output.AppendLine("      Parameters: " + testParameters);
                             }
-
-                            TestCaseMetadata? testCaseMetadata = null;
-
-                            var startTime = result.StartTime;
                             
-                            // StartTime in metadata
-                            if (testCaseMetadatas is not null &&
-                                testCaseMetadatas.TryGetValue(result.TestCase.Id, out testCaseMetadata))
-                            {
-                                startTime = testCaseMetadata.Start;
-                            }
                             
                             var test = suite.CreateTest(testName, startTime);
                             
                             // Cpu values
                             if (cpuValues is not null && cpuValues.TryGetValue(result.TestCase.Id, out var values))
                             {
-                                var stats = BenchmarkDiscreteStats.GetFrom(values.ToArray());
-                                test.SetTag("test.cpu_usage.samples", stats.N);
-                                test.SetTag("test.cpu_usage.mean", stats.Mean);
-                                test.SetTag("test.cpu_usage.median", stats.Median);
-                                test.SetTag("test.cpu_usage.min", stats.Min);
-                                test.SetTag("test.cpu_usage.max", stats.Max);
-                                test.SetTag("test.cpu_usage.p90", stats.P90);
-                                test.SetTag("test.cpu_usage.p95", stats.P95);
-                                test.SetTag("test.cpu_usage.p99", stats.P99);
+                                var processCpuData = values.Select(i => i.Process).ToArray();
+                                var processCpuStat = BenchmarkDiscreteStats.GetFrom(processCpuData);
+                                test.SetTag("test.process_cpu_usage.samples", processCpuStat.N);
+                                test.SetTag("test.process_cpu_usage.mean", processCpuStat.Mean);
+                                test.SetTag("test.process_cpu_usage.median", processCpuStat.Median);
+                                test.SetTag("test.process_cpu_usage.min", processCpuStat.Min);
+                                test.SetTag("test.process_cpu_usage.max", processCpuStat.Max);
+                                test.SetTag("test.process_cpu_usage.p90", processCpuStat.P90);
+                                test.SetTag("test.process_cpu_usage.p95", processCpuStat.P95);
+                                test.SetTag("test.process_cpu_usage.p99", processCpuStat.P99);
+                                
+                                var totalCpuData = values.Select(i => i.System).ToArray();
+                                var totalCpuStat = BenchmarkDiscreteStats.GetFrom(totalCpuData);
+                                test.SetTag("test.total_cpu_usage.samples", totalCpuStat.N);
+                                test.SetTag("test.total_cpu_usage.mean", totalCpuStat.Mean);
+                                test.SetTag("test.total_cpu_usage.median", totalCpuStat.Median);
+                                test.SetTag("test.total_cpu_usage.min", totalCpuStat.Min);
+                                test.SetTag("test.total_cpu_usage.max", totalCpuStat.Max);
+                                test.SetTag("test.total_cpu_usage.p90", totalCpuStat.P90);
+                                test.SetTag("test.total_cpu_usage.p95", totalCpuStat.P95);
+                                test.SetTag("test.total_cpu_usage.p99", totalCpuStat.P99);
                             }
 
                             // Process parameters
@@ -710,5 +735,19 @@ internal class TestSuiteSerializer
         public DateTime Start { get; set; }
         [JsonProperty("end")]
         public DateTime End { get; set; }
+    }
+
+    internal readonly struct CpuUsagePair
+    {
+        [JsonProperty("process")]
+        public readonly double Process;
+        [JsonProperty("system")]
+        public readonly double System;
+
+        public CpuUsagePair(double process, double system)
+        {
+            Process = process;
+            System = system;
+        }
     }
 }

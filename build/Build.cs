@@ -28,7 +28,7 @@ class Build : NukeBuild
     [Parameter("Where the NuGet package should be published")]
     readonly AbsolutePath ArtifactsDirectory = RootDirectory / "artifacts";
 
-    [Parameter] public string Version = "0.0.46"; 
+    [Parameter] public string Version = "0.0.47"; 
 
     Target Clean => _ => _
         .Executes(() =>
