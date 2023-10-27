@@ -100,7 +100,7 @@ internal class TestSuiteSerializer
                     .ThenBy(i => i.EndTime)
                     .GroupBy(g => g.AssemblyPath).ToArray();
 
-                Dictionary<Guid, List<double>>? cpuValues = null;
+                Dictionary<Guid, List<CpuUsagePair>>? cpuValues = null;
                 Dictionary<Guid, TestCaseMetadata>? testCaseMetadatas = null;
 
                 foreach (var resultByAssembly in groupedResults)
@@ -130,7 +130,7 @@ internal class TestSuiteSerializer
                                     output.AppendLine("CpuValues file: " + cpuValuesPath);
                                     var jsonCpuValues = File.ReadAllText(cpuValuesPath);
                                     cpuValues = JsonConvert
-                                        .DeserializeObject<Dictionary<Guid, List<double>>>(jsonCpuValues);
+                                        .DeserializeObject<Dictionary<Guid, List<CpuUsagePair>>>(jsonCpuValues);
                                     output.AppendLine("CpuValues file loaded with " + (cpuValues?.Count ?? -1) +
                                                       " test cases.");
                                 }
@@ -307,15 +307,27 @@ internal class TestSuiteSerializer
                             // Cpu values
                             if (cpuValues is not null && cpuValues.TryGetValue(result.TestCase.Id, out var values))
                             {
-                                var stats = BenchmarkDiscreteStats.GetFrom(values.ToArray());
-                                test.SetTag("test.cpu_usage.samples", stats.N);
-                                test.SetTag("test.cpu_usage.mean", stats.Mean);
-                                test.SetTag("test.cpu_usage.median", stats.Median);
-                                test.SetTag("test.cpu_usage.min", stats.Min);
-                                test.SetTag("test.cpu_usage.max", stats.Max);
-                                test.SetTag("test.cpu_usage.p90", stats.P90);
-                                test.SetTag("test.cpu_usage.p95", stats.P95);
-                                test.SetTag("test.cpu_usage.p99", stats.P99);
+                                var processCpuData = values.Select(i => i.Process).ToArray();
+                                var processCpuStat = BenchmarkDiscreteStats.GetFrom(processCpuData);
+                                test.SetTag("test.process_cpu_usage.samples", processCpuStat.N);
+                                test.SetTag("test.process_cpu_usage.mean", processCpuStat.Mean);
+                                test.SetTag("test.process_cpu_usage.median", processCpuStat.Median);
+                                test.SetTag("test.process_cpu_usage.min", processCpuStat.Min);
+                                test.SetTag("test.process_cpu_usage.max", processCpuStat.Max);
+                                test.SetTag("test.process_cpu_usage.p90", processCpuStat.P90);
+                                test.SetTag("test.process_cpu_usage.p95", processCpuStat.P95);
+                                test.SetTag("test.process_cpu_usage.p99", processCpuStat.P99);
+                                
+                                var totalCpuData = values.Select(i => i.System).ToArray();
+                                var totalCpuStat = BenchmarkDiscreteStats.GetFrom(totalCpuData);
+                                test.SetTag("test.total_cpu_usage.samples", totalCpuStat.N);
+                                test.SetTag("test.total_cpu_usage.mean", totalCpuStat.Mean);
+                                test.SetTag("test.total_cpu_usage.median", totalCpuStat.Median);
+                                test.SetTag("test.total_cpu_usage.min", totalCpuStat.Min);
+                                test.SetTag("test.total_cpu_usage.max", totalCpuStat.Max);
+                                test.SetTag("test.total_cpu_usage.p90", totalCpuStat.P90);
+                                test.SetTag("test.total_cpu_usage.p95", totalCpuStat.P95);
+                                test.SetTag("test.total_cpu_usage.p99", totalCpuStat.P99);
                             }
 
                             // Process parameters
@@ -723,5 +735,19 @@ internal class TestSuiteSerializer
         public DateTime Start { get; set; }
         [JsonProperty("end")]
         public DateTime End { get; set; }
+    }
+
+    internal readonly struct CpuUsagePair
+    {
+        [JsonProperty("process")]
+        public readonly double Process;
+        [JsonProperty("system")]
+        public readonly double System;
+
+        public CpuUsagePair(double process, double system)
+        {
+            Process = process;
+            System = system;
+        }
     }
 }

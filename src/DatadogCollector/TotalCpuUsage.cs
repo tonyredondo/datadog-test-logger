@@ -24,7 +24,7 @@ public static class TotalCpuUsage
         return null;
     });
 
-    public static float GetUsage()
+    public static double GetUsage()
     {
         try
         {
@@ -53,7 +53,7 @@ public static class TotalCpuUsage
         {
         }
         
-        public float GetUsage()
+        public double GetUsage()
         {
             if (GetSystemTimes(out var idleTime, out var kernelTime, out var userTime))
             {
@@ -71,7 +71,7 @@ public static class TotalCpuUsage
                     return 0;
                 }
 
-                return (float)((double)((sys - idl) * 100) / (double)sys);
+                return ((double)((sys - idl) * 100) / (double)sys);
             }
 
             return -1;
@@ -92,7 +92,7 @@ public static class TotalCpuUsage
         {
         }
 
-        public float GetUsage()
+        public double GetUsage()
         {
             var cpuDataLine = File.ReadAllText("/proc/stat").Split('\n')[0];
             var cpuDataParts = cpuDataLine.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
@@ -111,7 +111,7 @@ public static class TotalCpuUsage
             _prevIdleTime = idleTime;
             _prevTotalTime = totalTime;
 
-            return (float)((double)((totalTimeDelta - idleTimeDelta) * 100) / (double)totalTimeDelta);
+            return ((double)((totalTimeDelta - idleTimeDelta) * 100) / (double)totalTimeDelta);
         }
     }
 
@@ -129,12 +129,12 @@ public static class TotalCpuUsage
             Marshal.WriteInt64(_cpuInfoSize, sizeof(CpuTimeInfo));
         }
 
-        public unsafe float GetUsage()
+        public unsafe double GetUsage()
         {
             if (sysctlbyname("vm.loadavg", out var cpuInfo, _cpuInfoSize, IntPtr.Zero, 0) == 0)
             {
                 var avg = (double)(cpuInfo.ldavg[0]) / cpuInfo.fscale;
-                return (float) ((avg * 100) / Environment.ProcessorCount);
+                return (double) ((avg * 100) / Environment.ProcessorCount);
             }
 
             return -1;
@@ -159,6 +159,6 @@ public static class TotalCpuUsage
 
     interface IUsage
     {
-        float GetUsage();
+        double GetUsage();
     }
 }

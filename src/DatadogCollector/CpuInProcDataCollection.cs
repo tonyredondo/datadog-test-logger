@@ -9,11 +9,12 @@ namespace DatadogCollector;
 
 internal class CpuInProcDataCollection : InProcDataCollection
 {
-    private readonly ConcurrentDictionary<Guid, List<double>> _currentCpuValues = new();
-    private readonly ConcurrentDictionary<Guid, List<double>> _finalValues = new();
+    private readonly ConcurrentDictionary<Guid, List<CpuUsagePair>> _currentCpuValues = new();
+    private readonly ConcurrentDictionary<Guid, List<CpuUsagePair>> _finalValues = new();
     private CancellationTokenSource? _cpuUsageCancellationTokenSource;
     private Thread? _cpuCollectorThread;
     private double _lastCpuPercentageValue;
+    private double _lastSystemCpuPercentageValue;
 
     public void Initialize(IDataCollectionSink dataCollectionSink)
     {
@@ -40,7 +41,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         if (testCaseStartArgs?.TestCase?.Id is { } id)
         {
-            _currentCpuValues.GetOrAdd(id, new List<double> { _lastCpuPercentageValue });
+            _currentCpuValues.GetOrAdd(id, new List<CpuUsagePair> { new(_lastCpuPercentageValue, TotalCpuUsage.GetUsage()) });
         }
     }
 
@@ -53,13 +54,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
             {
                 lock (values)
                 {
-                    // Check if the last cpu percentage value was already included.
-                    if (values.Count > 0 && Math.Abs(values[values.Count - 1] - _lastCpuPercentageValue) <= 0.000001)
-                    {
-                        return;
-                    }
-
-                    values.Add(_lastCpuPercentageValue);
+                    values.Add(new(_lastCpuPercentageValue, TotalCpuUsage.GetUsage()));
                 }
             }
         }
@@ -102,6 +97,8 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         if (dataCollection?._cpuUsageCancellationTokenSource is { Token: { } token })
         {
+            _ = TotalCpuUsage.GetUsage();
+
             // Get current Process
             var process = Process.GetCurrentProcess();
             // Create a high precision clock
@@ -132,7 +129,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
                     }
 
                     // Add value to current executing tests
-                    Interlocked.Exchange(ref dataCollection._lastCpuPercentageValue, result);
+                    dataCollection._lastCpuPercentageValue = result;
                     foreach(var values in dataCollection._currentCpuValues.Values)
                     {
                         if (token.IsCancellationRequested)
@@ -142,7 +139,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
 
                         lock (values)
                         {
-                            values.Add(dataCollection._lastCpuPercentageValue);
+                            values.Add(new CpuUsagePair(dataCollection._lastCpuPercentageValue, TotalCpuUsage.GetUsage()));
                         }
                     }
                 }
@@ -151,6 +148,20 @@ internal class CpuInProcDataCollection : InProcDataCollection
                     Thread.Sleep(100);
                 }
             }
+        }
+    }
+
+    private readonly struct CpuUsagePair
+    {
+        [JsonProperty("process")]
+        public readonly double Process;
+        [JsonProperty("system")]
+        public readonly double System;
+
+        public CpuUsagePair(double process, double system)
+        {
+            Process = process;
+            System = system;
         }
     }
 }
