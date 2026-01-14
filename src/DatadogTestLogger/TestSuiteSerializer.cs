@@ -26,6 +26,90 @@ internal class TestSuiteSerializer
         _runConfiguration = runConfiguration;
     }
 
+    internal static bool TryGetTypeAndMethodInfo(Assembly assembly, string testSuiteName, string testName, out Type? suiteType, out MethodInfo? testMethod)
+    {
+        suiteType = null;
+        testMethod = null;
+
+        if (assembly is null ||
+            string.IsNullOrWhiteSpace(testSuiteName) ||
+            string.IsNullOrWhiteSpace(testName))
+        {
+            return false;
+        }
+
+        testSuiteName = testSuiteName.Trim();
+        testName = testName.Trim();
+
+        Type? firstTypeFound = null;
+
+        bool TryResolve(string suiteTypeName, string methodName, out Type? resolvedSuiteType, out MethodInfo? resolvedMethod)
+        {
+            resolvedSuiteType = null;
+            resolvedMethod = null;
+
+            if (string.IsNullOrWhiteSpace(suiteTypeName) || string.IsNullOrWhiteSpace(methodName))
+            {
+                return false;
+            }
+
+            suiteTypeName = suiteTypeName.Trim();
+            methodName = methodName.Trim();
+
+            resolvedSuiteType = assembly.GetType(suiteTypeName);
+            if (resolvedSuiteType is null)
+            {
+                return false;
+            }
+
+            firstTypeFound ??= resolvedSuiteType;
+
+            resolvedMethod = FindMethodInfo(resolvedSuiteType, methodName);
+            return resolvedMethod is not null;
+        }
+
+        // 1) The simple case: full type name + method name
+        if (TryResolve(testSuiteName, testName, out suiteType, out testMethod))
+        {
+            return true;
+        }
+
+        // 2) When the test name contains a '.', it's very likely "TypeName.MethodName" (methods can't contain '.').
+        var lastDotIndex = testName.LastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < testName.Length - 1)
+        {
+            var typePart = testName.Substring(0, lastDotIndex).Trim();
+            var methodPart = testName.Substring(lastDotIndex + 1).Trim();
+
+            // Handle redundant prefixes like: suiteType="Namespace.Type", testName="Type.Method"
+            if (TryResolve(testSuiteName, methodPart, out suiteType, out testMethod))
+            {
+                return true;
+            }
+
+            foreach (var candidateSuiteTypeName in GetCandidateSuiteTypeNames(testSuiteName, typePart))
+            {
+                if (TryResolve(candidateSuiteTypeName, methodPart, out suiteType, out testMethod))
+                {
+                    return true;
+                }
+            }
+        }
+
+        // 3) Fallback: suite name looks like a namespace, test name looks like a method name
+        if (testName.IndexOf('.') == -1 &&
+            TryResolveMethodInNamespace(assembly, testSuiteName, testName, out var fallbackSuiteType, out var fallbackMethod))
+        {
+            suiteType = fallbackSuiteType;
+            testMethod = fallbackMethod;
+            return true;
+        }
+
+        suiteType = firstTypeFound;
+        testMethod = null;
+        return false;
+    }
+
     public string Serialize(List<TestResultInfo> results, List<TestMessageInfo> messages)
     { 
         var output = new StringBuilder();
@@ -412,21 +496,16 @@ internal class TestSuiteSerializer
                             }
 
                             // Set Test method info
-                            var testSuiteType = testModule.GetType(testSuite);
-                            if (testSuiteType is null)
+                            if (TryGetTypeAndMethodInfo(testModule, testSuite, testName, out var testSuiteType, out var methodInfo))
                             {
-                                output.AppendFormat("      Test suite type not found (for TestMethodInfo): {1}, {0} (testMethod: {2})", testModuleName, testSuite, testName);
+                                output.AppendLine("      Setting Test Method Info: " + methodInfo);
+                                test.SetTestMethodInfo(methodInfo!);
                             }
                             else
                             {
-                                var methodInfos = testSuiteType
-                                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                    .Where(m => m.Name == testName)
-                                    .ToArray();
-                                if (methodInfos.Length > 0)
+                                if (testSuiteType is null)
                                 {
-                                    output.AppendLine("      Setting Test Method Info: " + methodInfos[0]);
-                                    test.SetTestMethodInfo(methodInfos[0]);
+                                    output.AppendFormat("      Test suite type not found (for TestMethodInfo): {1}, {0} (testMethod: {2})", testModuleName, testSuite, testName);
                                 }
                                 else
                                 {
@@ -764,5 +843,215 @@ internal class TestSuiteSerializer
             Process = process;
             System = system;
         }
+    }
+
+    private static IEnumerable<string> GetCandidateSuiteTypeNames(string testSuiteName, string typePart)
+    {
+        var candidates = new List<string>
+        {
+            typePart,
+            $"{testSuiteName}.{typePart}",
+            $"{testSuiteName}+{typePart}",
+        };
+
+        var testSuiteLastSegment = GetLastTypeSegment(testSuiteName);
+        if (!string.IsNullOrEmpty(testSuiteLastSegment) &&
+            typePart.StartsWith(testSuiteLastSegment, StringComparison.Ordinal))
+        {
+            var remainder = typePart.Substring(testSuiteLastSegment.Length);
+            if (remainder.Length > 0 && (remainder[0] == '.' || remainder[0] == '+'))
+            {
+                candidates.Add(testSuiteName + remainder);
+            }
+        }
+
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var candidate in candidates)
+        {
+            foreach (var normalized in NormalizeTypeNameVariants(candidate))
+            {
+                if (seen.Add(normalized))
+                {
+                    yield return normalized;
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<string> NormalizeTypeNameVariants(string typeName)
+    {
+        if (string.IsNullOrWhiteSpace(typeName))
+        {
+            yield break;
+        }
+
+        typeName = typeName.Trim();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var candidate in GetCoreTypeNameVariants(typeName))
+        {
+            var currentCandidate = candidate;
+            while (true)
+            {
+                if (seen.Add(currentCandidate))
+                {
+                    yield return currentCandidate;
+                }
+
+                // Some test frameworks use '.' to represent nested types (instead of '+')
+                var lastDotIndex = currentCandidate.LastIndexOf('.');
+                if (lastDotIndex < 0)
+                {
+                    break;
+                }
+
+                currentCandidate = currentCandidate.Substring(0, lastDotIndex) + "+" + currentCandidate.Substring(lastDotIndex + 1);
+            }
+        }
+    }
+
+    private static IEnumerable<string> GetCoreTypeNameVariants(string typeName)
+    {
+        yield return typeName;
+
+        var normalizedGenericsName = ReplaceAngleBracketGenericNotation(typeName);
+        if (!string.Equals(normalizedGenericsName, typeName, StringComparison.Ordinal))
+        {
+            yield return normalizedGenericsName;
+        }
+    }
+
+    private static string GetLastTypeSegment(string typeName)
+    {
+        if (string.IsNullOrEmpty(typeName))
+        {
+            return string.Empty;
+        }
+
+        var lastPlusIndex = typeName.LastIndexOf('+');
+        var lastDotIndex = typeName.LastIndexOf('.');
+        var lastSeparatorIndex = Math.Max(lastPlusIndex, lastDotIndex);
+        return lastSeparatorIndex < 0 ? typeName : typeName.Substring(lastSeparatorIndex + 1);
+    }
+
+    private static string ReplaceAngleBracketGenericNotation(string typeName)
+    {
+        if (typeName.IndexOf('<') == -1)
+        {
+            return typeName;
+        }
+
+        var sb = new StringBuilder(typeName.Length);
+        var index = 0;
+        while (index < typeName.Length)
+        {
+            var ch = typeName[index];
+            if (ch != '<')
+            {
+                sb.Append(ch);
+                index++;
+                continue;
+            }
+
+            index++;
+            var depth = 1;
+            var argCount = 1;
+
+            while (index < typeName.Length && depth > 0)
+            {
+                ch = typeName[index];
+                if (ch == '<')
+                {
+                    depth++;
+                }
+                else if (ch == '>')
+                {
+                    depth--;
+                }
+                else if (ch == ',' && depth == 1)
+                {
+                    argCount++;
+                }
+
+                index++;
+            }
+
+            if (depth != 0)
+            {
+                return typeName;
+            }
+
+            sb.Append('`').Append(argCount);
+        }
+
+        return sb.ToString();
+    }
+
+    private static bool TryResolveMethodInNamespace(Assembly assembly, string namespaceName, string methodName, out Type? suiteType, out MethodInfo? testMethod)
+    {
+        suiteType = null;
+        testMethod = null;
+
+        Type[] types;
+        try
+        {
+            types = assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            types = ex.Types.Where(t => t is not null).Cast<Type>().ToArray();
+        }
+
+        foreach (var type in types)
+        {
+            var fullName = type.FullName;
+            if (fullName is null)
+            {
+                continue;
+            }
+
+            if (type.Namespace != namespaceName &&
+                !fullName.StartsWith(namespaceName + ".", StringComparison.Ordinal) &&
+                !fullName.StartsWith(namespaceName + "+", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var resolvedMethod = FindMethodInfo(type, methodName);
+            if (resolvedMethod is null)
+            {
+                continue;
+            }
+
+            if (suiteType is not null)
+            {
+                suiteType = null;
+                testMethod = null;
+                return false;
+            }
+
+            suiteType = type;
+            testMethod = resolvedMethod;
+        }
+
+        return suiteType is not null && testMethod is not null;
+    }
+
+    private static MethodInfo? FindMethodInfo(Type suiteType, string methodName)
+    {
+        const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+
+        for (var currentType = suiteType; currentType is not null; currentType = currentType.BaseType)
+        {
+            var methods = currentType.GetMethods(Flags);
+            for (var i = 0; i < methods.Length; i++)
+            {
+                if (string.Equals(methods[i].Name, methodName, StringComparison.Ordinal))
+                {
+                    return methods[i];
+                }
+            }
+        }
+
+        return null;
     }
 }
