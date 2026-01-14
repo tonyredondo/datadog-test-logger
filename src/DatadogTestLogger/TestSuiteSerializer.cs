@@ -412,11 +412,26 @@ internal class TestSuiteSerializer
                             }
 
                             // Set Test method info
-                            var methodInfo = testModule.GetType(testSuite)?.GetMethod(testName);
-                            if (methodInfo is not null)
+                            var testSuiteType = testModule.GetType(testSuite);
+                            if (testSuiteType is null)
                             {
-                                output.AppendLine("      Setting Test Method Info: " + methodInfo);
-                                test.SetTestMethodInfo(methodInfo);
+                                output.AppendFormat("      Test suite type not found (for TestMethodInfo): {1}, {0} (testMethod: {2})", testModuleName, testSuite, testName);
+                            }
+                            else
+                            {
+                                var methodInfos = testSuiteType
+                                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                    .Where(m => m.Name == testName)
+                                    .ToArray();
+                                if (methodInfos.Length > 0)
+                                {
+                                    output.AppendLine("      Setting Test Method Info: " + methodInfos[0]);
+                                    test.SetTestMethodInfo(methodInfos[0]);
+                                }
+                                else
+                                {
+                                    output.AppendFormat("      Test method not found (for TestMethodInfo): {1}.{2}, {0}", testModuleName, testSuite, testName);
+                                }
                             }
 
                             // Traits

@@ -196,7 +196,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Debugger
 
             private string GetReversePath(string documentFullPath)
             {
-                var partsReverse = documentFullPath.Split(DirectorySeparatorsCrossPlatform, StringSplitOptions.None).Reverse();
+                var partsReverse = ((IEnumerable<string>)documentFullPath.Split(DirectorySeparatorsCrossPlatform, StringSplitOptions.None)).Reverse();
                 // Preserve the type of slash (back- or forward- slash) that was originally inserted.
                 return string.Join(_directoryPathSeparator ?? Path.DirectorySeparatorChar.ToString(), partsReverse);
             }
