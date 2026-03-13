@@ -19,7 +19,18 @@ namespace DatadogTestLogger;
 
 internal class TestSuiteSerializer
 {
+    private const string TestFinalStatusTag = "test.final_status";
     private readonly TestRunConfiguration _runConfiguration;
+
+    private static void SetFinalStatus(Test test, TestStatus status)
+    {
+        test.SetTag(TestFinalStatusTag, status switch
+        {
+            TestStatus.Pass => "pass",
+            TestStatus.Fail => "fail",
+            _ => "skip",
+        });
+    }
 
     public TestSuiteSerializer(TestRunConfiguration runConfiguration)
     {
@@ -598,6 +609,7 @@ internal class TestSuiteSerializer
                             if (result.Outcome == TestOutcome.Passed)
                             {
                                 output.AppendLine("    Closing test: " + testName + $" [PASS] [{duration}]");
+                                SetFinalStatus(test, TestStatus.Pass);
                                 test.Close(TestStatus.Pass, duration);
                             }
                             else if (result.Outcome == TestOutcome.Skipped)
@@ -608,12 +620,14 @@ internal class TestSuiteSerializer
                                 {
                                     output.AppendLine("    Closing test: " + testName +
                                                       $" [SKIP] [{duration}, {xUnitSkipMessage.Text}]");
+                                    SetFinalStatus(test, TestStatus.Skip);
                                     test.Close(TestStatus.Skip, duration, xUnitSkipMessage.Text);
                                 }
                                 else
                                 {
                                     output.AppendLine("    Closing test: " + testName +
                                                       $" [SKIP] [{duration}, {result.ErrorMessage}]");
+                                    SetFinalStatus(test, TestStatus.Skip);
                                     test.Close(TestStatus.Skip, duration, result.ErrorMessage);
                                 }
                             }
@@ -655,12 +669,14 @@ internal class TestSuiteSerializer
                                 output.AppendLine("    Closing test: " + testName +
                                                   $" [FAIL] [{duration}, {errorType}, {errorMessage}]");
                                 test.SetErrorInfo(errorType, errorMessage, result.ErrorStackTrace);
+                                SetFinalStatus(test, TestStatus.Fail);
                                 test.Close(TestStatus.Fail, duration);
                             }
                             else
                             {
                                 output.AppendLine("    Closing test: " + testName +
                                                   $" [SKIP/NONE] [{duration}, {result.ErrorMessage}]");
+                                SetFinalStatus(test, TestStatus.Skip);
                                 test.Close(TestStatus.Skip, duration, result.ErrorMessage);
                             }
                         }
