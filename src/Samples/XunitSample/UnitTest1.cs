@@ -12,9 +12,12 @@ public class UnitTest1
     }
 
     [Fact]
+    [Trait("Attachment", "Test1")]
     public void Test1()
     {
         _output.WriteLine("Test 1 message");
+        _output.WriteLine("<SpanTag Key=\"MyKey2\" Value=\"MyValue2\" />");
+        _output.WriteLine("Test 1 message end");
     }
 
     [Fact]

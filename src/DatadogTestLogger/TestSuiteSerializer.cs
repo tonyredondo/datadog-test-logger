@@ -525,10 +525,10 @@ internal class TestSuiteSerializer
                             }
 
                             // Traits
-                            if (result.Traits.Any())
+                            if (result.TestCase.Traits.Any())
                             {
                                 output.AppendLine("      Setting test traits.");
-                                var traits = result.Traits.GroupBy(k => k.Name)
+                                var traits = result.TestCase.Traits.GroupBy(k => k.Name)
                                     .ToDictionary(k => k.Key, v => v.Select(i => i.Value).ToList());
                                 test.SetTraits(traits);
                             }
@@ -553,15 +553,18 @@ internal class TestSuiteSerializer
                                                 {
                                                     foreach (var messageItem in messageArray)
                                                     {
-                                                        var logEvent = new CIVisibilityLogEvent("xunit", "info",
-                                                            messageItem, scope.Span);
+                                                        var msgText = messageItem;
+                                                        ProcessMessagesAsSpanTags(ref msgText, scope.Span, output);
+                                                        var logEvent = new CIVisibilityLogEvent("testoptimization", "info",
+                                                            msgText, scope.Span);
                                                         Tracer.Instance.TracerManager.DirectLogSubmission.Sink
                                                             .EnqueueLog(logEvent);
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    var logEvent = new CIVisibilityLogEvent("xunit", "info",
+                                                    ProcessMessagesAsSpanTags(ref messageText, scope.Span, output);
+                                                    var logEvent = new CIVisibilityLogEvent("testoptimization", "info",
                                                         messageText, scope.Span);
                                                     Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(
                                                         logEvent);
@@ -709,8 +712,11 @@ internal class TestSuiteSerializer
                                         _ => "info"
                                     };
 
-                                    var logEvent = new CIVisibilityLogEvent("xunit", level, message.Message,
-                                        new InternalISpan(span));
+                                    var iSpan = new InternalISpan(span);
+                                    var msgText = message.Message;
+                                    ProcessMessagesAsSpanTags(ref msgText, iSpan, output);
+                                    var logEvent = new CIVisibilityLogEvent("testoptimization", level, msgText,
+                                        iSpan);
                                     Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
                                 }
 
@@ -740,6 +746,23 @@ internal class TestSuiteSerializer
         }
 
         return output.ToString();
+    }
+
+    private static void ProcessMessagesAsSpanTags(ref string messageItem, ISpan span, StringBuilder output)
+    {
+        if (messageItem.IndexOf("<SpanTag", StringComparison.OrdinalIgnoreCase) != -1)
+        {
+            var tagMatch = Regex.Match(messageItem, @"<SpanTag\s+Key=""(?<key>[^""]+)""\s+Value=""(?<value>[^""]+)""\s*/>");
+            if (tagMatch.Success)
+            {
+                var key = tagMatch.Groups["key"].Value.Trim();
+                var value = tagMatch.Groups["value"].Value.Trim();
+                span.SetTag(key, value);
+                output.AppendLine($"        Added span tag: {key} = {value}");
+                
+                messageItem = messageItem.Replace(tagMatch.Value, string.Empty);
+            }
+        }
     }
 
     // *****************************************************
