@@ -17,6 +17,8 @@ public class UnitTest1
     {
         _output.WriteLine("Test 1 message");
         _output.WriteLine("<SpanTag Key=\"MyKey2\" Value=\"MyValue2\" />");
+        _output.WriteLine("<SpanTag Key=\"MyKey3\" Value=\"MyValue3\" />");
+        _output.WriteLine("<SpanTag Key=\"MyKey4\" Value=\"MyValue4\" /><SpanTag Key=\"MyKey5\" Value=\"MyValue5\" />");
         _output.WriteLine("Test 1 message end");
     }
 

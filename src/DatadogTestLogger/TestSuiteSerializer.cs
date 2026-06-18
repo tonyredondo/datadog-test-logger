@@ -752,14 +752,15 @@ internal class TestSuiteSerializer
     {
         if (messageItem.IndexOf("<SpanTag", StringComparison.OrdinalIgnoreCase) != -1)
         {
-            var tagMatch = Regex.Match(messageItem, @"<SpanTag\s+Key=""(?<key>[^""]+)""\s+Value=""(?<value>[^""]+)""\s*/>");
-            if (tagMatch.Success)
+            var tagMatches = Regex.Matches(messageItem, @"<SpanTag\s+Key=""(?<key>[^""]+)""\s+Value=""(?<value>[^""]+)""\s*/>");
+            for (var i = 0; i < tagMatches.Count; i++)
             {
+                var tagMatch = tagMatches[i];
                 var key = tagMatch.Groups["key"].Value.Trim();
                 var value = tagMatch.Groups["value"].Value.Trim();
                 span.SetTag(key, value);
                 output.AppendLine($"        Added span tag: {key} = {value}");
-                
+
                 messageItem = messageItem.Replace(tagMatch.Value, string.Empty);
             }
         }
