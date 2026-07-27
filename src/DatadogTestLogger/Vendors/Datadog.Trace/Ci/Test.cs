@@ -183,7 +183,12 @@ internal sealed class Test
                 var match = codeOwners.Match("/" + CIEnvironmentValues.Instance.MakeRelativePathFromSourceRoot(methodSymbol.File, false));
                 if (match is not null)
                 {
-                    tags.CodeOwners = match.Value.GetOwnersString();
+                    var owners = string.Join("\",\"", match);
+                    if (!string.IsNullOrEmpty(owners))
+                    {
+                        tags.CodeOwners = "[\"" + owners + "\"]";
+                    }
+
                 }
             }
         }

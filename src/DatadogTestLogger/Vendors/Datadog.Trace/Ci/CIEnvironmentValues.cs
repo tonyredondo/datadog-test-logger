@@ -602,7 +602,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                     if (File.Exists(codeOwnersPath))
                     {
                         Log.Debug("CODEOWNERS file found: {Path}", codeOwnersPath);
-                        CodeOwners = new CodeOwners(codeOwnersPath);
+                        CodeOwners = new CodeOwners(codeOwnersPath, Provider == "gitlab" ? CodeOwners.Platform.GitLab : CodeOwners.Platform.GitHub);
                         break;
                     }
                 }
