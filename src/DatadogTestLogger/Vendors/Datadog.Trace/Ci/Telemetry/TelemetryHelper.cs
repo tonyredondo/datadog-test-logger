@@ -91,10 +91,10 @@ internal static class TelemetryHelper
             {
                 return CIEnvironmentValues.Instance switch
                 {
-                    { CodeOwners: not null, IsCI: true } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_HasCodeOwner_IsSupportedCi,
-                    { CodeOwners: not null, IsCI: false } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_HasCodeOwner_UnsupportedCi,
-                    { CodeOwners: null, IsCI: true } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_NoCodeOwner_IsSupportedCi,
-                    { CodeOwners: null, IsCI: false } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_NoCodeOwner_UnsupportedCi,
+                    { HasCodeOwners: true, IsCI: true } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_HasCodeOwner_IsSupportedCi,
+                    { HasCodeOwners: true, IsCI: false } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_HasCodeOwner_UnsupportedCi,
+                    { HasCodeOwners: false, IsCI: true } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_NoCodeOwner_IsSupportedCi,
+                    { HasCodeOwners: false, IsCI: false } => MetricTags.CIVisibilityTestingEventTypeWithCodeOwnerAndSupportedCiAndBenchmark.Session_NoCodeOwner_UnsupportedCi,
                 };
             }
         }

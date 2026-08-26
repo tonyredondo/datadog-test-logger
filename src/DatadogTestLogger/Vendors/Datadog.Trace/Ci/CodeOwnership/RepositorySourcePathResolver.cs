@@ -252,7 +252,6 @@ internal sealed class RepositorySourcePathResolver
         segmentCount = 0;
         hasEmptySegments = false;
 
-        // SplitIntoSpans lets us validate the path without allocating a string for every segment.
         foreach (var segment in path.SplitIntoSpans('/'))
         {
             if (segment.Length == 0)
@@ -266,7 +265,7 @@ internal sealed class RepositorySourcePathResolver
                 continue;
             }
 
-            if (IsNavigationSegment(segment.AsSpan()))
+            if (IsNavigationSegment(segment))
             {
                 return false;
             }
@@ -278,7 +277,7 @@ internal sealed class RepositorySourcePathResolver
         return segmentCount >= 2;
     }
 
-    private static bool IsNavigationSegment(ReadOnlySpan<char> segment)
+    private static bool IsNavigationSegment(in SpanCharSplitter.SpanSplitEnumerator.SpanSplitValue segment)
         => (segment.Length == 1 && segment[0] == '.') ||
            (segment.Length == 2 && segment[0] == '.' && segment[1] == '.');
 

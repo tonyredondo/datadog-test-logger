@@ -15,6 +15,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.CodeOwnership;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
 using DatadogTestLogger.Vendors.Datadog.Trace.Util;
@@ -28,6 +29,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
         private static readonly Lazy<CIEnvironmentValues> _instance = new(() => new CIEnvironmentValues());
 
         private string _gitSearchFolder = null;
+        private CodeOwnersResolver _codeOwnersResolver;
 
         private CIEnvironmentValues()
         {
@@ -94,7 +96,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 
         public string[] NodeLabels { get; private set; }
 
-        public CodeOwners CodeOwners { get; private set; }
+        internal bool HasCodeOwners => _codeOwnersResolver?.HasCodeOwners == true;
 
         public Dictionary<string, string> VariablesToBypass { get; private set; }
 
@@ -236,37 +238,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             {
                 span.SetTag(CommonTags.CiEnvVars, Datadog.Trace.Vendors.Newtonsoft.Json.JsonConvert.SerializeObject(variablesToBypass));
             }
-        }
-
-        public string MakeRelativePathFromSourceRoot(string absolutePath, bool useOSSeparator = true)
-        {
-            var pivotFolder = SourceRoot;
-            if (string.IsNullOrEmpty(pivotFolder))
-            {
-                return absolutePath;
-            }
-
-            if (string.IsNullOrEmpty(absolutePath))
-            {
-                return pivotFolder;
-            }
-
-            var folderSeparator = Path.DirectorySeparatorChar;
-            if (pivotFolder[pivotFolder.Length - 1] != folderSeparator)
-            {
-                pivotFolder += folderSeparator;
-            }
-
-            var pivotFolderUri = new Uri(pivotFolder);
-            var absolutePathUri = new Uri(absolutePath);
-            var relativeUri = pivotFolderUri.MakeRelativeUri(absolutePathUri);
-            if (useOSSeparator)
-            {
-                return Uri.UnescapeDataString(
-                    relativeUri.ToString().Replace('/', folderSeparator));
-            }
-
-            return Uri.UnescapeDataString(relativeUri.ToString());
         }
 
         internal void ReloadEnvironmentData()
@@ -591,30 +562,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 Repository = Repository.Replace(uriRepository.UserInfo, string.Empty);
             }
 
-            // **********
-            // Try load CodeOwners
-            // **********
-            if (!string.IsNullOrEmpty(SourceRoot))
-            {
-                foreach (var codeOwnersPath in GetCodeOwnersPaths(SourceRoot))
-                {
-                    Log.Debug("Looking for CODEOWNERS file in: {Path}", codeOwnersPath);
-                    if (File.Exists(codeOwnersPath))
-                    {
-                        Log.Debug("CODEOWNERS file found: {Path}", codeOwnersPath);
-                        CodeOwners = new CodeOwners(codeOwnersPath, Provider == "gitlab" ? CodeOwners.Platform.GitLab : CodeOwners.Platform.GitHub);
-                        break;
-                    }
-                }
-            }
-
-            static IEnumerable<string> GetCodeOwnersPaths(string sourceRoot)
-            {
-                yield return Path.Combine(sourceRoot, "CODEOWNERS");
-                yield return Path.Combine(sourceRoot, ".github", "CODEOWNERS");
-                yield return Path.Combine(sourceRoot, ".gitlab", "CODEOWNERS");
-                yield return Path.Combine(sourceRoot, ".docs", "CODEOWNERS");
-            }
+            _codeOwnersResolver = new CodeOwnersResolver(SourceRoot, WorkspacePath, Repository, Provider);
         }
 
         private void SetupTravisEnvironment()
@@ -1152,6 +1100,23 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             {
                 Branch = null;
             }
+        }
+
+        public string MakeRelativePathFromSourceRoot(string absolutePath, bool useOSSeparator = true)
+        {
+            return RepositorySourcePathResolver.MakeRelativePath(SourceRoot, absolutePath, useOSSeparator);
+        }
+
+        /// <summary>
+        /// Resolves a compiler source path and the CODEOWNERS entries that match it.
+        /// </summary>
+        /// <param name="sourceFilePath">The compiler-recorded source file path.</param>
+        /// <param name="useOSSeparator">Whether to use the current operating system's directory separator.</param>
+        /// <returns>The normalized source path and matching owners.</returns>
+        internal SourceOwnership ResolveSourceOwnership(string sourceFilePath, bool useOSSeparator = true)
+        {
+            return _codeOwnersResolver?.Resolve(sourceFilePath, useOSSeparator)
+                   ?? new SourceOwnership(MakeRelativePathFromSourceRoot(sourceFilePath, useOSSeparator), [], isRepositoryRelative: false);
         }
 
         internal sealed class Constants
