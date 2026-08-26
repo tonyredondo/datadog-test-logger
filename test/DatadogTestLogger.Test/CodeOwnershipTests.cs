@@ -24,6 +24,23 @@ public class CodeOwnershipTests
     }
 
     [Fact]
+    public void ResolvesSourcePathRecordedByBuildOnAnotherOperatingSystem()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        var sourceDirectory = Path.Combine(repositoryDirectory.Path, "src");
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(Path.Combine(repositoryDirectory.Path, "CODEOWNERS"), "/src/ @repository-owner");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        var resolver = new CodeOwnersResolver(repositoryDirectory.Path, repositoryDirectory.Path, Repository, "github");
+
+        var ownership = resolver.Resolve("D:/a/_work/1/s/src/SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(ownership.IsRepositoryRelative);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
     public void UsesGitRootInsteadOfNestedCodeOwnersFile()
     {
         using var repositoryDirectory = new TemporaryDirectory();
