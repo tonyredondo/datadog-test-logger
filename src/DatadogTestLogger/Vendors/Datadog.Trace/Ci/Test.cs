@@ -20,6 +20,7 @@ using DatadogTestLogger.Vendors.Datadog.Trace.Pdb;
 using DatadogTestLogger.Vendors.Datadog.Trace.Sampling;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry;
 using DatadogTestLogger.Vendors.Datadog.Trace.Telemetry.Metrics;
+using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 
 namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 
@@ -173,23 +174,24 @@ internal sealed class Test
                 startLine -= 2;
             }
 
+            var ciValues = CIEnvironmentValues.Instance;
+            var sourceOwnership = ciValues.ResolveSourceOwnership(methodSymbol.File, useOSSeparator: false);
+
             var tags = (TestSpanTags)_scope.Span.Tags;
-            tags.SourceFile = CIEnvironmentValues.Instance.MakeRelativePathFromSourceRoot(methodSymbol.File, false);
+            tags.SourceFile = sourceOwnership.RepositoryRelativePath;
             tags.SourceStart = startLine;
             tags.SourceEnd = methodSymbol.EndLine;
 
-            if (CIEnvironmentValues.Instance.CodeOwners is { } codeOwners)
-            {
-                var match = codeOwners.Match("/" + CIEnvironmentValues.Instance.MakeRelativePathFromSourceRoot(methodSymbol.File, false));
-                if (match is not null)
-                {
-                    var owners = string.Join("\",\"", match);
-                    if (!string.IsNullOrEmpty(owners))
-                    {
-                        tags.CodeOwners = "[\"" + owners + "\"]";
-                    }
+            SetStringOrArray(
+                tags,
+                Suite.Tags,
+                static testTags => testTags.SourceFile,
+                static suiteTags => suiteTags.SourceFile,
+                static (suiteTags, value) => suiteTags.SourceFile = value);
 
-                }
+            if (sourceOwnership.CodeOwnersTag is { } codeOwnersTag)
+            {
+                SetCodeOwnersOnTags(tags, Suite.Tags, sourceOwnership.MatchingOwners, codeOwnersTag);
             }
         }
     }
@@ -431,5 +433,86 @@ internal sealed class Test
     internal ISpan GetInternalSpan()
     {
         return _scope.Span;
+    }
+
+    internal static void SetStringOrArray(TestSpanTags testTags, TestSuiteSpanTags suiteTags, Func<TestSpanTags, string?> getTestTag, Func<TestSuiteSpanTags, string?> getSuiteTag, Action<TestSuiteSpanTags, string?> setSuiteTag)
+    {
+        // If the value is not set, we set it to the current test tag
+        // If it is set, we check if it is an array and add the current test tag to it
+        // If it is not an array, we create a new array with both values
+        // This is to support multiple values in a single tag
+        var suiteTagValue = getSuiteTag(suiteTags);
+        var testTagValue = getTestTag(testTags);
+        if (StringUtil.IsNullOrEmpty(testTagValue))
+        {
+            return;
+        }
+
+        if (StringUtil.IsNullOrEmpty(suiteTagValue))
+        {
+            setSuiteTag(suiteTags, testTagValue);
+        }
+        else if (!string.Equals(suiteTagValue, testTagValue, StringComparison.Ordinal))
+        {
+            if (suiteTagValue.StartsWith("[", StringComparison.Ordinal) &&
+                suiteTagValue.EndsWith("]", StringComparison.Ordinal))
+            {
+                // If the source file is an array, we add the new source file to it
+                List<string>? files;
+                try
+                {
+                    files = JsonConvert.DeserializeObject<List<string>>(suiteTagValue);
+                }
+                catch (Exception ex)
+                {
+                    CIVisibility.Log.Warning(ex, "Error deserializing '{SuiteTagValue}' environment variable.", suiteTagValue);
+                    files = [];
+                }
+
+                if (files is not null && !files.Contains(testTagValue, StringComparer.Ordinal))
+                {
+                    files.Add(testTagValue);
+                    setSuiteTag(suiteTags, JsonConvert.SerializeObject(files));
+                }
+            }
+            else
+            {
+                // If the source file is not an array, we create a new one with both values
+                try
+                {
+                    setSuiteTag(suiteTags, JsonConvert.SerializeObject(new List<string> { suiteTagValue, testTagValue }));
+                }
+                catch (Exception ex)
+                {
+                    CIVisibility.Log.Warning(ex, "Error serializing '{SuiteTagValue}' environment variable.", suiteTagValue);
+                    setSuiteTag(suiteTags, $"[\"{suiteTagValue}\",\"{testTagValue}\"]");
+                }
+            }
+        }
+    }
+
+    private static void SetCodeOwnersOnTags(TestSpanTags testTags, TestSuiteSpanTags suiteTags, string[] codeOwners, string codeOwnersTag)
+    {
+        testTags.CodeOwners = codeOwnersTag;
+        if (StringUtil.IsNullOrEmpty(suiteTags.CodeOwners))
+        {
+            suiteTags.CodeOwners = testTags.CodeOwners;
+        }
+        else if (!string.Equals(suiteTags.CodeOwners, testTags.CodeOwners, StringComparison.Ordinal))
+        {
+            List<string> suiteCodeOwners;
+            try
+            {
+                suiteCodeOwners = JsonConvert.DeserializeObject<List<string>>(suiteTags.CodeOwners) ?? [];
+            }
+            catch (Exception ex)
+            {
+                CIVisibility.Log.Warning(ex, "Error deserializing '{SuiteCodeOwners}' environment variable.", suiteTags.CodeOwners);
+                suiteCodeOwners = [];
+            }
+
+            suiteCodeOwners.AddRange(codeOwners);
+            suiteTags.CodeOwners = "[\"" + string.Join("\",\"", suiteCodeOwners.Distinct(StringComparer.Ordinal)) + "\"]";
+        }
     }
 }
