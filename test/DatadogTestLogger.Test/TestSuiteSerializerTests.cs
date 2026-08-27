@@ -200,6 +200,23 @@ public class TestSuiteSerializerTests
         Assert.Equal("[\"@test-owner\"]", values["test.codeowners"]);
     }
 
+    [Fact]
+    public void TestTagsEnumerateInheritedSourceFileAndCodeOwnersOnce()
+    {
+        var tags = new TestSpanTags
+        {
+            SourceFile = "test/SampleTests.cs",
+            CodeOwners = "[\"@test-owner\"]",
+        };
+        var counts = new Dictionary<string, int>();
+        var processor = new TagCounter(counts);
+
+        tags.EnumerateTags(ref processor);
+
+        Assert.Equal(1, counts["test.source.file"]);
+        Assert.Equal(1, counts["test.codeowners"]);
+    }
+
     private struct TagCollector : IItemProcessor<string>
     {
         private readonly Dictionary<string, string> _values;
@@ -210,5 +227,21 @@ public class TestSuiteSerializerTests
         }
 
         public void Process(TagItem<string> item) => _values[item.Key] = item.Value;
+    }
+
+    private struct TagCounter : IItemProcessor<string>
+    {
+        private readonly Dictionary<string, int> _counts;
+
+        public TagCounter(Dictionary<string, int> counts)
+        {
+            _counts = counts;
+        }
+
+        public void Process(TagItem<string> item)
+        {
+            _counts.TryGetValue(item.Key, out var count);
+            _counts[item.Key] = count + 1;
+        }
     }
 }
