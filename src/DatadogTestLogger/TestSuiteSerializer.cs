@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using DatadogTestLogger.Vendors.Datadog.Trace;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -21,6 +22,18 @@ internal class TestSuiteSerializer
 {
     private const string TestFinalStatusTag = "test.final_status";
     private readonly TestRunConfiguration _runConfiguration;
+
+    // Reflection targets are cached once: they are resolved per test/module otherwise.
+    private static readonly FieldInfo TestScopeField =
+        typeof(Test).GetField("_scope", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo ModuleSpanField =
+        typeof(TestModule).GetField("_span", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo FakeSessionField =
+        typeof(TestModule).GetField("_fakeSession", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo SessionSpanField =
+        typeof(TestSession).GetField("_span", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo SessionCurrentField =
+        typeof(TestSession).GetField("CurrentSession", BindingFlags.Static | BindingFlags.NonPublic);
 
     private static void SetFinalStatus(Test test, TestStatus status)
     {
@@ -124,7 +137,13 @@ internal class TestSuiteSerializer
     public string Serialize(List<TestResultInfo> results, List<TestMessageInfo> messages)
     { 
         var output = new StringBuilder();
-        
+
+        // Shared run-level session state, declared at method scope so the outer catch can
+        // still close the session when an assembly failure aborts the loop below.
+        TestSession? testSession = null;
+        DateTime runStartTime = DateTime.MinValue;
+        DateTime runEndTime = DateTime.MinValue;
+
         try
         {
             output.AppendLine("**************************************************");
@@ -197,6 +216,7 @@ internal class TestSuiteSerializer
 
                 Dictionary<Guid, List<CpuUsagePair>>? cpuValues = null;
                 Dictionary<Guid, TestCaseMetadata>? testCaseMetadatas = null;
+                ISpan? sessionSpan = null;
 
                 foreach (var resultByAssembly in groupedResults)
                 {
@@ -215,58 +235,18 @@ internal class TestSuiteSerializer
 
                     foreach (var folderPath in new[] { Path.GetDirectoryName(moduleFile) ?? string.Empty, Environment.CurrentDirectory })
                     {
-                        if (cpuValues is null)
-                        {
-                            var cpuValuesPath = Path.Combine(folderPath, "cpu_values.json");
-                            try
-                            {
-                                if (File.Exists(cpuValuesPath))
-                                {
-                                    output.AppendLine("CpuValues file: " + cpuValuesPath);
-                                    var jsonCpuValues = File.ReadAllText(cpuValuesPath);
-                                    cpuValues = JsonConvert
-                                        .DeserializeObject<Dictionary<Guid, List<CpuUsagePair>>>(jsonCpuValues);
-                                    output.AppendLine("CpuValues file loaded with " + (cpuValues?.Count ?? -1) +
-                                                      " test cases.");
-                                }
-                                else
-                                {
-                                    output.AppendLine("CpuValues file doesn't exist!: " + cpuValuesPath);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                output.AppendLine("Error reading CpuValues json file: " + ex);
-                            }
-                        }
+                        // Always probe (and consume) every candidate location: after a successful load
+                        // a `??=` short-circuit would leave an identical handoff file in the other
+                        // directory on disk, ready to poison a later run that only finds that copy.
+                        var loadedCpuValues = LoadAndConsumeJsonFile<Dictionary<Guid, List<CpuUsagePair>>>(
+                            Path.Combine(folderPath, "cpu_values.json"), output);
+                        cpuValues ??= loadedCpuValues;
 
-                        if (testCaseMetadatas is null)
-                        {
-                            var testCaseMetadataPath = Path.Combine(folderPath, "testcase_metadata.json");
-                            try
-                            {
-                                if (File.Exists(testCaseMetadataPath))
-                                {
-                                    output.AppendLine("TestCase Metadata file: " + testCaseMetadataPath);
-                                    var testCaseMetadataJson = File.ReadAllText(testCaseMetadataPath);
-                                    testCaseMetadatas =
-                                        JsonConvert.DeserializeObject<Dictionary<Guid, TestCaseMetadata>>(
-                                            testCaseMetadataJson);
-                                    output.AppendLine("TestCase Metadata file loaded with " +
-                                                      (testCaseMetadatas?.Count ?? -1) + " test cases.");
-                                }
-                                else
-                                {
-                                    output.AppendLine("TestCase Metadata file doesn't exist!: " + testCaseMetadataPath);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                output.AppendLine("Error reading TestCase Metadata json file: " + ex);
-                            }
-                        }
+                        var loadedTestCaseMetadatas = LoadAndConsumeJsonFile<Dictionary<Guid, TestCaseMetadata>>(
+                            Path.Combine(folderPath, "testcase_metadata.json"), output);
+                        testCaseMetadatas ??= loadedTestCaseMetadatas;
                     }
-                    
+
                     var testFramework = string.Empty;
                     var testFrameworkVersion = "N/A";
 
@@ -295,6 +275,10 @@ internal class TestSuiteSerializer
                             if (module is null)
                             {
                                 var folder = Path.GetDirectoryName(result.TestCase.Source);
+                                if (string.IsNullOrEmpty(folder))
+                                {
+                                    folder = Path.GetDirectoryName(moduleFile) ?? Environment.CurrentDirectory;
+                                }
 
                                 if (result.TestCase.ExecutorUri.Host.IndexOf("xunit",
                                         StringComparison.OrdinalIgnoreCase) !=
@@ -302,7 +286,7 @@ internal class TestSuiteSerializer
                                 {
                                     output.AppendLine("xUnit framework detected.");
                                     testFramework = "xUnit";
-                                    var xunitCoreFile = Path.Combine(folder!, "xunit.core.dll");
+                                    var xunitCoreFile = Path.Combine(folder, "xunit.core.dll");
                                     output.AppendLine("Looking for: " + xunitCoreFile);
                                     if (File.Exists(xunitCoreFile))
                                     {
@@ -324,7 +308,7 @@ internal class TestSuiteSerializer
                                 {
                                     output.AppendLine("NUnit framework detected.");
                                     testFramework = "NUnit";
-                                    var nUnitFramework = Path.Combine(folder!, "nunit.framework.dll");
+                                    var nUnitFramework = Path.Combine(folder, "nunit.framework.dll");
                                     output.AppendLine("Looking for: " + nUnitFramework);
                                     if (File.Exists(nUnitFramework))
                                     {
@@ -346,7 +330,7 @@ internal class TestSuiteSerializer
                                 {
                                     output.AppendLine("MSTest framework detected.");
                                     testFramework = "MSTestV2";
-                                    var msTestFramework = Path.Combine(folder!,
+                                    var msTestFramework = Path.Combine(folder,
                                         "Microsoft.VisualStudio.TestPlatform.TestFramework.dll");
                                     output.AppendLine("Looking for: " + msTestFramework);
                                     if (File.Exists(msTestFramework))
@@ -367,11 +351,35 @@ internal class TestSuiteSerializer
 
                                 output.AppendLine("**************************************************");
                                 output.AppendLine("Creating test module: " + testModuleName);
+
+                                // Keep ONE session alive for every module of this process: closing a module
+                                // also finishes its fake session and clears TestSession.Current, which would
+                                // otherwise spawn a brand new fake session for the next assembly.
+                                RestoreCurrentSession(testSession);
+
                                 moduleStartTime = startTime;
                                 module = TestModule.Create(testModuleName, testFramework, testFrameworkVersion,
                                     moduleStartTime);
                                 module.SetTag("runtime.name", runtimeName);
                                 module.SetTag("runtime.version", runtimeVersion);
+
+                                // Capture the shared session and its span ONCE per run: this block runs for the
+                                // first module of every assembly, but emission must not repeat per assembly.
+                                // In out-of-process scenarios there is no local session object and we fall
+                                // back to this first module's span.
+                                if (sessionSpan is null)
+                                {
+                                    testSession ??= FakeSessionField?.GetValue(module) as TestSession;
+                                    sessionSpan = (testSession is not null
+                                        ? SessionSpanField?.GetValue(testSession) as ISpan
+                                        : null) ?? ModuleSpanField?.GetValue(module) as ISpan;
+                                    runStartTime = startTime;
+
+                                    // Emit the session messages while the target span is still open: Span.SetTag
+                                    // ignores mutations after Finish, and emitting here also keeps the messages
+                                    // alive even when a later assembly fails to load.
+                                    EmitSessionMessages(messages, sessionSpan, output);
+                                }
                             }
 
                             if (suite is null)
@@ -516,11 +524,11 @@ internal class TestSuiteSerializer
                             {
                                 if (testSuiteType is null)
                                 {
-                                    output.AppendFormat("      Test suite type not found (for TestMethodInfo): {1}, {0} (testMethod: {2})", testModuleName, testSuite, testName);
+                                    output.AppendLine($"      Test suite type not found (for TestMethodInfo): module '{testModuleName}', suite '{testSuite}'");
                                 }
                                 else
                                 {
-                                    output.AppendFormat("      Test method not found (for TestMethodInfo): {1}.{2}, {0}", testModuleName, testSuite, testName);
+                                    output.AppendLine($"      Test method not found (for TestMethodInfo): {testModuleName}.{testSuite}.{testName}");
                                 }
                             }
 
@@ -538,9 +546,7 @@ internal class TestSuiteSerializer
                             {
                                 if (result.Messages?.Count > 0)
                                 {
-                                    var scopeField = typeof(Test).GetField("_scope",
-                                        BindingFlags.Instance | BindingFlags.NonPublic);
-                                    if (scopeField?.GetValue(test) is Scope scope)
+                                    if (TestScopeField?.GetValue(test) is Scope scope)
                                     {
                                         output.AppendLine("      Including test messages.");
                                         foreach (var message in result.Messages)
@@ -692,60 +698,177 @@ internal class TestSuiteSerializer
                         }
                     }
 
-                    // Messages
-                    try
-                    {
-                        if (messages is not null)
-                        {
-                            var spanField = typeof(TestModule).GetField("_span",
-                                BindingFlags.Instance | BindingFlags.NonPublic);
-                            if (spanField is not null && spanField.GetValue(module) is ISpan span)
-                            {
-                                output.AppendLine();
-                                output.AppendLine("Module contains messages.");
-                                foreach (var message in messages)
-                                {
-                                    var level = message.Level switch
-                                    {
-                                        TestMessageLevel.Error => "error",
-                                        TestMessageLevel.Warning => "warn",
-                                        _ => "info"
-                                    };
-
-                                    var iSpan = new InternalISpan(span);
-                                    var msgText = message.Message;
-                                    ProcessMessagesAsSpanTags(ref msgText, iSpan, output);
-                                    var logEvent = new CIVisibilityLogEvent("testoptimization", level, msgText,
-                                        iSpan);
-                                    Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
-                                }
-
-                                output.AppendLine();
-                            }
-                            else
-                            {
-                                output.AppendLine();
-                                output.AppendLine(":( _span cannot be found inside the TestModule.");
-                                output.AppendLine();
-                            }
-                        }
-                    }
-                    catch (Exception innerEx)
-                    {
-                        output.AppendLine(innerEx.ToString());
-                    }
-
                     output.AppendLine("Closing module: " + testModuleName);
+
+                    // Forward the coverage tags TestModule's own Close would normally send to the
+                    // shared session, then detach it so the module Close only finishes the module
+                    // span: the session must stay open across every assembly and is closed exactly
+                    // once afterwards (or from the outer catch on failure).
+                    if (module is not null)
+                    {
+                        PropagateCoverageTags(module, testSession);
+                        FakeSessionField?.SetValue(module, null);
+                    }
+
                     module?.Close(moduleTime.Subtract(moduleStartTime));
+                    if (moduleTime > runEndTime)
+                    {
+                        runEndTime = moduleTime;
+                    }
                 }
+
+                CloseSharedSession(testSession, runStartTime, runEndTime, results, output);
             }
         }
         catch (Exception ex)
         {
+            CloseSharedSession(testSession, runStartTime, runEndTime, results, output);
             output.AppendLine(ex.ToString());
         }
 
         return output.ToString();
+    }
+
+    /// <summary>
+    /// Closes the shared session exactly once, from the normal path or from the outer catch so
+    /// an assembly failure cannot leave it unfinished. A zero duration (e.g. an all-skipped
+    /// run) is a valid window and still emits the session span.
+    /// </summary>
+    private static void CloseSharedSession(TestSession? testSession, DateTime runStartTime, DateTime runEndTime, List<TestResultInfo>? results, StringBuilder output)
+    {
+        if (testSession is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var sessionStatus = results is not null && results.Any(r =>
+                r.Outcome is TestOutcome.Failed or TestOutcome.NotFound)
+                ? TestStatus.Fail
+                : TestStatus.Pass;
+
+            var sessionDuration = runEndTime > runStartTime ? runEndTime - runStartTime : TimeSpan.Zero;
+            testSession.Close(sessionStatus, sessionDuration);
+        }
+        catch (Exception closeEx)
+        {
+            output.AppendLine($"Error closing the shared test session: {closeEx}");
+        }
+    }
+
+    /// <summary>
+    /// Forwards the coverage tags that TestModule.InternalClose would normally send to its
+    /// fake session, before the shared session is detached from the module.
+    /// </summary>
+    private static void PropagateCoverageTags(TestModule module, TestSession? session)
+    {
+        if (session is null || ModuleSpanField?.GetValue(module) is not ISpan moduleSpan)
+        {
+            return;
+        }
+
+        foreach (var key in new[] { CodeCoverageTags.Enabled, CodeCoverageTags.PercentageOfTotalLines })
+        {
+            if (moduleSpan.GetTag(key) is { } value)
+            {
+                session.SetTag(key, value);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Re-seeds the vendored TestSession.Current (a private static AsyncLocal) with the session
+    /// shared by this run, so every module attaches to the same CI session instead of creating
+    /// a new fake session per assembly.
+    /// </summary>
+    private static void RestoreCurrentSession(TestSession? session)
+    {
+        if (session is null || SessionCurrentField?.GetValue(null) is not AsyncLocal<TestSession?> asyncLocal)
+        {
+            return;
+        }
+
+        asyncLocal.Value = session;
+    }
+
+    private static void EmitSessionMessages(List<TestMessageInfo>? messages, ISpan? span, StringBuilder output)
+    {
+        if (messages is null || messages.Count == 0)
+        {
+            return;
+        }
+
+        if (span is null)
+        {
+            output.AppendLine(":( session/module span cannot be found for session messages.");
+            return;
+        }
+
+        try
+        {
+            output.AppendLine();
+            output.AppendLine("Session contains messages.");
+            foreach (var message in messages)
+            {
+                var level = message.Level switch
+                {
+                    TestMessageLevel.Error => "error",
+                    TestMessageLevel.Warning => "warn",
+                    _ => "info"
+                };
+
+                var iSpan = new InternalISpan(span);
+                var msgText = message.Message;
+                ProcessMessagesAsSpanTags(ref msgText, iSpan, output);
+                var logEvent = new CIVisibilityLogEvent("testoptimization", level, msgText, iSpan);
+                Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+            }
+
+            output.AppendLine();
+        }
+        catch (Exception innerEx)
+        {
+            output.AppendLine(innerEx.ToString());
+        }
+    }
+
+    /// <summary>
+    /// Loads and deserializes a json file, then consumes it (deletes it) so that a later run can
+    /// never pick up stale data from a previous session when the collector fails to run or is disabled.
+    /// </summary>
+    private static T? LoadAndConsumeJsonFile<T>(string path, StringBuilder output)
+        where T : class, System.Collections.ICollection
+    {
+        try
+        {
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            output.AppendLine($"{typeof(T).Name} file: {path}");
+            var result = JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
+            output.AppendLine($"{typeof(T).Name} file loaded with {result?.Count.ToString() ?? "invalid"} entries.");
+            return result;
+        }
+        catch (Exception ex)
+        {
+            output.AppendLine($"Error consuming {typeof(T).Name} json file ({path}): {ex}");
+            return null;
+        }
+        finally
+        {
+            // Best-effort cleanup: consumed files are deleted even if the load or parse failed.
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception deleteEx)
+            {
+                output.AppendLine($"Could not delete consumed file {path}: {deleteEx}");
+            }
+        }
     }
 
     private static void ProcessMessagesAsSpanTags(ref string messageItem, ISpan span, StringBuilder output)

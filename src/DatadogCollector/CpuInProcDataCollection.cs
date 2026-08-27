@@ -14,7 +14,6 @@ internal class CpuInProcDataCollection : InProcDataCollection
     private CancellationTokenSource? _cpuUsageCancellationTokenSource;
     private Thread? _cpuCollectorThread;
     private double _lastCpuPercentageValue;
-    private double _lastSystemCpuPercentageValue;
 
     public void Initialize(IDataCollectionSink dataCollectionSink)
     {
@@ -41,7 +40,8 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         if (testCaseStartArgs?.TestCase?.Id is { } id)
         {
-            _currentCpuValues.GetOrAdd(id, new List<CpuUsagePair> { new(_lastCpuPercentageValue, GetTotalCpuUsage()) });
+            var currentCpu = Interlocked.CompareExchange(ref _lastCpuPercentageValue, 0, 0);
+            _currentCpuValues.GetOrAdd(id, new List<CpuUsagePair> { new(currentCpu, GetTotalCpuUsage()) });
         }
     }
 
@@ -49,13 +49,20 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         if (testCaseEndArgs?.DataCollectionContext?.TestCase is { } testCase)
         {
-            if (_currentCpuValues.TryRemove(testCase.Id, out var values) &&
-                _finalValues.TryAdd(testCase.Id, values))
+            // Collect the final sample before publishing so the collector thread never
+            // appends to an already-published list.
+            if (_currentCpuValues.TryRemove(testCase.Id, out var values))
             {
                 lock (values)
                 {
-                    values.Add(new(_lastCpuPercentageValue, GetTotalCpuUsage()));
+                    var lastCpu = Interlocked.CompareExchange(ref _lastCpuPercentageValue, 0, 0);
+                    values.Add(new(lastCpu, GetTotalCpuUsage()));
                 }
+
+                // Indexer instead of TryAdd: retries of the same TestCase.Id ([Retry], runner reruns)
+                // must replace the previous attempt's metrics with the latest one, which is the
+                // attempt whose outcome gets published.
+                _finalValues[testCase.Id] = values;
             }
         }
     }
@@ -70,7 +77,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
             // Move current cpu values to the final values.
             foreach (var item in _currentCpuValues)
             {
-                _finalValues.TryAdd(item.Key, item.Value);
+                _finalValues[item.Key] = item.Value;
             }
             
             _currentCpuValues.Clear();
@@ -97,8 +104,6 @@ internal class CpuInProcDataCollection : InProcDataCollection
     {
         if (dataCollection?._cpuUsageCancellationTokenSource is { Token: { } token })
         {
-            _ = TotalCpuUsage.GetUsage();
-
             // Get current Process
             var process = Process.GetCurrentProcess();
             // Create a high precision clock
@@ -129,7 +134,12 @@ internal class CpuInProcDataCollection : InProcDataCollection
                     }
 
                     // Add value to current executing tests
-                    dataCollection._lastCpuPercentageValue = result;
+                    Interlocked.Exchange(ref dataCollection._lastCpuPercentageValue, result);
+
+                    // One system sample per pass: the system implementations keep delta state
+                    // between calls, so sampling once per active test would consume the whole
+                    // interval in the first test and report ~0% to the remaining ones.
+                    var systemCpuUsage = GetTotalCpuUsage();
                     foreach(var values in dataCollection._currentCpuValues.Values)
                     {
                         if (token.IsCancellationRequested)
@@ -139,7 +149,8 @@ internal class CpuInProcDataCollection : InProcDataCollection
 
                         lock (values)
                         {
-                            values.Add(new CpuUsagePair(dataCollection._lastCpuPercentageValue, GetTotalCpuUsage()));
+                            var lastCpu = Interlocked.CompareExchange(ref dataCollection._lastCpuPercentageValue, 0, 0);
+                            values.Add(new CpuUsagePair(lastCpu, systemCpuUsage));
                         }
                     }
                 }

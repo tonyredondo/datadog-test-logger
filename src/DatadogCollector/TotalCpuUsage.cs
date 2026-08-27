@@ -6,22 +6,35 @@ public static class TotalCpuUsage
 {
     private static readonly Lazy<IUsage?> LazyUsage = new(() =>
     {
+        IUsage? usage = null;
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            return Windows.Instance;
+            usage = Windows.Instance;
         }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            return Linux.Instance;
+            usage = Linux.Instance;
         }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            return MacOs.Instance;
+            usage = MacOs.Instance;
         }
 
-        return null;
+        // Prime the deltas with an initial sample so consumers never see a bogus first
+        // value (with unset previous ticks Linux reported ~100% and Windows a
+        // boot-to-now average). Best-effort: Lazy caches thrown exceptions from the
+        // factory, so a transient failure here would disable sampling forever.
+        try
+        {
+            _ = usage?.GetUsage();
+        }
+        catch
+        {
+            // The sampling loop reports real failures through the regular error path.
+        }
+
+        return usage;
     });
 
     private static long _totalErrors;
@@ -69,17 +82,12 @@ public static class TotalCpuUsage
                 var ker = kernelTime - _prevKernelTime;
                 var idl = idleTime - _prevIdleTime;
                 var sys = ker + usr;
-                
+
                 _prevUserTime = userTime;
                 _prevKernelTime = kernelTime;
                 _prevIdleTime = idleTime;
 
-                if (sys == 0)
-                {
-                    return 0;
-                }
-
-                return ((double)((sys - idl) * 100) / (double)sys);
+                return CpuUsageCalculator.FromDeltas(idl, sys);
             }
 
             return -1;
@@ -105,10 +113,19 @@ public static class TotalCpuUsage
             var cpuDataLine = File.ReadAllText("/proc/stat").Split('\n')[0];
             var cpuDataParts = cpuDataLine.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
 
-            var idleTime = long.Parse(cpuDataParts[4]) + long.Parse(cpuDataParts[5]);
-            long totalTime = 0;
+            // cpuDataParts[0] is the "cpu" label, then: user nice system idle iowait irq softirq steal ...
+            // Parse dynamically so new kernel columns don't break the parser, and include steal
+            // (cycles lost to the hypervisor) in the total so overcommitted VMs don't report >100%.
+            // guest/guest_nice (index 9+) are excluded: the kernel already counts them inside user/nice.
+            if (cpuDataParts.Length < 6)
+            {
+                return -1;
+            }
 
-            for (var i = 1; i <= 7; ++i)
+            var idleTime = long.Parse(cpuDataParts[4]) + long.Parse(cpuDataParts[5]);
+            var totalFields = Math.Min(cpuDataParts.Length, 9);
+            var totalTime = 0L;
+            for (var i = 1; i < totalFields; ++i)
             {
                 totalTime += long.Parse(cpuDataParts[i]);
             }
@@ -119,50 +136,92 @@ public static class TotalCpuUsage
             _prevIdleTime = idleTime;
             _prevTotalTime = totalTime;
 
-            return ((double)((totalTimeDelta - idleTimeDelta) * 100) / (double)totalTimeDelta);
+            return CpuUsageCalculator.FromDeltas(idleTimeDelta, totalTimeDelta);
         }
     }
 
     class MacOs : IUsage
     {
-        private IntPtr _cpuInfoSize;
+        private const int HostCpuLoadInfoFlavor = 3; // HOST_CPU_LOAD_INFO from mach/host_info.h
+
+        // host_statistics takes a mach_msg_type_number_t* which counts in natural_t units,
+        // i.e. element count (CPU_STATE_MAX == 4), not byte size.
+        private static readonly uint HostCpuLoadInfoCount =
+            (uint)(Marshal.SizeOf<HostCpuLoadInfo>() / sizeof(uint));
+
+        // Cache the host port send right once: mach_host_self() grants a new right on each call.
+        private static readonly IntPtr HostPort = mach_host_self();
+
+        // Per-state previous ticks: deltas are computed per uint state (wrapping arithmetic),
+        // never as absolute long totals, so a wrapped counter cannot produce a bogus interval.
+        private readonly uint[] _prevCpuTicks = new uint[4];
+
+        // TestCaseStart/End callbacks can call GetUsage concurrently with the collector thread;
+        // reading and advancing the baseline must be atomic or interleaved calls mix old and new
+        // baselines (which reads back as a bogus 2^32 wrap).
+        private readonly object _syncRoot = new();
 
         private static readonly Lazy<MacOs> LazyInstance = new(() => new MacOs());
 
         public static MacOs Instance => LazyInstance.Value;
 
-        private unsafe MacOs()
+        private MacOs()
         {
-            _cpuInfoSize = Marshal.AllocCoTaskMem(sizeof(nint));
-            Marshal.WriteInt64(_cpuInfoSize, sizeof(CpuTimeInfo));
         }
 
         public unsafe double GetUsage()
         {
-            if (sysctlbyname("vm.loadavg", out var cpuInfo, _cpuInfoSize, IntPtr.Zero, 0) == 0)
+            var count = HostCpuLoadInfoCount;
+            if (host_statistics(HostPort, HostCpuLoadInfoFlavor, out var info, ref count) != 0)
             {
-                var avg = (double)(cpuInfo.ldavg[0]) / cpuInfo.fscale;
-                return (double) ((avg * 100) / Environment.ProcessorCount);
+                return -1;
             }
 
-            return -1;
+            // CpuTicks follows the CPU_STATE_* layout: USER, SYSTEM, IDLE, NICE.
+            // NICE is low-priority user time, i.e. busy time: only IDLE counts as idle.
+            long idleTimeDelta;
+            long totalTimeDelta;
+            lock (_syncRoot)
+            {
+                idleTimeDelta = 0;
+                totalTimeDelta = 0;
+                for (var i = 0; i < 4; i++)
+                {
+                    // uint subtraction wraps modulo 2^32, so a wrapped counter still yields the
+                    // correct small delta instead of a huge negative jump.
+                    uint delta;
+                    unchecked
+                    {
+                        delta = info.CpuTicks[i] - _prevCpuTicks[i];
+                    }
+
+                    _prevCpuTicks[i] = info.CpuTicks[i];
+                    totalTimeDelta += delta;
+                    if (i == 2)
+                    {
+                        idleTimeDelta = delta;
+                    }
+                }
+            }
+
+            return CpuUsageCalculator.FromDeltas(idleTimeDelta, totalTimeDelta);
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        struct CpuTimeInfo
+        private struct HostCpuLoadInfo
         {
-            public unsafe fixed uint ldavg[3];
-            public long fscale;
+            public unsafe fixed uint CpuTicks[4]; // CPU_STATE_MAX from mach/host_info.h
         }
 
-        [DllImport("libc", SetLastError = true)]
-        private static extern int sysctlbyname(
-            [MarshalAs(UnmanagedType.LPStr)] string property,
-            out CpuTimeInfo output,
-            IntPtr oldLen,
-            IntPtr newp,
-            uint newlen
-        );
+        [DllImport("libSystem.dylib")]
+        private static extern int host_statistics(
+            IntPtr hostPrivPort,
+            int flavor,
+            out HostCpuLoadInfo info,
+            ref uint count);
+
+        [DllImport("libSystem.dylib")]
+        private static extern IntPtr mach_host_self();
     }
 
     interface IUsage
