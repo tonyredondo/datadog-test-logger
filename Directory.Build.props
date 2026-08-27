@@ -1,0 +1,24 @@
+<Project>
+
+    <!--
+      Reproducible build + SourceLink-friendly packaging, applied to every project in the repo.
+      See: https://learn.microsoft.com/dotnet/standard/library-guidance/sourcelink
+    -->
+    <PropertyGroup>
+        <!-- Derive the MVID and PDB content deterministically from the sources. -->
+        <Deterministic>true</Deterministic>
+        <!-- Stamp the repository metadata into the generated nuspec. -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <!-- Embed sources not tracked by git (generated files) so PDBs stay debuggable. -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <!-- Ship PDBs in a symbol package (snupkg) next to the nupkg. -->
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <!-- Only in CI: remap absolute source paths to '/_/' so PDBs don't leak
+             machine-specific paths and remain reproducible across agents.
+             (Kept off locally to preserve plain F5 debugging.) -->
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+</Project>
