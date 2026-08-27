@@ -23,8 +23,13 @@ public class CodeOwnershipTests
         Assert.Null(ownership.CodeOwnersTag);
     }
 
-    [Fact]
-    public void ResolvesSourcePathRecordedByBuildOnAnotherOperatingSystem()
+    [Theory]
+    [InlineData(@"D:\a\_work\1\s\src\SampleTests.cs")]
+    [InlineData("D:/a/_work/1/s/src/SampleTests.cs")]
+    [InlineData("/home/vsts/work/1/s/src/SampleTests.cs")]
+    [InlineData("file:///D:/a/_work/1/s/src/SampleTests.cs")]
+    [InlineData("../../../_/src/SampleTests.cs")]
+    public void ResolvesRelocatedCompilerSourcePath(string sourcePath)
     {
         using var repositoryDirectory = new TemporaryDirectory();
         var sourceDirectory = Path.Combine(repositoryDirectory.Path, "src");
@@ -33,7 +38,29 @@ public class CodeOwnershipTests
         File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
         var resolver = new CodeOwnersResolver(repositoryDirectory.Path, repositoryDirectory.Path, Repository, "github");
 
-        var ownership = resolver.Resolve("D:/a/_work/1/s/src/SampleTests.cs", useOSSeparator: false);
+        var ownership = resolver.Resolve(sourcePath, useOSSeparator: false);
+
+        Assert.True(ownership.IsRepositoryRelative);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void ResolvesExistingCompilerSourcePathOutsideRepositoryByItsRepositorySuffix()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var buildDirectory = new TemporaryDirectory();
+        var repositorySourceDirectory = Path.Combine(repositoryDirectory.Path, "src");
+        var buildSourceDirectory = Path.Combine(buildDirectory.Path, "src");
+        Directory.CreateDirectory(repositorySourceDirectory);
+        Directory.CreateDirectory(buildSourceDirectory);
+        File.WriteAllText(Path.Combine(repositoryDirectory.Path, "CODEOWNERS"), "/src/ @repository-owner");
+        File.WriteAllText(Path.Combine(repositorySourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        var compilerSourcePath = Path.Combine(buildSourceDirectory, "SampleTests.cs");
+        File.WriteAllText(compilerSourcePath, "class SampleTests {}");
+        var resolver = new CodeOwnersResolver(repositoryDirectory.Path, repositoryDirectory.Path, Repository, "github");
+
+        var ownership = resolver.Resolve(compilerSourcePath, useOSSeparator: false);
 
         Assert.True(ownership.IsRepositoryRelative);
         Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
