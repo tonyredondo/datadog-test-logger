@@ -156,6 +156,11 @@ public static class TotalCpuUsage
         // never as absolute long totals, so a wrapped counter cannot produce a bogus interval.
         private readonly uint[] _prevCpuTicks = new uint[4];
 
+        // TestCaseStart/End callbacks can call GetUsage concurrently with the collector thread;
+        // reading and advancing the baseline must be atomic or interleaved calls mix old and new
+        // baselines (which reads back as a bogus 2^32 wrap).
+        private readonly object _syncRoot = new();
+
         private static readonly Lazy<MacOs> LazyInstance = new(() => new MacOs());
 
         public static MacOs Instance => LazyInstance.Value;
@@ -174,23 +179,28 @@ public static class TotalCpuUsage
 
             // CpuTicks follows the CPU_STATE_* layout: USER, SYSTEM, IDLE, NICE.
             // NICE is low-priority user time, i.e. busy time: only IDLE counts as idle.
-            long idleTimeDelta = 0;
-            long totalTimeDelta = 0;
-            for (var i = 0; i < 4; i++)
+            long idleTimeDelta;
+            long totalTimeDelta;
+            lock (_syncRoot)
             {
-                // uint subtraction wraps modulo 2^32, so a wrapped counter still yields the
-                // correct small delta instead of a huge negative jump.
-                uint delta;
-                unchecked
+                idleTimeDelta = 0;
+                totalTimeDelta = 0;
+                for (var i = 0; i < 4; i++)
                 {
-                    delta = info.CpuTicks[i] - _prevCpuTicks[i];
-                }
+                    // uint subtraction wraps modulo 2^32, so a wrapped counter still yields the
+                    // correct small delta instead of a huge negative jump.
+                    uint delta;
+                    unchecked
+                    {
+                        delta = info.CpuTicks[i] - _prevCpuTicks[i];
+                    }
 
-                _prevCpuTicks[i] = info.CpuTicks[i];
-                totalTimeDelta += delta;
-                if (i == 2)
-                {
-                    idleTimeDelta = delta;
+                    _prevCpuTicks[i] = info.CpuTicks[i];
+                    totalTimeDelta += delta;
+                    if (i == 2)
+                    {
+                        idleTimeDelta = delta;
+                    }
                 }
             }
 

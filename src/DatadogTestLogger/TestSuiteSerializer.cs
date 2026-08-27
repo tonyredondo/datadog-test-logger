@@ -211,6 +211,8 @@ internal class TestSuiteSerializer
                 Dictionary<Guid, TestCaseMetadata>? testCaseMetadatas = null;
                 TestSession? testSession = null;
                 ISpan? sessionSpan = null;
+                DateTime runStartTime = DateTime.MinValue;
+                DateTime runEndTime = DateTime.MinValue;
 
                 foreach (var resultByAssembly in groupedResults)
                 {
@@ -229,11 +231,16 @@ internal class TestSuiteSerializer
 
                     foreach (var folderPath in new[] { Path.GetDirectoryName(moduleFile) ?? string.Empty, Environment.CurrentDirectory })
                     {
-                        cpuValues ??= LoadAndConsumeJsonFile<Dictionary<Guid, List<CpuUsagePair>>>(
+                        // Always probe (and consume) every candidate location: after a successful load
+                        // a `??=` short-circuit would leave an identical handoff file in the other
+                        // directory on disk, ready to poison a later run that only finds that copy.
+                        var loadedCpuValues = LoadAndConsumeJsonFile<Dictionary<Guid, List<CpuUsagePair>>>(
                             Path.Combine(folderPath, "cpu_values.json"), output);
+                        cpuValues ??= loadedCpuValues;
 
-                        testCaseMetadatas ??= LoadAndConsumeJsonFile<Dictionary<Guid, TestCaseMetadata>>(
+                        var loadedTestCaseMetadatas = LoadAndConsumeJsonFile<Dictionary<Guid, TestCaseMetadata>>(
                             Path.Combine(folderPath, "testcase_metadata.json"), output);
+                        testCaseMetadatas ??= loadedTestCaseMetadatas;
                     }
 
                     var testFramework = string.Empty;
@@ -362,6 +369,7 @@ internal class TestSuiteSerializer
                                     sessionSpan = (testSession is not null
                                         ? SessionSpanField?.GetValue(testSession) as ISpan
                                         : null) ?? ModuleSpanField?.GetValue(module) as ISpan;
+                                    runStartTime = startTime;
 
                                     // Emit the session messages while the target span is still open: Span.SetTag
                                     // ignores mutations after Finish, and emitting here also keeps the messages
@@ -687,7 +695,31 @@ internal class TestSuiteSerializer
                     }
 
                     output.AppendLine("Closing module: " + testModuleName);
+
+                    // Detach the shared session from the module so its Close only finishes the module
+                    // span: the session must stay open across every assembly and is closed exactly once
+                    // after the loop below.
+                    if (module is not null)
+                    {
+                        FakeSessionField?.SetValue(module, null);
+                    }
+
                     module?.Close(moduleTime.Subtract(moduleStartTime));
+                    if (moduleTime > runEndTime)
+                    {
+                        runEndTime = moduleTime;
+                    }
+                }
+
+                // Close the shared session exactly once, with the whole run as its window.
+                if (testSession is not null && runEndTime > runStartTime)
+                {
+                    var sessionStatus = results!.Any(r =>
+                        r.Outcome is TestOutcome.Failed or TestOutcome.NotFound)
+                        ? TestStatus.Fail
+                        : TestStatus.Pass;
+
+                    testSession.Close(sessionStatus, runEndTime - runStartTime);
                 }
             }
         }
