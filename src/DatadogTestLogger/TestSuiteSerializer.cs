@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using DatadogTestLogger.Vendors.Datadog.Trace;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Logging.DirectSubmission;
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -136,7 +137,13 @@ internal class TestSuiteSerializer
     public string Serialize(List<TestResultInfo> results, List<TestMessageInfo> messages)
     { 
         var output = new StringBuilder();
-        
+
+        // Shared run-level session state, declared at method scope so the outer catch can
+        // still close the session when an assembly failure aborts the loop below.
+        TestSession? testSession = null;
+        DateTime runStartTime = DateTime.MinValue;
+        DateTime runEndTime = DateTime.MinValue;
+
         try
         {
             output.AppendLine("**************************************************");
@@ -209,10 +216,7 @@ internal class TestSuiteSerializer
 
                 Dictionary<Guid, List<CpuUsagePair>>? cpuValues = null;
                 Dictionary<Guid, TestCaseMetadata>? testCaseMetadatas = null;
-                TestSession? testSession = null;
                 ISpan? sessionSpan = null;
-                DateTime runStartTime = DateTime.MinValue;
-                DateTime runEndTime = DateTime.MinValue;
 
                 foreach (var resultByAssembly in groupedResults)
                 {
@@ -696,11 +700,13 @@ internal class TestSuiteSerializer
 
                     output.AppendLine("Closing module: " + testModuleName);
 
-                    // Detach the shared session from the module so its Close only finishes the module
-                    // span: the session must stay open across every assembly and is closed exactly once
-                    // after the loop below.
+                    // Forward the coverage tags TestModule's own Close would normally send to the
+                    // shared session, then detach it so the module Close only finishes the module
+                    // span: the session must stay open across every assembly and is closed exactly
+                    // once afterwards (or from the outer catch on failure).
                     if (module is not null)
                     {
+                        PropagateCoverageTags(module, testSession);
                         FakeSessionField?.SetValue(module, null);
                     }
 
@@ -711,24 +717,64 @@ internal class TestSuiteSerializer
                     }
                 }
 
-                // Close the shared session exactly once, with the whole run as its window.
-                if (testSession is not null && runEndTime > runStartTime)
-                {
-                    var sessionStatus = results!.Any(r =>
-                        r.Outcome is TestOutcome.Failed or TestOutcome.NotFound)
-                        ? TestStatus.Fail
-                        : TestStatus.Pass;
-
-                    testSession.Close(sessionStatus, runEndTime - runStartTime);
-                }
+                CloseSharedSession(testSession, runStartTime, runEndTime, results, output);
             }
         }
         catch (Exception ex)
         {
+            CloseSharedSession(testSession, runStartTime, runEndTime, results, output);
             output.AppendLine(ex.ToString());
         }
 
         return output.ToString();
+    }
+
+    /// <summary>
+    /// Closes the shared session exactly once, from the normal path or from the outer catch so
+    /// an assembly failure cannot leave it unfinished. A zero duration (e.g. an all-skipped
+    /// run) is a valid window and still emits the session span.
+    /// </summary>
+    private static void CloseSharedSession(TestSession? testSession, DateTime runStartTime, DateTime runEndTime, List<TestResultInfo>? results, StringBuilder output)
+    {
+        if (testSession is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var sessionStatus = results is not null && results.Any(r =>
+                r.Outcome is TestOutcome.Failed or TestOutcome.NotFound)
+                ? TestStatus.Fail
+                : TestStatus.Pass;
+
+            var sessionDuration = runEndTime > runStartTime ? runEndTime - runStartTime : TimeSpan.Zero;
+            testSession.Close(sessionStatus, sessionDuration);
+        }
+        catch (Exception closeEx)
+        {
+            output.AppendLine($"Error closing the shared test session: {closeEx}");
+        }
+    }
+
+    /// <summary>
+    /// Forwards the coverage tags that TestModule.InternalClose would normally send to its
+    /// fake session, before the shared session is detached from the module.
+    /// </summary>
+    private static void PropagateCoverageTags(TestModule module, TestSession? session)
+    {
+        if (session is null || ModuleSpanField?.GetValue(module) is not ISpan moduleSpan)
+        {
+            return;
+        }
+
+        foreach (var key in new[] { CodeCoverageTags.Enabled, CodeCoverageTags.PercentageOfTotalLines })
+        {
+            if (moduleSpan.GetTag(key) is { } value)
+            {
+                session.SetTag(key, value);
+            }
+        }
     }
 
     /// <summary>
