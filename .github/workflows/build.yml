@@ -1,21 +1,76 @@
-name: Build and pack
+name: Build, test and pack
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Canonical build: compiles every target framework, runs the unit tests and packs the
+  # NuGet packages into artifacts/ so they can be downloaded from the run summary and
+  # published to NuGet.
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET
+    - name: Setup .NET 7.0
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 7.0.x
     - name: Build, test and pack
       run: ./build.sh
+    - name: Upload NuGet packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: |
+          artifacts/*.nupkg
+          artifacts/*.snupkg
+        if-no-files-found: error
+
+  # Tests across platforms and .NET SDK versions. The test project targets net7.0, so when
+  # the matrix SDK is newer we also install the 7.0 toolchain: newer SDKs can build older
+  # targets, but executing them requires the matching runtime to be installed side by side.
+  test:
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.os }}, ${{ matrix.dotnet }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet: ['7.0.x', '8.0.x', '9.0.x', '10.0.x']
+        # Keep the (slower) macOS lane to the repo baseline and the newest SDK.
+        exclude:
+          - os: macos-latest
+            dotnet: '8.0.x'
+          - os: macos-latest
+            dotnet: '9.0.x'
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET ${{ matrix.dotnet }}
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ matrix.dotnet }}
+    - name: Setup .NET 7.0
+      if: matrix.dotnet != '7.0.x'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 7.0.x
+    - name: Run tests
+      run: dotnet test test/DatadogTestLogger.Test/DatadogTestLogger.Test.csproj -c Release
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.dotnet }}
+        path: '**/TestResults/**/*.trx'
+        if-no-files-found: ignore
