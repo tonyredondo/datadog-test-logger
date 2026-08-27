@@ -12,7 +12,10 @@
         <RepositoryType>git</RepositoryType>
         <!-- Embed sources not tracked by git (generated files) so PDBs stay debuggable. -->
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <!-- Ship PDBs in a symbol package (snupkg) next to the nupkg. -->
+        <!-- Ship PDBs in a symbol package (snupkg) next to the nupkg. Portable PDBs are
+             forced explicitly: newer SDKs default to 'embedded', which hides the symbols
+             inside the distributed assemblies and yields empty symbol packages. -->
+        <DebugType>portable</DebugType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <!-- Only in CI: remap absolute source paths to '/_/' so PDBs don't leak
