@@ -20,10 +20,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET 7.0
+    - name: Setup .NET 10.0
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 10.0.x
     - name: Build, test and pack
       run: ./build.sh
     - name: Upload NuGet packages
@@ -35,42 +35,47 @@ jobs:
           artifacts/*.snupkg
         if-no-files-found: error
 
-  # Tests across platforms and .NET SDK versions. The test project targets net7.0, so when
-  # the matrix SDK is newer we also install the 7.0 toolchain: newer SDKs can build older
-  # targets, but executing them requires the matching runtime to be installed side by side.
+  # Tests across platforms, pinned to the SDK the repository actually requires (the vendored
+  # sources use C# 14 'extension members', which only the 10.x Roslyn can compile), and
+  # executed against the net7.0 runtime the test project targets.
   test:
     runs-on: ${{ matrix.os }}
-    name: Test (${{ matrix.os }}, ${{ matrix.dotnet }})
+    name: Test (${{ matrix.os }})
 
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        dotnet: ['7.0.x', '8.0.x', '9.0.x', '10.0.x']
-        # Keep the (slower) macOS lane to the repo baseline and the newest SDK.
-        exclude:
-          - os: macos-latest
-            dotnet: '8.0.x'
-          - os: macos-latest
-            dotnet: '9.0.x'
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET ${{ matrix.dotnet }}
+    - name: Pin .NET SDK 10.0
+      shell: bash
+      run: |
+        cat > global.json << 'EOF'
+        {
+          "sdk": {
+            "version": "10.0.100",
+            "rollForward": "latestMinor",
+            "allowPrerelease": true
+          }
+        }
+        EOF
+        dotnet --version
+    - name: Setup .NET 10.0
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ matrix.dotnet }}
-    - name: Setup .NET 7.0
-      if: matrix.dotnet != '7.0.x'
+        dotnet-version: 10.0.x
+    - name: Setup .NET 7.0 runtime
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 7.0.x
     - name: Run tests
-      run: dotnet test test/DatadogTestLogger.Test/DatadogTestLogger.Test.csproj -c Release
+      run: dotnet test test/DatadogTestLogger.Test/DatadogTestLogger.Test.csproj -c Release --logger trx
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-${{ matrix.os }}-${{ matrix.dotnet }}
+        name: test-results-${{ matrix.os }}
         path: '**/TestResults/**/*.trx'
         if-no-files-found: ignore
