@@ -7,6 +7,7 @@
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
+#nullable enable
 
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tags;
 using DatadogTestLogger.Vendors.Datadog.Trace.SourceGenerators;
@@ -65,7 +66,7 @@ internal partial class TestSuiteSpanTags : TestModuleSpanTags
     public ulong SuiteId { get; set; }
 
     [Tag(TestTags.Suite)]
-    public string Suite { get; set; }
+    public string? Suite { get; set; }
 
     [Tag(TestTags.SourceFile)]
     public string? SourceFile { get; set; }
