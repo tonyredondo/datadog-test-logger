@@ -1,21 +1,85 @@
-name: Build and pack
+name: Build, test and pack
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Canonical build: compiles every target framework, runs the unit tests and packs the
+  # NuGet packages into artifacts/ so they can be downloaded from the run summary and
+  # published to NuGet.
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Setup .NET 7.0 runtime
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 7.0.x
     - name: Build, test and pack
       run: ./build.sh
+    - name: Upload NuGet packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: |
+          artifacts/*.nupkg
+          artifacts/*.snupkg
+        if-no-files-found: error
+
+  # Tests across platforms, pinned to the SDK the repository actually requires (the vendored
+  # sources use C# 14 'extension members', which only the 10.x Roslyn can compile), and
+  # executed against the net7.0 runtime the test project targets.
+  test:
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.os }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Pin .NET SDK 10.0
+      shell: bash
+      run: |
+        cat > global.json << 'EOF'
+        {
+          "sdk": {
+            "version": "10.0.100",
+            "rollForward": "latestMinor",
+            "allowPrerelease": true
+          }
+        }
+        EOF
+        dotnet --version
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Setup .NET 7.0 runtime
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 7.0.x
+    - name: Run tests
+      run: dotnet test test/DatadogTestLogger.Test/DatadogTestLogger.Test.csproj -c Release --logger trx
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}
+        path: '**/TestResults/**/*.trx'
+        if-no-files-found: ignore
