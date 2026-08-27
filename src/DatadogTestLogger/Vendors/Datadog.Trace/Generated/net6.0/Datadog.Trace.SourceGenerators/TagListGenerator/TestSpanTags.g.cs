@@ -44,18 +44,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
 #else
         private static readonly byte[] ParametersBytes = new byte[] { 175, 116, 101, 115, 116, 46, 112, 97, 114, 97, 109, 101, 116, 101, 114, 115 };
 #endif
-        // SourceFileBytes = MessagePack.Serialize("test.source.file");
-#if NETCOREAPP
-        private static ReadOnlySpan<byte> SourceFileBytes => new byte[] { 176, 116, 101, 115, 116, 46, 115, 111, 117, 114, 99, 101, 46, 102, 105, 108, 101 };
-#else
-        private static readonly byte[] SourceFileBytes = new byte[] { 176, 116, 101, 115, 116, 46, 115, 111, 117, 114, 99, 101, 46, 102, 105, 108, 101 };
-#endif
-        // CodeOwnersBytes = MessagePack.Serialize("test.codeowners");
-#if NETCOREAPP
-        private static ReadOnlySpan<byte> CodeOwnersBytes => new byte[] { 175, 116, 101, 115, 116, 46, 99, 111, 100, 101, 111, 119, 110, 101, 114, 115 };
-#else
-        private static readonly byte[] CodeOwnersBytes = new byte[] { 175, 116, 101, 115, 116, 46, 99, 111, 100, 101, 111, 119, 110, 101, 114, 115 };
-#endif
         // TraitsBytes = MessagePack.Serialize("test.traits");
 #if NETCOREAPP
         private static ReadOnlySpan<byte> TraitsBytes => new byte[] { 171, 116, 101, 115, 116, 46, 116, 114, 97, 105, 116, 115 };
@@ -93,8 +81,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
             {
                 "test.name" => Name,
                 "test.parameters" => Parameters,
-                "test.source.file" => SourceFile,
-                "test.codeowners" => CodeOwners,
                 "test.traits" => Traits,
                 "test.skip_reason" => SkipReason,
                 "test.skipped_by_itr" => SkippedByIntelligentTestRunner,
@@ -113,12 +99,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
                     break;
                 case "test.parameters": 
                     Parameters = value;
-                    break;
-                case "test.source.file": 
-                    SourceFile = value;
-                    break;
-                case "test.codeowners": 
-                    CodeOwners = value;
                     break;
                 case "test.traits": 
                     Traits = value;
@@ -151,16 +131,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
             if (Parameters is not null)
             {
                 processor.Process(new TagItem<string>("test.parameters", Parameters, ParametersBytes));
-            }
-
-            if (SourceFile is not null)
-            {
-                processor.Process(new TagItem<string>("test.source.file", SourceFile, SourceFileBytes));
-            }
-
-            if (CodeOwners is not null)
-            {
-                processor.Process(new TagItem<string>("test.codeowners", CodeOwners, CodeOwnersBytes));
             }
 
             if (Traits is not null)
@@ -204,20 +174,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging
             {
                 sb.Append("test.parameters (tag):")
                   .Append(Parameters)
-                  .Append(',');
-            }
-
-            if (SourceFile is not null)
-            {
-                sb.Append("test.source.file (tag):")
-                  .Append(SourceFile)
-                  .Append(',');
-            }
-
-            if (CodeOwners is not null)
-            {
-                sb.Append("test.codeowners (tag):")
-                  .Append(CodeOwners)
                   .Append(',');
             }
 

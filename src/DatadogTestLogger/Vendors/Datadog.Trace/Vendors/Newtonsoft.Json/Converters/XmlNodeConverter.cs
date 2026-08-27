@@ -1531,7 +1531,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Vendors.Newtonsoft.Json.Conver
                 XmlDocument d = new XmlDocument();
 #if HAVE_XML_DOCUMENT_TYPE
                 // prevent http request when resolving any DTD references
-                d.XmlResolver = null;
+                d.XmlResolver = null!;
 #endif
 
                 document = new XmlDocumentWrapper(d);

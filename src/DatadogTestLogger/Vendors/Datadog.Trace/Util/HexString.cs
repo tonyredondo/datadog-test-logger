@@ -174,8 +174,9 @@ internal static class HexString
 #else
 
         var bytes = GetBuffer(TraceId.Size);
-        BitConverter.GetBytes(upper).CopyTo(bytes.Array, bytes.Offset);
-        BitConverter.GetBytes(lower).CopyTo(bytes.Array, bytes.Offset + sizeof(ulong));
+        var buffer = bytes.Array ?? throw new InvalidOperationException("The pooled trace ID buffer has no backing array.");
+        BitConverter.GetBytes(upper).CopyTo(buffer, bytes.Offset);
+        BitConverter.GetBytes(lower).CopyTo(buffer, bytes.Offset + sizeof(ulong));
 
         return ToHexString(bytes, lowerCase);
 #endif

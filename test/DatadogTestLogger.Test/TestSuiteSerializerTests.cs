@@ -1,3 +1,6 @@
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci.Tagging;
+using DatadogTestLogger.Vendors.Datadog.Trace.Tagging;
+
 namespace DatadogTestLogger.Test;
 
 public class TestSuiteSerializerTests
@@ -176,5 +179,69 @@ public class TestSuiteSerializerTests
         Assert.False(result);
         Assert.Null(suiteType);
         Assert.Null(methodInfo);
+    }
+
+    [Fact]
+    public void TestSuiteTagsEnumerateSourceFileAndCodeOwners()
+    {
+        var tags = new TestSuiteSpanTags
+        {
+            Suite = "SampleTests",
+            SourceFile = "test/SampleTests.cs",
+            CodeOwners = "[\"@test-owner\"]",
+        };
+        var values = new Dictionary<string, string>();
+        var processor = new TagCollector(values);
+
+        tags.EnumerateTags(ref processor);
+
+        Assert.Equal("SampleTests", values["test.suite"]);
+        Assert.Equal("test/SampleTests.cs", values["test.source.file"]);
+        Assert.Equal("[\"@test-owner\"]", values["test.codeowners"]);
+    }
+
+    [Fact]
+    public void TestTagsEnumerateInheritedSourceFileAndCodeOwnersOnce()
+    {
+        var tags = new TestSpanTags
+        {
+            SourceFile = "test/SampleTests.cs",
+            CodeOwners = "[\"@test-owner\"]",
+        };
+        var counts = new Dictionary<string, int>();
+        var processor = new TagCounter(counts);
+
+        tags.EnumerateTags(ref processor);
+
+        Assert.Equal(1, counts["test.source.file"]);
+        Assert.Equal(1, counts["test.codeowners"]);
+    }
+
+    private struct TagCollector : IItemProcessor<string>
+    {
+        private readonly Dictionary<string, string> _values;
+
+        public TagCollector(Dictionary<string, string> values)
+        {
+            _values = values;
+        }
+
+        public void Process(TagItem<string> item) => _values[item.Key] = item.Value;
+    }
+
+    private struct TagCounter : IItemProcessor<string>
+    {
+        private readonly Dictionary<string, int> _counts;
+
+        public TagCounter(Dictionary<string, int> counts)
+        {
+            _counts = counts;
+        }
+
+        public void Process(TagItem<string> item)
+        {
+            _counts.TryGetValue(item.Key, out var count);
+            _counts[item.Key] = count + 1;
+        }
     }
 }
