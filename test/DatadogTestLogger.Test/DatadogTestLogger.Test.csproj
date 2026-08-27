@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\DatadogTestLogger\DatadogTestLogger.csproj" />
+      <ProjectReference Include="..\..\src\DatadogCollector\DatadogCollector.csproj" />
     </ItemGroup>
 
 </Project>

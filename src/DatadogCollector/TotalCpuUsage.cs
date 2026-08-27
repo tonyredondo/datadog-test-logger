@@ -74,17 +74,12 @@ public static class TotalCpuUsage
                 var ker = kernelTime - _prevKernelTime;
                 var idl = idleTime - _prevIdleTime;
                 var sys = ker + usr;
-                
+
                 _prevUserTime = userTime;
                 _prevKernelTime = kernelTime;
                 _prevIdleTime = idleTime;
 
-                if (sys == 0)
-                {
-                    return 0;
-                }
-
-                return ((double)((sys - idl) * 100) / (double)sys);
+                return CpuUsageCalculator.FromDeltas(idl, sys);
             }
 
             return -1;
@@ -133,12 +128,7 @@ public static class TotalCpuUsage
             _prevIdleTime = idleTime;
             _prevTotalTime = totalTime;
 
-            if (totalTimeDelta <= 0)
-            {
-                return 0;
-            }
-
-            return ((double)((totalTimeDelta - idleTimeDelta) * 100) / (double)totalTimeDelta);
+            return CpuUsageCalculator.FromDeltas(idleTimeDelta, totalTimeDelta);
         }
     }
 
@@ -183,12 +173,7 @@ public static class TotalCpuUsage
             _prevIdleTime = idleTime;
             _prevTotalTime = totalTime;
 
-            if (totalTimeDelta <= 0)
-            {
-                return 0;
-            }
-
-            return ((double)((totalTimeDelta - idleTimeDelta) * 100) / (double)totalTimeDelta);
+            return CpuUsageCalculator.FromDeltas(idleTimeDelta, totalTimeDelta);
         }
 
         [StructLayout(LayoutKind.Sequential)]
