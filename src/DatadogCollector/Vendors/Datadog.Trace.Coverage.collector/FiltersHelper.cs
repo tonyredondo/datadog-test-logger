@@ -93,7 +93,7 @@ internal static class FiltersHelper
                             }
                         }
 
-                        instance.AddInclude(Path.IsPathRooted(filter) ? filter.Substring(Path.GetPathRoot(filter).Length) : filter);
+                        instance.AddInclude(Path.GetPathRoot(filter) is { } root ? filter.Substring(root.Length) : filter);
                     }
 
                     return Tuple.Create(instance, (IReadOnlyList<Regex>)lstRegex);
@@ -101,7 +101,7 @@ internal static class FiltersHelper
 
             var matcher = value.Item1;
             // https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.filesystemglobbing.matcher?view=dotnet-plat-ext-6.0
-            var globbingResult = matcher.Match(Path.IsPathRooted(sourcePath) ? sourcePath.Substring(Path.GetPathRoot(sourcePath).Length) : sourcePath).HasMatches;
+            var globbingResult = matcher.Match(Path.GetPathRoot(sourcePath) is { } root ? sourcePath.Substring(root.Length) : sourcePath).HasMatches;
             if (globbingResult)
             {
                 return true;

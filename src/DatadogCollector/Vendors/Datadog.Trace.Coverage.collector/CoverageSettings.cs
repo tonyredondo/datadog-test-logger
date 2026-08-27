@@ -105,11 +105,16 @@ internal class CoverageSettings
 
     private static void GetStringArrayFromXmlNodeList(XmlNodeList? xmlNodeList, ref IReadOnlyList<string> elements)
     {
-        if (xmlNodeList is { } nodeList)
+        if (xmlNodeList is not null)
         {
             var lstElements = (List<string>)elements;
-            foreach (XmlElement element in nodeList)
+            foreach (XmlNode? node in xmlNodeList)
             {
+                if (node is not XmlElement element)
+                {
+                    continue;
+                }
+
                 var item = element.InnerText;
                 if (string.IsNullOrWhiteSpace(item))
                 {

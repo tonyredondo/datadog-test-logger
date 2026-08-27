@@ -38,10 +38,10 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
         private int _testNumber;
 
         /// <inheritdoc />
-        public override void Initialize(XmlElement configurationElement, DataCollectionEvents events, DataCollectionSink dataSink, DataCollectionLogger logger, DataCollectionEnvironmentContext environmentContext)
+        public override void Initialize(XmlElement? configurationElement, DataCollectionEvents events, DataCollectionSink dataSink, DataCollectionLogger logger, DataCollectionEnvironmentContext? environmentContext)
         {
             _events = events;
-            _logger = new DataCollectorLogger(logger, environmentContext.SessionDataCollectionContext);
+            _logger = environmentContext is null ? null : new DataCollectorLogger(logger, environmentContext.SessionDataCollectionContext);
             if (Initialize(configurationElement) && events is not null)
             {
                 events.SessionStart += OnSessionStart;
@@ -112,7 +112,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
             _logger?.SetContext(e.Context);
         }
 
-        private bool Initialize(XmlElement configurationElement)
+        private bool Initialize(XmlElement? configurationElement)
         {
             try
             {

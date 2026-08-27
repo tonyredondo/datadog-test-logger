@@ -71,7 +71,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
             var textToLogger = text;
             if (string.IsNullOrEmpty(textToLogger))
             {
-                textToLogger = exception?.ToString();
+                textToLogger = exception.ToString();
             }
             else
             {

@@ -626,7 +626,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
             if (string.IsNullOrEmpty(_settings.TracerHome))
             {
                 // If tracer home is empty then we try to load the Datadog.Trace.dll in the current folder.
-                return Path.Combine(Path.GetDirectoryName(FilePath), "Datadog.testlogger.dll");
+                return Path.Combine(Path.GetDirectoryName(FilePath) ?? string.Empty, "Datadog.testlogger.dll");
             }
 
             var targetFolder = "net461";
@@ -657,7 +657,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Coverage.Collector
                 if (string.IsNullOrEmpty(_settings.TracerHome))
                 {
                     // If tracer home is empty then we try to load the Datadog.Trace.dll in the current folder.
-                    return Path.Combine(Path.GetDirectoryName(FilePath), "Datadog.testlogger.dll");
+                    return Path.Combine(Path.GetDirectoryName(FilePath) ?? string.Empty, "Datadog.testlogger.dll");
                 }
                 
                 string targetFolder = "net461";
