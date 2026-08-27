@@ -698,8 +698,14 @@ internal class TestSuiteSerializer
 
     private static void EmitSessionMessages(List<TestMessageInfo>? messages, ISpan? span, StringBuilder output)
     {
-        if (messages is null || messages.Count == 0 || span is null)
+        if (messages is null || messages.Count == 0)
         {
+            return;
+        }
+
+        if (span is null)
+        {
+            output.AppendLine(":( session/module span cannot be found for session messages.");
             return;
         }
 

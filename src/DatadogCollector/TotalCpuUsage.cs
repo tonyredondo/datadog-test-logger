@@ -145,7 +145,11 @@ public static class TotalCpuUsage
     class MacOs : IUsage
     {
         private const int HostCpuLoadInfoFlavor = 3; // HOST_CPU_LOAD_INFO from mach/host_info.h
-        private static readonly int HostCpuLoadInfoCount = Marshal.SizeOf<HostCpuLoadInfo>();
+
+        // host_statistics takes a mach_msg_type_number_t* which counts in natural_t units,
+        // i.e. element count (CPU_STATE_MAX == 4), not byte size.
+        private static readonly uint HostCpuLoadInfoCount =
+            (uint)(Marshal.SizeOf<HostCpuLoadInfo>() / sizeof(uint));
 
         // Cache the host port send right once: mach_host_self() grants a new right on each call.
         private static readonly IntPtr HostPort = mach_host_self();
@@ -198,7 +202,7 @@ public static class TotalCpuUsage
             IntPtr hostPrivPort,
             int flavor,
             out HostCpuLoadInfo info,
-            ref int count);
+            ref uint count);
 
         [DllImport("libSystem.dylib")]
         private static extern IntPtr mach_host_self();
