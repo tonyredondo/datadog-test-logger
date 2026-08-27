@@ -31,6 +31,8 @@ internal class TestSuiteSerializer
         typeof(TestModule).GetField("_fakeSession", BindingFlags.Instance | BindingFlags.NonPublic);
     private static readonly FieldInfo SessionSpanField =
         typeof(TestSession).GetField("_span", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo SessionCurrentField =
+        typeof(TestSession).GetField("CurrentSession", BindingFlags.Static | BindingFlags.NonPublic);
 
     private static void SetFinalStatus(Test test, TestStatus status)
     {
@@ -207,6 +209,7 @@ internal class TestSuiteSerializer
 
                 Dictionary<Guid, List<CpuUsagePair>>? cpuValues = null;
                 Dictionary<Guid, TestCaseMetadata>? testCaseMetadatas = null;
+                TestSession? testSession = null;
                 ISpan? sessionSpan = null;
 
                 foreach (var resultByAssembly in groupedResults)
@@ -337,17 +340,29 @@ internal class TestSuiteSerializer
 
                                 output.AppendLine("**************************************************");
                                 output.AppendLine("Creating test module: " + testModuleName);
+
+                                // Keep ONE session alive for every module of this process: closing a module
+                                // also finishes its fake session and clears TestSession.Current, which would
+                                // otherwise spawn a brand new fake session for the next assembly.
+                                RestoreCurrentSession(testSession);
+
                                 moduleStartTime = startTime;
                                 module = TestModule.Create(testModuleName, testFramework, testFrameworkVersion,
                                     moduleStartTime);
                                 module.SetTag("runtime.name", runtimeName);
                                 module.SetTag("runtime.version", runtimeVersion);
 
-                                // All modules of this process share the same session (fake sessions created by
-                                // TestModule are reused through TestSession.Current), so capturing it once here
-                                // yields THE session span. In out-of-process scenarios there is no local session
-                                // object and we fall back to this first module's span.
-                                sessionSpan ??= TryGetSessionSpan(module) ?? ModuleSpanField?.GetValue(module) as ISpan;
+                                // Capture the shared session and its span once. In out-of-process scenarios
+                                // there is no local session object and we fall back to this first module's span.
+                                testSession ??= FakeSessionField?.GetValue(module) as TestSession;
+                                sessionSpan ??= (testSession is not null
+                                    ? SessionSpanField?.GetValue(testSession) as ISpan
+                                    : null) ?? ModuleSpanField?.GetValue(module) as ISpan;
+
+                                // Emit the session messages while the target span is still open: Span.SetTag
+                                // ignores mutations after Finish, and emitting here also keeps the messages
+                                // alive even when a later assembly fails to load.
+                                EmitSessionMessages(messages, sessionSpan, output);
                             }
 
                             if (suite is null)
@@ -669,11 +684,6 @@ internal class TestSuiteSerializer
                     output.AppendLine("Closing module: " + testModuleName);
                     module?.Close(moduleTime.Subtract(moduleStartTime));
                 }
-
-                // Session messages: these belong to the whole test session, so they are emitted once,
-                // after all the modules were processed, against the session span (falling back to the
-                // first module span when there is no local session object).
-                EmitSessionMessages(messages, sessionSpan, output);
             }
         }
         catch (Exception ex)
@@ -685,15 +695,18 @@ internal class TestSuiteSerializer
     }
 
     /// <summary>
-    /// Gets the session span of this test host process. All modules share the same session
-    /// (the fake session created by TestModule is reused through TestSession.Current), so any
-    /// module instance yields THE session span.
+    /// Re-seeds the vendored TestSession.Current (a private static AsyncLocal) with the session
+    /// shared by this run, so every module attaches to the same CI session instead of creating
+    /// a new fake session per assembly.
     /// </summary>
-    internal static ISpan? TryGetSessionSpan(TestModule module)
+    private static void RestoreCurrentSession(TestSession? session)
     {
-        return FakeSessionField?.GetValue(module) is TestSession session
-            ? SessionSpanField?.GetValue(session) as ISpan
-            : null;
+        if (session is null || SessionCurrentField?.GetValue(null) is not AsyncLocal<TestSession?> asyncLocal)
+        {
+            return;
+        }
+
+        asyncLocal.Value = session;
     }
 
     private static void EmitSessionMessages(List<TestMessageInfo>? messages, ISpan? span, StringBuilder output)

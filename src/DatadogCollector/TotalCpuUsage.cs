@@ -23,8 +23,16 @@ public static class TotalCpuUsage
 
         // Prime the deltas with an initial sample so consumers never see a bogus first
         // value (with unset previous ticks Linux reported ~100% and Windows a
-        // boot-to-now average).
-        _ = usage?.GetUsage();
+        // boot-to-now average). Best-effort: Lazy caches thrown exceptions from the
+        // factory, so a transient failure here would disable sampling forever.
+        try
+        {
+            _ = usage?.GetUsage();
+        }
+        catch
+        {
+            // The sampling loop reports real failures through the regular error path.
+        }
 
         return usage;
     });
@@ -164,8 +172,10 @@ public static class TotalCpuUsage
             }
 
             // CpuTicks follows the CPU_STATE_* layout: USER, SYSTEM, IDLE, NICE.
-            var idleTime = (long)info.CpuTicks[2] + (long)info.CpuTicks[3];
-            var totalTime = (long)info.CpuTicks[0] + (long)info.CpuTicks[1] + idleTime;
+            // NICE is low-priority user time, i.e. busy time: only IDLE counts as idle.
+            var idleTime = (long)info.CpuTicks[2];
+            var totalTime = (long)info.CpuTicks[0] + (long)info.CpuTicks[1]
+                            + idleTime + (long)info.CpuTicks[3];
 
             var idleTimeDelta = idleTime - _prevIdleTime;
             var totalTimeDelta = totalTime - _prevTotalTime;

@@ -135,6 +135,11 @@ internal class CpuInProcDataCollection : InProcDataCollection
 
                     // Add value to current executing tests
                     Interlocked.Exchange(ref dataCollection._lastCpuPercentageValue, result);
+
+                    // One system sample per pass: the system implementations keep delta state
+                    // between calls, so sampling once per active test would consume the whole
+                    // interval in the first test and report ~0% to the remaining ones.
+                    var systemCpuUsage = GetTotalCpuUsage();
                     foreach(var values in dataCollection._currentCpuValues.Values)
                     {
                         if (token.IsCancellationRequested)
@@ -145,7 +150,7 @@ internal class CpuInProcDataCollection : InProcDataCollection
                         lock (values)
                         {
                             var lastCpu = Interlocked.CompareExchange(ref dataCollection._lastCpuPercentageValue, 0, 0);
-                            values.Add(new CpuUsagePair(lastCpu, GetTotalCpuUsage()));
+                            values.Add(new CpuUsagePair(lastCpu, systemCpuUsage));
                         }
                     }
                 }
