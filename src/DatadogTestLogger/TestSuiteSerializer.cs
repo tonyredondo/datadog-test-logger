@@ -352,17 +352,22 @@ internal class TestSuiteSerializer
                                 module.SetTag("runtime.name", runtimeName);
                                 module.SetTag("runtime.version", runtimeVersion);
 
-                                // Capture the shared session and its span once. In out-of-process scenarios
-                                // there is no local session object and we fall back to this first module's span.
-                                testSession ??= FakeSessionField?.GetValue(module) as TestSession;
-                                sessionSpan ??= (testSession is not null
-                                    ? SessionSpanField?.GetValue(testSession) as ISpan
-                                    : null) ?? ModuleSpanField?.GetValue(module) as ISpan;
+                                // Capture the shared session and its span ONCE per run: this block runs for the
+                                // first module of every assembly, but emission must not repeat per assembly.
+                                // In out-of-process scenarios there is no local session object and we fall
+                                // back to this first module's span.
+                                if (sessionSpan is null)
+                                {
+                                    testSession ??= FakeSessionField?.GetValue(module) as TestSession;
+                                    sessionSpan = (testSession is not null
+                                        ? SessionSpanField?.GetValue(testSession) as ISpan
+                                        : null) ?? ModuleSpanField?.GetValue(module) as ISpan;
 
-                                // Emit the session messages while the target span is still open: Span.SetTag
-                                // ignores mutations after Finish, and emitting here also keeps the messages
-                                // alive even when a later assembly fails to load.
-                                EmitSessionMessages(messages, sessionSpan, output);
+                                    // Emit the session messages while the target span is still open: Span.SetTag
+                                    // ignores mutations after Finish, and emitting here also keeps the messages
+                                    // alive even when a later assembly fails to load.
+                                    EmitSessionMessages(messages, sessionSpan, output);
+                                }
                             }
 
                             if (suite is null)

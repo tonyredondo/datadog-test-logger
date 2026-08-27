@@ -152,8 +152,9 @@ public static class TotalCpuUsage
         // Cache the host port send right once: mach_host_self() grants a new right on each call.
         private static readonly IntPtr HostPort = mach_host_self();
 
-        private long _prevIdleTime = 0;
-        private long _prevTotalTime = 0;
+        // Per-state previous ticks: deltas are computed per uint state (wrapping arithmetic),
+        // never as absolute long totals, so a wrapped counter cannot produce a bogus interval.
+        private readonly uint[] _prevCpuTicks = new uint[4];
 
         private static readonly Lazy<MacOs> LazyInstance = new(() => new MacOs());
 
@@ -173,15 +174,25 @@ public static class TotalCpuUsage
 
             // CpuTicks follows the CPU_STATE_* layout: USER, SYSTEM, IDLE, NICE.
             // NICE is low-priority user time, i.e. busy time: only IDLE counts as idle.
-            var idleTime = (long)info.CpuTicks[2];
-            var totalTime = (long)info.CpuTicks[0] + (long)info.CpuTicks[1]
-                            + idleTime + (long)info.CpuTicks[3];
+            long idleTimeDelta = 0;
+            long totalTimeDelta = 0;
+            for (var i = 0; i < 4; i++)
+            {
+                // uint subtraction wraps modulo 2^32, so a wrapped counter still yields the
+                // correct small delta instead of a huge negative jump.
+                uint delta;
+                unchecked
+                {
+                    delta = info.CpuTicks[i] - _prevCpuTicks[i];
+                }
 
-            var idleTimeDelta = idleTime - _prevIdleTime;
-            var totalTimeDelta = totalTime - _prevTotalTime;
-
-            _prevIdleTime = idleTime;
-            _prevTotalTime = totalTime;
+                _prevCpuTicks[i] = info.CpuTicks[i];
+                totalTimeDelta += delta;
+                if (i == 2)
+                {
+                    idleTimeDelta = delta;
+                }
+            }
 
             return CpuUsageCalculator.FromDeltas(idleTimeDelta, totalTimeDelta);
         }
