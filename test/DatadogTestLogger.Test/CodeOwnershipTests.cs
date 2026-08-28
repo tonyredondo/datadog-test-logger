@@ -172,6 +172,26 @@ public class CodeOwnershipTests
     }
 
     [Fact]
+    public void ReadsPackedBranchFromFileBackedWorktree()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var worktreeDirectory = new TemporaryDirectory();
+        const string commit = "0123456789abcdef0123456789abcdef01234567";
+        var commonGitDirectory = Path.Combine(repositoryDirectory.Path, ".git");
+        var worktreeGitDirectory = Path.Combine(commonGitDirectory, "worktrees", "test-worktree");
+        Directory.CreateDirectory(Path.Combine(commonGitDirectory, "objects", "pack"));
+        Directory.CreateDirectory(worktreeGitDirectory);
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), $"gitdir: {worktreeGitDirectory}");
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "commondir"), Path.Combine("..", ".."));
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "HEAD"), "ref: refs/heads/test");
+        File.WriteAllText(Path.Combine(commonGitDirectory, "packed-refs"), $"{commit} refs/heads/test");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Equal(commit, gitInfo.Commit);
+    }
+
+    [Fact]
     public void DoesNotUseLocalCheckoutWhenItWasNotValidated()
     {
         using var repositoryDirectory = new TemporaryDirectory();

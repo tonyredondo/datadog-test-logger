@@ -152,24 +152,18 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                             refPath = Path.Combine(commonGitDirectory.FullName, gitInfo.Branch);
                         }
 
-                        string infoRefPath = Path.Combine(commonGitDirectory.FullName, "info", "refs");
-
                         if (File.Exists(refPath))
                         {
                             // Get the commit from the .git/{refPath} file.
                             gitInfo.Commit = File.ReadAllText(refPath).Trim();
                         }
-                        else if (File.Exists(infoRefPath))
+                        else
                         {
-                            // Get the commit from the .git/info/refs file.
-                            string[] lines = File.ReadAllLines(infoRefPath);
-                            foreach (string line in lines)
+                            string packedRefsPath = Path.Combine(commonGitDirectory.FullName, "packed-refs");
+                            if (TryGetCommitFromReferenceFile(packedRefsPath, gitInfo.Branch, out var commit) ||
+                                TryGetCommitFromReferenceFile(Path.Combine(commonGitDirectory.FullName, "info", "refs"), gitInfo.Branch, out commit))
                             {
-                                string[] hashRef = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                                if (hashRef[1] == gitInfo.Branch)
-                                {
-                                    gitInfo.Commit = hashRef[0];
-                                }
+                                gitInfo.Commit = commit;
                             }
                         }
                     }
@@ -254,6 +248,34 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             }
 
             return gitInfo;
+        }
+
+        private static bool TryGetCommitFromReferenceFile(string filePath, string reference, out string commit)
+        {
+            commit = null;
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
+            foreach (string line in File.ReadLines(filePath))
+            {
+                int separator = line.IndexOf(' ');
+                if (separator < 0)
+                {
+                    separator = line.IndexOf('\t');
+                }
+
+                if (separator > 0 &&
+                    line.Length == separator + 1 + reference.Length &&
+                    string.CompareOrdinal(line, separator + 1, reference, 0, reference.Length) == 0)
+                {
+                    commit = line.Substring(0, separator);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool TryGetGitDirectories(
