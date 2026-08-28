@@ -22,8 +22,6 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.CodeOwnership;
 internal sealed class CodeOwnersFileLocator
 {
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<CodeOwnersFileLocator>();
-    private readonly string? _provider;
-    private readonly string? _repository;
 
     internal CodeOwnersFileLocator(
         string? sourceRoot,
@@ -33,18 +31,17 @@ internal sealed class CodeOwnersFileLocator
         string? localRepositoryRoot,
         string? localRepository)
     {
-        _repository = StringUtil.IsNullOrWhiteSpace(localRepository) ? repository : localRepository;
-        _provider = provider;
         var sourceDirectory = RepositorySourcePathResolver.GetSearchStart(sourceRoot, workspacePath);
         var workspaceDirectory = RepositorySourcePathResolver.GetSearchStart(workspacePath, basePath: null);
         var foundGitRoot = false;
-        LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundGitRoot)
-                   ?? TryLoadFromGitRoot(workspaceDirectory, ref foundGitRoot)
-                   ?? TryLoadFromGitRoot(localRepositoryRoot, ref foundGitRoot);
+        LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundGitRoot, repository, provider)
+                   ?? TryLoadFromGitRoot(workspaceDirectory, ref foundGitRoot, repository, provider)
+                   ?? TryLoadFromGitRoot(localRepositoryRoot, ref foundGitRoot, localRepository, provider: null);
 
         if (LocatedFile is null && !foundGitRoot)
         {
-            LocatedFile = TryLoadFromExplicitRoot(workspaceDirectory) ?? TryLoadFromExplicitRoot(sourceDirectory);
+            LocatedFile = TryLoadFromExplicitRoot(workspaceDirectory, repository, provider)
+                       ?? TryLoadFromExplicitRoot(sourceDirectory, repository, provider);
         }
     }
 
@@ -53,7 +50,11 @@ internal sealed class CodeOwnersFileLocator
     /// </summary>
     internal LocatedCodeOwners? LocatedFile { get; }
 
-    private LocatedCodeOwners? TryLoadFromGitRoot(string? startDirectory, ref bool foundGitRoot)
+    private LocatedCodeOwners? TryLoadFromGitRoot(
+        string? startDirectory,
+        ref bool foundGitRoot,
+        string? repository,
+        string? provider)
     {
         var repositoryRoot = FindGitRoot(startDirectory);
         if (repositoryRoot is null)
@@ -62,7 +63,7 @@ internal sealed class CodeOwnersFileLocator
         }
 
         foundGitRoot = true;
-        return TryLoadFromRepositoryRoot(repositoryRoot);
+        return TryLoadFromRepositoryRoot(repositoryRoot, repository, provider);
     }
 
     private static string? FindGitRoot(string? startDirectory)
@@ -96,9 +97,9 @@ internal sealed class CodeOwnersFileLocator
         return null;
     }
 
-    private LocatedCodeOwners? TryLoadFromRepositoryRoot(string root)
+    private LocatedCodeOwners? TryLoadFromRepositoryRoot(string root, string? repository, string? provider)
     {
-        var dialect = DetectDialect(root);
+        var dialect = DetectDialect(root, repository, provider);
         var codeOwnersPath = FindCodeOwnersPath(root, dialect);
         if (codeOwnersPath is null)
         {
@@ -112,23 +113,23 @@ internal sealed class CodeOwnersFileLocator
                    : null;
     }
 
-    private LocatedCodeOwners? TryLoadFromExplicitRoot(string? root)
-        => StringUtil.IsNullOrEmpty(root) ? null : TryLoadFromRepositoryRoot(root);
+    private LocatedCodeOwners? TryLoadFromExplicitRoot(string? root, string? repository, string? provider)
+        => StringUtil.IsNullOrEmpty(root) ? null : TryLoadFromRepositoryRoot(root, repository, provider);
 
-    private CodeOwners.Dialect DetectDialect(string root)
+    private static CodeOwners.Dialect DetectDialect(string root, string? repository, string? provider)
     {
-        var repositoryDialect = GetDialectFromRepository(_repository);
+        var repositoryDialect = GetDialectFromRepository(repository);
         if (repositoryDialect.HasValue)
         {
             return repositoryDialect.Value;
         }
 
-        if (string.Equals(_provider, "gitlab", StringComparison.Ordinal))
+        if (string.Equals(provider, "gitlab", StringComparison.Ordinal))
         {
             return CodeOwners.Dialect.GitLab;
         }
 
-        if (string.Equals(_provider, "github", StringComparison.Ordinal))
+        if (string.Equals(provider, "github", StringComparison.Ordinal))
         {
             return CodeOwners.Dialect.GitHub;
         }
