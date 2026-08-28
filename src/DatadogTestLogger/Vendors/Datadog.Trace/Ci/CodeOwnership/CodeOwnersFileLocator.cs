@@ -113,9 +113,10 @@ internal sealed class CodeOwnersFileLocator
         bool requireCodeOwnersAtHead = false)
     {
         var dialect = DetectDialect(root, repository, provider, preferRepositoryLayout);
-        var codeOwnersPath = FindCodeOwnersPath(root, dialect);
-        if (codeOwnersPath is null ||
-            (requireCodeOwnersAtHead && !IsFileAtHead(root, codeOwnersPath)))
+        var codeOwnersPath = requireCodeOwnersAtHead
+                                 ? FindCodeOwnersPathAtHead(root, dialect)
+                                 : FindCodeOwnersPath(root, dialect);
+        if (codeOwnersPath is null)
         {
             return null;
         }
@@ -130,7 +131,56 @@ internal sealed class CodeOwnersFileLocator
     private LocatedCodeOwners? TryLoadFromExplicitRoot(string? root, string? repository, string? provider)
         => StringUtil.IsNullOrEmpty(root) ? null : TryLoadFromRepositoryRoot(root, repository, provider);
 
-    private static bool IsFileAtHead(string repositoryRoot, string filePath)
+    private static string? FindCodeOwnersPathAtHead(string repositoryRoot, CodeOwners.Dialect dialect)
+    {
+        try
+        {
+            // HEAD controls provider precedence even when a candidate was added or deleted locally.
+            foreach (var path in GetCodeOwnersPaths(repositoryRoot, dialect))
+            {
+                var relativePath = GetRepositoryRelativePath(repositoryRoot, path);
+                var result = AsyncUtil.RunSync(
+                    () => ProcessHelpers.RunCommandAsync(
+                        new ProcessHelpers.Command(
+                            "git",
+                            "rev-parse --verify HEAD:" + relativePath,
+                            repositoryRoot)));
+                if (result is { ExitCode: 0 } && result.Output.Length > 0)
+                {
+                    return IsFileAtHead(repositoryRoot, path, result.Output) ? path : null;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Error finding local CODEOWNERS file in HEAD: {RepositoryRoot}", repositoryRoot);
+        }
+
+        return null;
+    }
+
+    private static bool IsFileAtHead(string repositoryRoot, string filePath, string headHash)
+    {
+        var relativePath = GetRepositoryRelativePath(repositoryRoot, filePath);
+        try
+        {
+            var workingTreeHash = AsyncUtil.RunSync(
+                () => ProcessHelpers.RunCommandAsync(
+                    new ProcessHelpers.Command(
+                        "git",
+                        "hash-object --path=" + relativePath + " " + relativePath,
+                        repositoryRoot)));
+            return workingTreeHash is { ExitCode: 0 } &&
+                   string.Equals(workingTreeHash.Output, headHash, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Error validating local CODEOWNERS file against HEAD: {Path}", filePath);
+            return false;
+        }
+    }
+
+    private static string GetRepositoryRelativePath(string repositoryRoot, string filePath)
     {
         var relativePathStart = repositoryRoot.Length;
         while (relativePathStart < filePath.Length &&
@@ -140,35 +190,7 @@ internal sealed class CodeOwnersFileLocator
             relativePathStart++;
         }
 
-        var relativePath = filePath.Substring(relativePathStart).Replace('\\', '/');
-        try
-        {
-            // HEAD already matches the CI commit, so matching blob hashes tie this file to that revision.
-            var headHash = AsyncUtil.RunSync(
-                () => ProcessHelpers.RunCommandAsync(
-                    new ProcessHelpers.Command(
-                        "git",
-                        "rev-parse --verify HEAD:" + relativePath,
-                        repositoryRoot)));
-            if (headHash is not { ExitCode: 0 } || headHash.Output.Length == 0)
-            {
-                return false;
-            }
-
-            var workingTreeHash = AsyncUtil.RunSync(
-                () => ProcessHelpers.RunCommandAsync(
-                    new ProcessHelpers.Command(
-                        "git",
-                        "hash-object --path=" + relativePath + " " + relativePath,
-                        repositoryRoot)));
-            return workingTreeHash is { ExitCode: 0 } &&
-                   string.Equals(workingTreeHash.Output, headHash.Output, StringComparison.OrdinalIgnoreCase);
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Error validating local CODEOWNERS file against HEAD: {Path}", filePath);
-            return false;
-        }
+        return filePath.Substring(relativePathStart).Replace('\\', '/');
     }
 
     private static CodeOwners.Dialect DetectDialect(string root, string? repository, string? provider, bool preferRepositoryLayout)

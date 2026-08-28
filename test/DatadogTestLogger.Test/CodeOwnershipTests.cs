@@ -246,6 +246,52 @@ public class CodeOwnershipTests
     }
 
     [Fact]
+    public void DoesNotUseLowerPriorityCodeOwnersWhenPreferredFileWasDeleted()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var preferredDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        var preferredPath = Path.Combine(preferredDirectory, "CODEOWNERS");
+        Directory.CreateDirectory(preferredDirectory);
+        File.WriteAllText(preferredPath, "* @preferred-owner");
+        File.WriteAllText(Path.Combine(repositoryDirectory.Path, "CODEOWNERS"), "* @fallback-owner");
+        InitializeGitRepository(repositoryDirectory.Path);
+        File.Delete(preferredPath);
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.False(resolver.HasCodeOwners);
+    }
+
+    [Fact]
+    public void IgnoresUntrackedHigherPriorityCodeOwners()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        File.WriteAllText(Path.Combine(repositoryDirectory.Path, "CODEOWNERS"), "* @committed-owner");
+        InitializeGitRepository(repositoryDirectory.Path);
+        var untrackedDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        Directory.CreateDirectory(untrackedDirectory);
+        File.WriteAllText(Path.Combine(untrackedDirectory, "CODEOWNERS"), "* @untracked-owner");
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.True(resolver.HasCodeOwners);
+    }
+
+    [Fact]
     public void ReadsGitInfoFromFileBackedWorktree()
     {
         using var repositoryDirectory = new TemporaryDirectory();
