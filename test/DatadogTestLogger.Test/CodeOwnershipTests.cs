@@ -88,6 +88,54 @@ public class CodeOwnershipTests
         Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
     }
 
+    [Fact]
+    public void UsesValidatedLocalCheckoutForMirroredCiWorkspace()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        var sourceDirectory = Path.Combine(repositoryRoot, "src");
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            repositoryRoot,
+            Repository);
+
+        var ownership = resolver.Resolve(@"D:\build\datadog-test-logger\src\SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.True(ownership.IsRepositoryRelative);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void DoesNotUseLocalCheckoutWhenItWasNotValidated()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
+        File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "* @repository-owner");
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            localRepositoryRoot: null,
+            localRepository: null);
+
+        Assert.False(resolver.HasCodeOwners);
+    }
+
     private sealed class TemporaryDirectory : IDisposable
     {
         public TemporaryDirectory()
