@@ -33,21 +33,26 @@ internal sealed class CodeOwnersFileLocator
     {
         var sourceDirectory = RepositorySourcePathResolver.GetSearchStart(sourceRoot, workspacePath);
         var workspaceDirectory = RepositorySourcePathResolver.GetSearchStart(workspacePath, basePath: null);
-        var foundGitRoot = false;
-        LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundGitRoot, repository, provider)
-                   ?? TryLoadFromGitRoot(workspaceDirectory, ref foundGitRoot, repository, provider)
-                   ?? TryLoadFromGitRoot(
-                          localRepositoryRoot,
-                          ref foundGitRoot,
-                          localRepository,
-                          provider,
-                          preferRepositoryLayout: true,
-                          requireCodeOwnersAtHead: true);
+        var foundCiGitRoot = false;
+        LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundCiGitRoot, repository, provider)
+                   ?? TryLoadFromGitRoot(workspaceDirectory, ref foundCiGitRoot, repository, provider);
 
-        if (LocatedFile is null && !foundGitRoot)
+        if (LocatedFile is null && !foundCiGitRoot)
         {
             LocatedFile = TryLoadFromExplicitRoot(workspaceDirectory, repository, provider)
                        ?? TryLoadFromExplicitRoot(sourceDirectory, repository, provider);
+        }
+
+        if (LocatedFile is null)
+        {
+            var foundLocalGitRoot = false;
+            LocatedFile = TryLoadFromGitRoot(
+                localRepositoryRoot,
+                ref foundLocalGitRoot,
+                localRepository,
+                provider,
+                preferRepositoryLayout: true,
+                requireCodeOwnersAtHead: true);
         }
     }
 

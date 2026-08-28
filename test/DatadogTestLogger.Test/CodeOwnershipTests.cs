@@ -232,6 +232,41 @@ public class CodeOwnershipTests
         Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void UsesExplicitCiRootBeforeValidatedLocalCheckout(bool localHasCodeOwners)
+    {
+        using var ciDirectory = new TemporaryDirectory();
+        using var localDirectory = new TemporaryDirectory();
+        var ciSourceDirectory = Path.Combine(ciDirectory.Path, "src");
+        Directory.CreateDirectory(ciSourceDirectory);
+        File.WriteAllText(Path.Combine(ciDirectory.Path, "CODEOWNERS"), "/src/ @ci-owner");
+        File.WriteAllText(Path.Combine(ciSourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        if (localHasCodeOwners)
+        {
+            var localSourceDirectory = Path.Combine(localDirectory.Path, "src");
+            Directory.CreateDirectory(localSourceDirectory);
+            File.WriteAllText(Path.Combine(localDirectory.Path, "CODEOWNERS"), "/src/ @local-owner");
+            File.WriteAllText(Path.Combine(localSourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        }
+
+        InitializeGitRepository(localDirectory.Path);
+        var resolver = new CodeOwnersResolver(
+            ciDirectory.Path,
+            ciDirectory.Path,
+            Repository,
+            "github",
+            localDirectory.Path,
+            Repository);
+
+        var ownership = resolver.Resolve(Path.Combine(ciSourceDirectory, "SampleTests.cs"), useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@ci-owner" }, ownership.MatchingOwners);
+    }
+
     [Fact]
     public void DoesNotUseModifiedCodeOwnersFromValidatedLocalCheckout()
     {
