@@ -1,3 +1,4 @@
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.CodeOwnership;
 
 namespace DatadogTestLogger.Test;
@@ -114,6 +115,60 @@ public class CodeOwnershipTests
         Assert.True(ownership.IsRepositoryRelative);
         Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
         Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void UsesValidatedLocalCheckoutWhenCiGitRootHasNoCodeOwners()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        var sourceDirectory = Path.Combine(repositoryRoot, "src");
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
+        Directory.CreateDirectory(Path.Combine(remoteCiDirectory.Path, ".git"));
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            repositoryRoot,
+            Repository);
+
+        var ownership = resolver.Resolve(@"D:\build\datadog-test-logger\src\SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void ReadsGitInfoFromFileBackedWorktree()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var worktreeDirectory = new TemporaryDirectory();
+        const string commit = "0123456789abcdef0123456789abcdef01234567";
+        var commonGitDirectory = Path.Combine(repositoryDirectory.Path, ".git");
+        var worktreeGitDirectory = Path.Combine(commonGitDirectory, "worktrees", "test-worktree");
+        Directory.CreateDirectory(Path.Combine(commonGitDirectory, "refs", "heads"));
+        Directory.CreateDirectory(Path.Combine(commonGitDirectory, "objects", "pack"));
+        Directory.CreateDirectory(worktreeGitDirectory);
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), $"gitdir: {worktreeGitDirectory}");
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "commondir"), Path.Combine("..", ".."));
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "HEAD"), "ref: refs/heads/test");
+        File.WriteAllText(Path.Combine(commonGitDirectory, "refs", "heads", "test"), commit);
+        File.WriteAllText(
+            Path.Combine(commonGitDirectory, "config"),
+            $"[remote \"origin\"]{Environment.NewLine}\turl = {Repository}{Environment.NewLine}[branch \"test\"]");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Equal(worktreeDirectory.Path, gitInfo.SourceRoot);
+        Assert.Equal(commit, gitInfo.Commit);
+        Assert.Equal(Repository, gitInfo.Repository);
     }
 
     [Fact]

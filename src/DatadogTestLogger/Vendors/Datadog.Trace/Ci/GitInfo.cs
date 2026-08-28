@@ -97,7 +97,13 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
         /// <returns>Git info</returns>
         public static GitInfo GetFrom(string folder)
         {
-            return GetFrom(new DirectoryInfo(folder));
+            if (TryGetGitDirectories(folder, out var gitDirectory, out var commonGitDirectory, out var sourceRoot))
+            {
+                return GetFrom(gitDirectory, commonGitDirectory, sourceRoot);
+            }
+
+            gitDirectory = new DirectoryInfo(folder);
+            return GetFrom(gitDirectory, gitDirectory, gitDirectory.Parent?.FullName);
         }
 
         /// <summary>
@@ -107,11 +113,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
         public static GitInfo GetCurrent()
         {
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            DirectoryInfo gitDirectory = GetParentGitFolder(baseDirectory) ?? GetParentGitFolder(Environment.CurrentDirectory);
-            return GetFrom(gitDirectory);
+            if (TryGetGitDirectories(baseDirectory, out var gitDirectory, out var commonGitDirectory, out var sourceRoot) ||
+                TryGetGitDirectories(Environment.CurrentDirectory, out gitDirectory, out commonGitDirectory, out sourceRoot))
+            {
+                return GetFrom(gitDirectory, commonGitDirectory, sourceRoot);
+            }
+
+            return new GitInfo();
         }
 
-        private static GitInfo GetFrom(DirectoryInfo gitDirectory)
+        private static GitInfo GetFrom(DirectoryInfo gitDirectory, DirectoryInfo commonGitDirectory, string sourceRoot)
         {
             if (gitDirectory == null)
             {
@@ -122,7 +133,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
 
             try
             {
-                gitInfo.SourceRoot = gitDirectory.Parent?.FullName;
+                gitInfo.SourceRoot = sourceRoot;
 
                 // Get Git commit
                 string headPath = Path.Combine(gitDirectory.FullName, "HEAD");
@@ -136,7 +147,12 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                         gitInfo.Branch = head.Substring(4).Trim();
 
                         string refPath = Path.Combine(gitDirectory.FullName, gitInfo.Branch);
-                        string infoRefPath = Path.Combine(gitDirectory.FullName, "info", "refs");
+                        if (!File.Exists(refPath))
+                        {
+                            refPath = Path.Combine(commonGitDirectory.FullName, gitInfo.Branch);
+                        }
+
+                        string infoRefPath = Path.Combine(commonGitDirectory.FullName, "info", "refs");
 
                         if (File.Exists(refPath))
                         {
@@ -165,7 +181,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 }
 
                 // Process Git Config
-                string configPath = Path.Combine(gitDirectory.FullName, "config");
+                string configPath = Path.Combine(commonGitDirectory.FullName, "config");
                 List<ConfigItem> lstConfigs = GetConfigItems(configPath);
                 if (lstConfigs != null && lstConfigs.Count > 0)
                 {
@@ -190,7 +206,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 {
                     string folder = gitInfo.Commit.Substring(0, 2);
                     string file = gitInfo.Commit.Substring(2);
-                    string objectFilePath = Path.Combine(gitDirectory.FullName, "objects", folder, file);
+                    string objectFilePath = Path.Combine(commonGitDirectory.FullName, "objects", folder, file);
                     if (File.Exists(objectFilePath))
                     {
                         // Load and parse object file
@@ -209,7 +225,7 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                     else
                     {
                         // Search git object file from the pack files
-                        string packFolder = Path.Combine(gitDirectory.FullName, "objects", "pack");
+                        string packFolder = Path.Combine(commonGitDirectory.FullName, "objects", "pack");
                         string[] files = Directory.GetFiles(packFolder, "*.idx", SearchOption.TopDirectoryOnly);
                         foreach (string idxFile in files)
                         {
@@ -240,27 +256,80 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             return gitInfo;
         }
 
-        private static DirectoryInfo GetParentGitFolder(string innerFolder)
+        private static bool TryGetGitDirectories(
+            string innerFolder,
+            out DirectoryInfo gitDirectory,
+            out DirectoryInfo commonGitDirectory,
+            out string sourceRoot)
         {
+            gitDirectory = null;
+            commonGitDirectory = null;
+            sourceRoot = null;
             DirectoryInfo dirInfo = new DirectoryInfo(innerFolder);
             while (dirInfo != null)
             {
-                DirectoryInfo[] gitDirectories = dirInfo.GetDirectories(".git");
-                if (gitDirectories.Length > 0)
+                string gitPath = Path.Combine(dirInfo.FullName, ".git");
+                if (Directory.Exists(gitPath))
                 {
-                    foreach (var gitDir in gitDirectories)
-                    {
-                        if (gitDir.Name == ".git")
-                        {
-                            return gitDir;
-                        }
-                    }
+                    gitDirectory = new DirectoryInfo(gitPath);
+                    commonGitDirectory = gitDirectory;
+                    sourceRoot = dirInfo.FullName;
+                    return true;
+                }
+
+                if (File.Exists(gitPath) && TryResolveGitFile(gitPath, out gitDirectory))
+                {
+                    commonGitDirectory = GetCommonGitDirectory(gitDirectory);
+                    sourceRoot = dirInfo.FullName;
+                    return true;
                 }
 
                 dirInfo = dirInfo.Parent;
             }
 
-            return null;
+            return false;
+        }
+
+        private static bool TryResolveGitFile(string gitFilePath, out DirectoryInfo gitDirectory)
+        {
+            gitDirectory = null;
+            const string gitDirectoryPrefix = "gitdir:";
+            string contents = File.ReadAllText(gitFilePath).Trim();
+            if (!contents.StartsWith(gitDirectoryPrefix, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            string path = contents.Substring(gitDirectoryPrefix.Length).Trim();
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(gitFilePath), path));
+            }
+
+            if (!Directory.Exists(path))
+            {
+                return false;
+            }
+
+            gitDirectory = new DirectoryInfo(path);
+            return true;
+        }
+
+        private static DirectoryInfo GetCommonGitDirectory(DirectoryInfo gitDirectory)
+        {
+            string commonDirectoryFile = Path.Combine(gitDirectory.FullName, "commondir");
+            if (!File.Exists(commonDirectoryFile))
+            {
+                return gitDirectory;
+            }
+
+            string path = File.ReadAllText(commonDirectoryFile).Trim();
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.GetFullPath(Path.Combine(gitDirectory.FullName, path));
+            }
+
+            return Directory.Exists(path) ? new DirectoryInfo(path) : gitDirectory;
         }
 
         private static List<ConfigItem> GetConfigItems(string configFile)

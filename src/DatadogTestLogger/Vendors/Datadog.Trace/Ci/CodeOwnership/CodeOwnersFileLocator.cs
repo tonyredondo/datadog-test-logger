@@ -37,21 +37,33 @@ internal sealed class CodeOwnersFileLocator
         _provider = provider;
         var sourceDirectory = RepositorySourcePathResolver.GetSearchStart(sourceRoot, workspacePath);
         var workspaceDirectory = RepositorySourcePathResolver.GetSearchStart(workspacePath, basePath: null);
-        var repositoryRoot = FindGitRoot(sourceDirectory) ?? FindGitRoot(workspaceDirectory) ?? FindGitRoot(localRepositoryRoot);
+        var foundGitRoot = false;
+        LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundGitRoot)
+                   ?? TryLoadFromGitRoot(workspaceDirectory, ref foundGitRoot)
+                   ?? TryLoadFromGitRoot(localRepositoryRoot, ref foundGitRoot);
 
-        if (repositoryRoot is not null)
+        if (LocatedFile is null && !foundGitRoot)
         {
-            LocatedFile = TryLoadFromRepositoryRoot(repositoryRoot);
-            return;
+            LocatedFile = TryLoadFromExplicitRoot(workspaceDirectory) ?? TryLoadFromExplicitRoot(sourceDirectory);
         }
-
-        LocatedFile = TryLoadFromExplicitRoot(workspaceDirectory) ?? TryLoadFromExplicitRoot(sourceDirectory);
     }
 
     /// <summary>
     /// Gets the CODEOWNERS file found when the test session was initialized.
     /// </summary>
     internal LocatedCodeOwners? LocatedFile { get; }
+
+    private LocatedCodeOwners? TryLoadFromGitRoot(string? startDirectory, ref bool foundGitRoot)
+    {
+        var repositoryRoot = FindGitRoot(startDirectory);
+        if (repositoryRoot is null)
+        {
+            return null;
+        }
+
+        foundGitRoot = true;
+        return TryLoadFromRepositoryRoot(repositoryRoot);
+    }
 
     private static string? FindGitRoot(string? startDirectory)
     {
