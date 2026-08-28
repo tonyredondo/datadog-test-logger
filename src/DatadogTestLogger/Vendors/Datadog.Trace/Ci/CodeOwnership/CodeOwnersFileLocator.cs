@@ -22,30 +22,62 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci.CodeOwnership;
 internal sealed class CodeOwnersFileLocator
 {
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<CodeOwnersFileLocator>();
-    private readonly string? _provider;
-    private readonly string? _repository;
 
-    internal CodeOwnersFileLocator(string? sourceRoot, string? workspacePath, string? repository, string? provider)
+    internal CodeOwnersFileLocator(
+        string? sourceRoot,
+        string? workspacePath,
+        string? repository,
+        string? provider,
+        string? localRepositoryRoot,
+        string? localRepository)
     {
-        _repository = repository;
-        _provider = provider;
         var sourceDirectory = RepositorySourcePathResolver.GetSearchStart(sourceRoot, workspacePath);
         var workspaceDirectory = RepositorySourcePathResolver.GetSearchStart(workspacePath, basePath: null);
-        var repositoryRoot = FindGitRoot(sourceDirectory) ?? FindGitRoot(workspaceDirectory);
+        var foundCiGitRoot = false;
+        LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundCiGitRoot, repository, provider)
+                   ?? TryLoadFromGitRoot(workspaceDirectory, ref foundCiGitRoot, repository, provider);
 
-        if (repositoryRoot is not null)
+        if (LocatedFile is null && !foundCiGitRoot)
         {
-            LocatedFile = TryLoadFromRepositoryRoot(repositoryRoot);
-            return;
+            LocatedFile = TryLoadFromExplicitRoot(workspaceDirectory, repository, provider)
+                       ?? TryLoadFromExplicitRoot(sourceDirectory, repository, provider);
         }
 
-        LocatedFile = TryLoadFromExplicitRoot(workspaceDirectory) ?? TryLoadFromExplicitRoot(sourceDirectory);
+        if (LocatedFile is null)
+        {
+            var foundLocalGitRoot = false;
+            LocatedFile = TryLoadFromGitRoot(
+                localRepositoryRoot,
+                ref foundLocalGitRoot,
+                localRepository,
+                provider,
+                preferRepositoryLayout: true,
+                requireCodeOwnersAtHead: true);
+        }
     }
 
     /// <summary>
     /// Gets the CODEOWNERS file found when the test session was initialized.
     /// </summary>
     internal LocatedCodeOwners? LocatedFile { get; }
+
+    private LocatedCodeOwners? TryLoadFromGitRoot(
+        string? startDirectory,
+        ref bool foundGitRoot,
+        string? repository,
+        string? provider,
+        bool preferRepositoryLayout = false,
+        bool requireCodeOwnersAtHead = false)
+    {
+        var repositoryRoot = FindGitRoot(startDirectory);
+        if (repositoryRoot is null)
+        {
+            return null;
+        }
+
+        foundGitRoot = true;
+        return TryLoadFromRepositoryRoot(repositoryRoot, repository, provider, preferRepositoryLayout, requireCodeOwnersAtHead);
+    }
 
     private static string? FindGitRoot(string? startDirectory)
     {
@@ -78,10 +110,17 @@ internal sealed class CodeOwnersFileLocator
         return null;
     }
 
-    private LocatedCodeOwners? TryLoadFromRepositoryRoot(string root)
+    private LocatedCodeOwners? TryLoadFromRepositoryRoot(
+        string root,
+        string? repository,
+        string? provider,
+        bool preferRepositoryLayout = false,
+        bool requireCodeOwnersAtHead = false)
     {
-        var dialect = DetectDialect(root);
-        var codeOwnersPath = FindCodeOwnersPath(root, dialect);
+        var dialect = DetectDialect(root, repository, provider, preferRepositoryLayout, requireCodeOwnersAtHead);
+        var codeOwnersPath = requireCodeOwnersAtHead
+                                 ? FindCodeOwnersPathAtHead(root, dialect)
+                                 : FindCodeOwnersPath(root, dialect);
         if (codeOwnersPath is null)
         {
             return null;
@@ -94,35 +133,145 @@ internal sealed class CodeOwnersFileLocator
                    : null;
     }
 
-    private LocatedCodeOwners? TryLoadFromExplicitRoot(string? root)
-        => StringUtil.IsNullOrEmpty(root) ? null : TryLoadFromRepositoryRoot(root);
+    private LocatedCodeOwners? TryLoadFromExplicitRoot(string? root, string? repository, string? provider)
+        => StringUtil.IsNullOrEmpty(root) ? null : TryLoadFromRepositoryRoot(root, repository, provider);
 
-    private CodeOwners.Dialect DetectDialect(string root)
+    private static string? FindCodeOwnersPathAtHead(string repositoryRoot, CodeOwners.Dialect dialect)
     {
-        var repositoryDialect = GetDialectFromRepository(_repository);
+        try
+        {
+            // HEAD controls provider precedence even when a candidate was added or deleted locally.
+            foreach (var path in GetCodeOwnersPaths(repositoryRoot, dialect))
+            {
+                var headHash = GetFileHashAtHead(repositoryRoot, path);
+                if (headHash is not null)
+                {
+                    return IsFileAtHead(repositoryRoot, path, headHash) ? path : null;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Error finding local CODEOWNERS file in HEAD: {RepositoryRoot}", repositoryRoot);
+        }
+
+        return null;
+    }
+
+    private static string? GetFileHashAtHead(string repositoryRoot, string filePath)
+    {
+        var relativePath = GetRepositoryRelativePath(repositoryRoot, filePath);
+        var result = AsyncUtil.RunSync(
+            () => ProcessHelpers.RunCommandAsync(
+                new ProcessHelpers.Command(
+                    "git",
+                    "rev-parse --verify HEAD:" + relativePath,
+                    repositoryRoot)));
+        return result is { ExitCode: 0 } && result.Output.Length > 0 ? result.Output : null;
+    }
+
+    private static bool IsFileAtHead(string repositoryRoot, string filePath, string headHash)
+    {
+        var relativePath = GetRepositoryRelativePath(repositoryRoot, filePath);
+        try
+        {
+            var workingTreeHash = AsyncUtil.RunSync(
+                () => ProcessHelpers.RunCommandAsync(
+                    new ProcessHelpers.Command(
+                        "git",
+                        "hash-object --path=" + relativePath + " " + relativePath,
+                        repositoryRoot)));
+            return workingTreeHash is { ExitCode: 0 } &&
+                   string.Equals(workingTreeHash.Output, headHash, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Error validating local CODEOWNERS file against HEAD: {Path}", filePath);
+            return false;
+        }
+    }
+
+    private static string GetRepositoryRelativePath(string repositoryRoot, string filePath)
+    {
+        var relativePathStart = repositoryRoot.Length;
+        while (relativePathStart < filePath.Length &&
+               (filePath[relativePathStart] == Path.DirectorySeparatorChar ||
+                filePath[relativePathStart] == Path.AltDirectorySeparatorChar))
+        {
+            relativePathStart++;
+        }
+
+        return filePath.Substring(relativePathStart).Replace('\\', '/');
+    }
+
+    private static CodeOwners.Dialect DetectDialect(
+        string root,
+        string? repository,
+        string? provider,
+        bool preferRepositoryLayout,
+        bool repositoryLayoutAtHead)
+    {
+        var repositoryDialect = GetDialectFromRepository(repository);
         if (repositoryDialect.HasValue)
         {
             return repositoryDialect.Value;
         }
 
-        if (string.Equals(_provider, "gitlab", StringComparison.Ordinal))
+        CodeOwners.Dialect? layoutDialect = null;
+        if (preferRepositoryLayout)
+        {
+            layoutDialect = repositoryLayoutAtHead
+                                ? GetDialectFromHeadLayout(root)
+                                : GetDialectFromRepositoryLayout(root);
+            if (layoutDialect.HasValue)
+            {
+                return layoutDialect.Value;
+            }
+        }
+
+        if (string.Equals(provider, "gitlab", StringComparison.Ordinal))
         {
             return CodeOwners.Dialect.GitLab;
         }
 
-        if (string.Equals(_provider, "github", StringComparison.Ordinal))
+        if (string.Equals(provider, "github", StringComparison.Ordinal))
         {
             return CodeOwners.Dialect.GitHub;
         }
 
-        if (File.Exists(Path.Combine(root, ".gitlab", "CODEOWNERS")) &&
-            !File.Exists(Path.Combine(root, ".github", "CODEOWNERS")))
+        return (preferRepositoryLayout ? layoutDialect : GetDialectFromRepositoryLayout(root)) ?? CodeOwners.Dialect.GitHub;
+    }
+
+    private static CodeOwners.Dialect? GetDialectFromHeadLayout(string root)
+    {
+        try
         {
-            // The GitLab-only location identifies self-managed instances whose host does not.
-            return CodeOwners.Dialect.GitLab;
+            return GetDialectFromLayout(
+                GetFileHashAtHead(root, Path.Combine(root, ".github", "CODEOWNERS")) is not null,
+                GetFileHashAtHead(root, Path.Combine(root, ".gitlab", "CODEOWNERS")) is not null);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Error detecting local CODEOWNERS layout in HEAD: {RepositoryRoot}", root);
+            return null;
+        }
+    }
+
+    private static CodeOwners.Dialect? GetDialectFromRepositoryLayout(string root)
+    {
+        var hasGitHubCodeOwners = File.Exists(Path.Combine(root, ".github", "CODEOWNERS"));
+        var hasGitLabCodeOwners = File.Exists(Path.Combine(root, ".gitlab", "CODEOWNERS"));
+        return GetDialectFromLayout(hasGitHubCodeOwners, hasGitLabCodeOwners);
+    }
+
+    private static CodeOwners.Dialect? GetDialectFromLayout(bool hasGitHubCodeOwners, bool hasGitLabCodeOwners)
+    {
+        if (hasGitHubCodeOwners == hasGitLabCodeOwners)
+        {
+            return null;
         }
 
-        return CodeOwners.Dialect.GitHub;
+        return hasGitLabCodeOwners ? CodeOwners.Dialect.GitLab : CodeOwners.Dialect.GitHub;
     }
 
 #pragma warning disable SA1204

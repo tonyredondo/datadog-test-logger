@@ -562,7 +562,16 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                 Repository = Repository.Replace(uriRepository.UserInfo, string.Empty);
             }
 
-            _codeOwnersResolver = new CodeOwnersResolver(SourceRoot, WorkspacePath, Repository, Provider);
+            // The local checkout is safe to use for CODEOWNERS only when it contains the CI revision.
+            var localGitMatchesCi = !string.IsNullOrEmpty(Commit) &&
+                                    string.Equals(gitInfo.Commit, Commit, StringComparison.OrdinalIgnoreCase);
+            _codeOwnersResolver = new CodeOwnersResolver(
+                SourceRoot,
+                WorkspacePath,
+                Repository,
+                Provider,
+                localGitMatchesCi ? gitInfo.SourceRoot : null,
+                localGitMatchesCi ? gitInfo.Repository : null);
         }
 
         private void SetupTravisEnvironment()

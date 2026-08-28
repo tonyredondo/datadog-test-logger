@@ -1,4 +1,6 @@
+using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.CodeOwnership;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Test;
 
@@ -86,6 +88,385 @@ public class CodeOwnershipTests
         Assert.True(ownership.IsRepositoryRelative);
         Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
         Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void UsesValidatedLocalCheckoutForMirroredCiWorkspace()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        var sourceDirectory = Path.Combine(repositoryRoot, "src");
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            repositoryRoot,
+            Repository);
+
+        var ownership = resolver.Resolve(@"D:\build\datadog-test-logger\src\SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.True(ownership.IsRepositoryRelative);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void UsesValidatedLocalCheckoutLayoutWhenRemoteIsMissing()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        var sourceDirectory = Path.Combine(repositoryRoot, "src");
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            repositoryRoot,
+            localRepository: null);
+
+        var ownership = resolver.Resolve(@"D:\build\datadog-test-logger\src\SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void UsesCiProviderWhenLocalRemoteAndLayoutDoNotIdentifyDialect()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        var sourceDirectory = Path.Combine(repositoryRoot, "src");
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(
+            Path.Combine(repositoryRoot, "CODEOWNERS"),
+            $"[Tests] @repository-owner{Environment.NewLine}/src/");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            repositoryRoot,
+            "https://vcs.company/repo.git");
+
+        var ownership = resolver.Resolve(@"D:\build\datadog-test-logger\src\SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void UsesCiProviderWhenUntrackedLayoutDoesNotMatchHead()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        var sourceDirectory = Path.Combine(repositoryRoot, "src");
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(
+            Path.Combine(repositoryRoot, "CODEOWNERS"),
+            $"[Tests] @repository-owner{Environment.NewLine}/src/");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
+        var untrackedDirectory = Path.Combine(repositoryRoot, ".github");
+        Directory.CreateDirectory(untrackedDirectory);
+        File.WriteAllText(Path.Combine(untrackedDirectory, "CODEOWNERS"), "/src/ @untracked-owner");
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            repositoryRoot,
+            "https://vcs.company/repo.git");
+
+        var ownership = resolver.Resolve(@"D:\build\datadog-test-logger\src\SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void UsesValidatedLocalCheckoutWhenCiGitRootHasNoCodeOwners()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        var sourceDirectory = Path.Combine(repositoryRoot, "src");
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
+        Directory.CreateDirectory(Path.Combine(remoteCiDirectory.Path, ".git"));
+        Directory.CreateDirectory(sourceDirectory);
+        File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
+        File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            repositoryRoot,
+            Repository);
+
+        var ownership = resolver.Resolve(@"D:\build\datadog-test-logger\src\SampleTests.cs", useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void UsesExplicitCiRootBeforeValidatedLocalCheckout(bool localHasCodeOwners)
+    {
+        using var ciDirectory = new TemporaryDirectory();
+        using var localDirectory = new TemporaryDirectory();
+        var ciSourceDirectory = Path.Combine(ciDirectory.Path, "src");
+        Directory.CreateDirectory(ciSourceDirectory);
+        File.WriteAllText(Path.Combine(ciDirectory.Path, "CODEOWNERS"), "/src/ @ci-owner");
+        File.WriteAllText(Path.Combine(ciSourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        if (localHasCodeOwners)
+        {
+            var localSourceDirectory = Path.Combine(localDirectory.Path, "src");
+            Directory.CreateDirectory(localSourceDirectory);
+            File.WriteAllText(Path.Combine(localDirectory.Path, "CODEOWNERS"), "/src/ @local-owner");
+            File.WriteAllText(Path.Combine(localSourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        }
+
+        InitializeGitRepository(localDirectory.Path);
+        var resolver = new CodeOwnersResolver(
+            ciDirectory.Path,
+            ciDirectory.Path,
+            Repository,
+            "github",
+            localDirectory.Path,
+            Repository);
+
+        var ownership = resolver.Resolve(Path.Combine(ciSourceDirectory, "SampleTests.cs"), useOSSeparator: false);
+
+        Assert.True(resolver.HasCodeOwners);
+        Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
+        Assert.Equal(new[] { "@ci-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void DoesNotUseModifiedCodeOwnersFromValidatedLocalCheckout()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var codeOwnersDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        var codeOwnersPath = Path.Combine(codeOwnersDirectory, "CODEOWNERS");
+        Directory.CreateDirectory(codeOwnersDirectory);
+        File.WriteAllText(codeOwnersPath, "* @committed-owner");
+        InitializeGitRepository(repositoryDirectory.Path);
+        File.WriteAllText(codeOwnersPath, "* @uncommitted-owner");
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.False(resolver.HasCodeOwners);
+    }
+
+    [Fact]
+    public void DoesNotUseUntrackedCodeOwnersFromValidatedLocalCheckout()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        InitializeGitRepository(repositoryDirectory.Path);
+        var codeOwnersDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        Directory.CreateDirectory(codeOwnersDirectory);
+        File.WriteAllText(Path.Combine(codeOwnersDirectory, "CODEOWNERS"), "* @untracked-owner");
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.False(resolver.HasCodeOwners);
+    }
+
+    [Fact]
+    public void DoesNotUseLowerPriorityCodeOwnersWhenPreferredFileWasDeleted()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var preferredDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        var preferredPath = Path.Combine(preferredDirectory, "CODEOWNERS");
+        Directory.CreateDirectory(preferredDirectory);
+        File.WriteAllText(preferredPath, "* @preferred-owner");
+        File.WriteAllText(Path.Combine(repositoryDirectory.Path, "CODEOWNERS"), "* @fallback-owner");
+        InitializeGitRepository(repositoryDirectory.Path);
+        File.Delete(preferredPath);
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.False(resolver.HasCodeOwners);
+    }
+
+    [Fact]
+    public void IgnoresUntrackedHigherPriorityCodeOwners()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        File.WriteAllText(Path.Combine(repositoryDirectory.Path, "CODEOWNERS"), "* @committed-owner");
+        InitializeGitRepository(repositoryDirectory.Path);
+        var untrackedDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        Directory.CreateDirectory(untrackedDirectory);
+        File.WriteAllText(Path.Combine(untrackedDirectory, "CODEOWNERS"), "* @untracked-owner");
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.True(resolver.HasCodeOwners);
+    }
+
+    [Fact]
+    public void ReadsGitInfoFromFileBackedWorktree()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var worktreeDirectory = new TemporaryDirectory();
+        const string commit = "0123456789abcdef0123456789abcdef01234567";
+        var commonGitDirectory = Path.Combine(repositoryDirectory.Path, ".git");
+        var worktreeGitDirectory = Path.Combine(commonGitDirectory, "worktrees", "test-worktree");
+        Directory.CreateDirectory(Path.Combine(commonGitDirectory, "refs", "heads"));
+        Directory.CreateDirectory(Path.Combine(commonGitDirectory, "objects", "pack"));
+        Directory.CreateDirectory(worktreeGitDirectory);
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), $"gitdir: {worktreeGitDirectory}");
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "commondir"), Path.Combine("..", ".."));
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "HEAD"), "ref: refs/heads/test");
+        File.WriteAllText(Path.Combine(commonGitDirectory, "refs", "heads", "test"), commit);
+        File.WriteAllText(
+            Path.Combine(commonGitDirectory, "config"),
+            $"[remote \"origin\"]{Environment.NewLine}\turl = {Repository}{Environment.NewLine}[branch \"test\"]");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Equal(worktreeDirectory.Path, gitInfo.SourceRoot);
+        Assert.Equal(commit, gitInfo.Commit);
+        Assert.Equal(Repository, gitInfo.Repository);
+    }
+
+    [Fact]
+    public void ReadsPackedBranchFromFileBackedWorktree()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var worktreeDirectory = new TemporaryDirectory();
+        const string commit = "0123456789abcdef0123456789abcdef01234567";
+        var commonGitDirectory = Path.Combine(repositoryDirectory.Path, ".git");
+        var worktreeGitDirectory = Path.Combine(commonGitDirectory, "worktrees", "test-worktree");
+        Directory.CreateDirectory(Path.Combine(commonGitDirectory, "objects", "pack"));
+        Directory.CreateDirectory(worktreeGitDirectory);
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), $"gitdir: {worktreeGitDirectory}");
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "commondir"), Path.Combine("..", ".."));
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "HEAD"), "ref: refs/heads/test");
+        File.WriteAllText(Path.Combine(commonGitDirectory, "packed-refs"), $"{commit} refs/heads/test");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Equal(commit, gitInfo.Commit);
+    }
+
+    [Fact]
+    public void IgnoresInvalidFileBackedGitDirectory()
+    {
+        using var worktreeDirectory = new TemporaryDirectory();
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), "gitdir: invalid\0path");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Null(gitInfo.Commit);
+    }
+
+    [Fact]
+    public void IgnoresInvalidCommonGitDirectory()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var worktreeDirectory = new TemporaryDirectory();
+        var commonGitDirectory = Path.Combine(repositoryDirectory.Path, ".git");
+        var worktreeGitDirectory = Path.Combine(commonGitDirectory, "worktrees", "test-worktree");
+        Directory.CreateDirectory(worktreeGitDirectory);
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), $"gitdir: {worktreeGitDirectory}");
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "commondir"), "invalid\0path");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Null(gitInfo.Commit);
+    }
+
+    [Fact]
+    public void DoesNotUseLocalCheckoutWhenItWasNotValidated()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var repositoryRoot = repositoryDirectory.Path;
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
+        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
+        File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "* @repository-owner");
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            "https://gitlab.example.com/mirror/datadog-test-logger.git",
+            "gitlab",
+            localRepositoryRoot: null,
+            localRepository: null);
+
+        Assert.False(resolver.HasCodeOwners);
+    }
+
+    private static void InitializeGitRepository(string repositoryRoot)
+    {
+        RunGit(repositoryRoot, "init --quiet");
+        RunGit(repositoryRoot, "add .");
+        RunGit(
+            repositoryRoot,
+            "-c user.name=Datadog-Test -c user.email=test@datadoghq.com commit --quiet --allow-empty -m initial");
+    }
+
+    private static void RunGit(string workingDirectory, string arguments)
+    {
+        var output = AsyncUtil.RunSync(
+            () => ProcessHelpers.RunCommandAsync(new ProcessHelpers.Command("git", arguments, workingDirectory)));
+        Assert.NotNull(output);
+        Assert.True(
+            output.ExitCode == 0,
+            $"git {arguments} failed with exit code {output.ExitCode}:{Environment.NewLine}{output.Output}{output.Error}");
     }
 
     private sealed class TemporaryDirectory : IDisposable
