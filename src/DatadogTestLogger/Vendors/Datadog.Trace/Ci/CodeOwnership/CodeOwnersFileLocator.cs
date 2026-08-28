@@ -36,7 +36,7 @@ internal sealed class CodeOwnersFileLocator
         var foundGitRoot = false;
         LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundGitRoot, repository, provider)
                    ?? TryLoadFromGitRoot(workspaceDirectory, ref foundGitRoot, repository, provider)
-                   ?? TryLoadFromGitRoot(localRepositoryRoot, ref foundGitRoot, localRepository, provider: null);
+                   ?? TryLoadFromGitRoot(localRepositoryRoot, ref foundGitRoot, localRepository, provider, preferRepositoryLayout: true);
 
         if (LocatedFile is null && !foundGitRoot)
         {
@@ -54,7 +54,8 @@ internal sealed class CodeOwnersFileLocator
         string? startDirectory,
         ref bool foundGitRoot,
         string? repository,
-        string? provider)
+        string? provider,
+        bool preferRepositoryLayout = false)
     {
         var repositoryRoot = FindGitRoot(startDirectory);
         if (repositoryRoot is null)
@@ -63,7 +64,7 @@ internal sealed class CodeOwnersFileLocator
         }
 
         foundGitRoot = true;
-        return TryLoadFromRepositoryRoot(repositoryRoot, repository, provider);
+        return TryLoadFromRepositoryRoot(repositoryRoot, repository, provider, preferRepositoryLayout);
     }
 
     private static string? FindGitRoot(string? startDirectory)
@@ -97,9 +98,9 @@ internal sealed class CodeOwnersFileLocator
         return null;
     }
 
-    private LocatedCodeOwners? TryLoadFromRepositoryRoot(string root, string? repository, string? provider)
+    private LocatedCodeOwners? TryLoadFromRepositoryRoot(string root, string? repository, string? provider, bool preferRepositoryLayout = false)
     {
-        var dialect = DetectDialect(root, repository, provider);
+        var dialect = DetectDialect(root, repository, provider, preferRepositoryLayout);
         var codeOwnersPath = FindCodeOwnersPath(root, dialect);
         if (codeOwnersPath is null)
         {
@@ -116,12 +117,21 @@ internal sealed class CodeOwnersFileLocator
     private LocatedCodeOwners? TryLoadFromExplicitRoot(string? root, string? repository, string? provider)
         => StringUtil.IsNullOrEmpty(root) ? null : TryLoadFromRepositoryRoot(root, repository, provider);
 
-    private static CodeOwners.Dialect DetectDialect(string root, string? repository, string? provider)
+    private static CodeOwners.Dialect DetectDialect(string root, string? repository, string? provider, bool preferRepositoryLayout)
     {
         var repositoryDialect = GetDialectFromRepository(repository);
         if (repositoryDialect.HasValue)
         {
             return repositoryDialect.Value;
+        }
+
+        if (preferRepositoryLayout)
+        {
+            var layoutDialect = GetDialectFromRepositoryLayout(root);
+            if (layoutDialect.HasValue)
+            {
+                return layoutDialect.Value;
+            }
         }
 
         if (string.Equals(provider, "gitlab", StringComparison.Ordinal))
@@ -134,14 +144,19 @@ internal sealed class CodeOwnersFileLocator
             return CodeOwners.Dialect.GitHub;
         }
 
-        if (File.Exists(Path.Combine(root, ".gitlab", "CODEOWNERS")) &&
-            !File.Exists(Path.Combine(root, ".github", "CODEOWNERS")))
+        return GetDialectFromRepositoryLayout(root) ?? CodeOwners.Dialect.GitHub;
+    }
+
+    private static CodeOwners.Dialect? GetDialectFromRepositoryLayout(string root)
+    {
+        var hasGitHubCodeOwners = File.Exists(Path.Combine(root, ".github", "CODEOWNERS"));
+        var hasGitLabCodeOwners = File.Exists(Path.Combine(root, ".gitlab", "CODEOWNERS"));
+        if (hasGitHubCodeOwners == hasGitLabCodeOwners)
         {
-            // The GitLab-only location identifies self-managed instances whose host does not.
-            return CodeOwners.Dialect.GitLab;
+            return null;
         }
 
-        return CodeOwners.Dialect.GitHub;
+        return hasGitLabCodeOwners ? CodeOwners.Dialect.GitLab : CodeOwners.Dialect.GitHub;
     }
 
 #pragma warning disable SA1204
