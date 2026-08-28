@@ -192,6 +192,33 @@ public class CodeOwnershipTests
     }
 
     [Fact]
+    public void IgnoresInvalidFileBackedGitDirectory()
+    {
+        using var worktreeDirectory = new TemporaryDirectory();
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), "gitdir: invalid\0path");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Null(gitInfo.Commit);
+    }
+
+    [Fact]
+    public void IgnoresInvalidCommonGitDirectory()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var worktreeDirectory = new TemporaryDirectory();
+        var commonGitDirectory = Path.Combine(repositoryDirectory.Path, ".git");
+        var worktreeGitDirectory = Path.Combine(commonGitDirectory, "worktrees", "test-worktree");
+        Directory.CreateDirectory(worktreeGitDirectory);
+        File.WriteAllText(Path.Combine(worktreeDirectory.Path, ".git"), $"gitdir: {worktreeGitDirectory}");
+        File.WriteAllText(Path.Combine(worktreeGitDirectory, "commondir"), "invalid\0path");
+
+        var gitInfo = GitInfo.GetFrom(worktreeDirectory.Path);
+
+        Assert.Null(gitInfo.Commit);
+    }
+
+    [Fact]
     public void DoesNotUseLocalCheckoutWhenItWasNotValidated()
     {
         using var repositoryDirectory = new TemporaryDirectory();

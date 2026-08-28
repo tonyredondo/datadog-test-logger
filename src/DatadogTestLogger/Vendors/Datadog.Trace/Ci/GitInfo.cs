@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using DatadogTestLogger.Vendors.Datadog.Trace.Logging;
@@ -299,9 +300,8 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
                     return true;
                 }
 
-                if (File.Exists(gitPath) && TryResolveGitFile(gitPath, out gitDirectory))
+                if (File.Exists(gitPath) && TryResolveGitFile(gitPath, out gitDirectory, out commonGitDirectory))
                 {
-                    commonGitDirectory = GetCommonGitDirectory(gitDirectory);
                     sourceRoot = dirInfo.FullName;
                     return true;
                 }
@@ -312,29 +312,43 @@ namespace DatadogTestLogger.Vendors.Datadog.Trace.Ci
             return false;
         }
 
-        private static bool TryResolveGitFile(string gitFilePath, out DirectoryInfo gitDirectory)
+        private static bool TryResolveGitFile(
+            string gitFilePath,
+            out DirectoryInfo gitDirectory,
+            out DirectoryInfo commonGitDirectory)
         {
             gitDirectory = null;
-            const string gitDirectoryPrefix = "gitdir:";
-            string contents = File.ReadAllText(gitFilePath).Trim();
-            if (!contents.StartsWith(gitDirectoryPrefix, StringComparison.Ordinal))
+            commonGitDirectory = null;
+            try
             {
+                const string gitDirectoryPrefix = "gitdir:";
+                string contents = File.ReadAllText(gitFilePath).Trim();
+                if (!contents.StartsWith(gitDirectoryPrefix, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
+                string path = contents.Substring(gitDirectoryPrefix.Length).Trim();
+                if (!Path.IsPathRooted(path))
+                {
+                    path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(gitFilePath), path));
+                }
+
+                if (!Directory.Exists(path))
+                {
+                    return false;
+                }
+
+                gitDirectory = new DirectoryInfo(path);
+                commonGitDirectory = GetCommonGitDirectory(gitDirectory);
+                return true;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or SecurityException or ArgumentException or NotSupportedException)
+            {
+                gitDirectory = null;
+                commonGitDirectory = null;
                 return false;
             }
-
-            string path = contents.Substring(gitDirectoryPrefix.Length).Trim();
-            if (!Path.IsPathRooted(path))
-            {
-                path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(gitFilePath), path));
-            }
-
-            if (!Directory.Exists(path))
-            {
-                return false;
-            }
-
-            gitDirectory = new DirectoryInfo(path);
-            return true;
         }
 
         private static DirectoryInfo GetCommonGitDirectory(DirectoryInfo gitDirectory)
