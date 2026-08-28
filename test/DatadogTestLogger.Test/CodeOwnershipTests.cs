@@ -1,5 +1,6 @@
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci;
 using DatadogTestLogger.Vendors.Datadog.Trace.Ci.CodeOwnership;
+using DatadogTestLogger.Vendors.Datadog.Trace.Util;
 
 namespace DatadogTestLogger.Test;
 
@@ -96,11 +97,11 @@ public class CodeOwnershipTests
         using var remoteCiDirectory = new TemporaryDirectory();
         var repositoryRoot = repositoryDirectory.Path;
         var sourceDirectory = Path.Combine(repositoryRoot, "src");
-        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
         Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
         Directory.CreateDirectory(sourceDirectory);
         File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
         File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
         var resolver = new CodeOwnersResolver(
             remoteCiDirectory.Path,
             remoteCiDirectory.Path,
@@ -124,11 +125,11 @@ public class CodeOwnershipTests
         using var remoteCiDirectory = new TemporaryDirectory();
         var repositoryRoot = repositoryDirectory.Path;
         var sourceDirectory = Path.Combine(repositoryRoot, "src");
-        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
         Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
         Directory.CreateDirectory(sourceDirectory);
         File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
         File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
         var resolver = new CodeOwnersResolver(
             remoteCiDirectory.Path,
             remoteCiDirectory.Path,
@@ -151,12 +152,12 @@ public class CodeOwnershipTests
         using var remoteCiDirectory = new TemporaryDirectory();
         var repositoryRoot = repositoryDirectory.Path;
         var sourceDirectory = Path.Combine(repositoryRoot, "src");
-        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
         Directory.CreateDirectory(sourceDirectory);
         File.WriteAllText(
             Path.Combine(repositoryRoot, "CODEOWNERS"),
             $"[Tests] @repository-owner{Environment.NewLine}/src/");
         File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
         var resolver = new CodeOwnersResolver(
             remoteCiDirectory.Path,
             remoteCiDirectory.Path,
@@ -179,12 +180,12 @@ public class CodeOwnershipTests
         using var remoteCiDirectory = new TemporaryDirectory();
         var repositoryRoot = repositoryDirectory.Path;
         var sourceDirectory = Path.Combine(repositoryRoot, "src");
-        Directory.CreateDirectory(Path.Combine(repositoryRoot, ".git"));
         Directory.CreateDirectory(Path.Combine(repositoryRoot, ".github"));
         Directory.CreateDirectory(Path.Combine(remoteCiDirectory.Path, ".git"));
         Directory.CreateDirectory(sourceDirectory);
         File.WriteAllText(Path.Combine(repositoryRoot, ".github", "CODEOWNERS"), "/src/ @repository-owner");
         File.WriteAllText(Path.Combine(sourceDirectory, "SampleTests.cs"), "class SampleTests {}");
+        InitializeGitRepository(repositoryRoot);
         var resolver = new CodeOwnersResolver(
             remoteCiDirectory.Path,
             remoteCiDirectory.Path,
@@ -198,6 +199,50 @@ public class CodeOwnershipTests
         Assert.True(resolver.HasCodeOwners);
         Assert.Equal("src/SampleTests.cs", ownership.RepositoryRelativePath);
         Assert.Equal(new[] { "@repository-owner" }, ownership.MatchingOwners);
+    }
+
+    [Fact]
+    public void DoesNotUseModifiedCodeOwnersFromValidatedLocalCheckout()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        var codeOwnersDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        var codeOwnersPath = Path.Combine(codeOwnersDirectory, "CODEOWNERS");
+        Directory.CreateDirectory(codeOwnersDirectory);
+        File.WriteAllText(codeOwnersPath, "* @committed-owner");
+        InitializeGitRepository(repositoryDirectory.Path);
+        File.WriteAllText(codeOwnersPath, "* @uncommitted-owner");
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.False(resolver.HasCodeOwners);
+    }
+
+    [Fact]
+    public void DoesNotUseUntrackedCodeOwnersFromValidatedLocalCheckout()
+    {
+        using var repositoryDirectory = new TemporaryDirectory();
+        using var remoteCiDirectory = new TemporaryDirectory();
+        InitializeGitRepository(repositoryDirectory.Path);
+        var codeOwnersDirectory = Path.Combine(repositoryDirectory.Path, ".github");
+        Directory.CreateDirectory(codeOwnersDirectory);
+        File.WriteAllText(Path.Combine(codeOwnersDirectory, "CODEOWNERS"), "* @untracked-owner");
+
+        var resolver = new CodeOwnersResolver(
+            remoteCiDirectory.Path,
+            remoteCiDirectory.Path,
+            Repository,
+            "github",
+            repositoryDirectory.Path,
+            Repository);
+
+        Assert.False(resolver.HasCodeOwners);
     }
 
     [Fact]
@@ -291,6 +336,25 @@ public class CodeOwnershipTests
             localRepository: null);
 
         Assert.False(resolver.HasCodeOwners);
+    }
+
+    private static void InitializeGitRepository(string repositoryRoot)
+    {
+        RunGit(repositoryRoot, "init --quiet");
+        RunGit(repositoryRoot, "add .");
+        RunGit(
+            repositoryRoot,
+            "-c user.name=Datadog-Test -c user.email=test@datadoghq.com commit --quiet --allow-empty -m initial");
+    }
+
+    private static void RunGit(string workingDirectory, string arguments)
+    {
+        var output = AsyncUtil.RunSync(
+            () => ProcessHelpers.RunCommandAsync(new ProcessHelpers.Command("git", arguments, workingDirectory)));
+        Assert.NotNull(output);
+        Assert.True(
+            output.ExitCode == 0,
+            $"git {arguments} failed with exit code {output.ExitCode}:{Environment.NewLine}{output.Output}{output.Error}");
     }
 
     private sealed class TemporaryDirectory : IDisposable

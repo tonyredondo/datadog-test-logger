@@ -36,7 +36,13 @@ internal sealed class CodeOwnersFileLocator
         var foundGitRoot = false;
         LocatedFile = TryLoadFromGitRoot(sourceDirectory, ref foundGitRoot, repository, provider)
                    ?? TryLoadFromGitRoot(workspaceDirectory, ref foundGitRoot, repository, provider)
-                   ?? TryLoadFromGitRoot(localRepositoryRoot, ref foundGitRoot, localRepository, provider, preferRepositoryLayout: true);
+                   ?? TryLoadFromGitRoot(
+                          localRepositoryRoot,
+                          ref foundGitRoot,
+                          localRepository,
+                          provider,
+                          preferRepositoryLayout: true,
+                          requireCodeOwnersAtHead: true);
 
         if (LocatedFile is null && !foundGitRoot)
         {
@@ -55,7 +61,8 @@ internal sealed class CodeOwnersFileLocator
         ref bool foundGitRoot,
         string? repository,
         string? provider,
-        bool preferRepositoryLayout = false)
+        bool preferRepositoryLayout = false,
+        bool requireCodeOwnersAtHead = false)
     {
         var repositoryRoot = FindGitRoot(startDirectory);
         if (repositoryRoot is null)
@@ -64,7 +71,7 @@ internal sealed class CodeOwnersFileLocator
         }
 
         foundGitRoot = true;
-        return TryLoadFromRepositoryRoot(repositoryRoot, repository, provider, preferRepositoryLayout);
+        return TryLoadFromRepositoryRoot(repositoryRoot, repository, provider, preferRepositoryLayout, requireCodeOwnersAtHead);
     }
 
     private static string? FindGitRoot(string? startDirectory)
@@ -98,11 +105,17 @@ internal sealed class CodeOwnersFileLocator
         return null;
     }
 
-    private LocatedCodeOwners? TryLoadFromRepositoryRoot(string root, string? repository, string? provider, bool preferRepositoryLayout = false)
+    private LocatedCodeOwners? TryLoadFromRepositoryRoot(
+        string root,
+        string? repository,
+        string? provider,
+        bool preferRepositoryLayout = false,
+        bool requireCodeOwnersAtHead = false)
     {
         var dialect = DetectDialect(root, repository, provider, preferRepositoryLayout);
         var codeOwnersPath = FindCodeOwnersPath(root, dialect);
-        if (codeOwnersPath is null)
+        if (codeOwnersPath is null ||
+            (requireCodeOwnersAtHead && !IsFileAtHead(root, codeOwnersPath)))
         {
             return null;
         }
@@ -116,6 +129,47 @@ internal sealed class CodeOwnersFileLocator
 
     private LocatedCodeOwners? TryLoadFromExplicitRoot(string? root, string? repository, string? provider)
         => StringUtil.IsNullOrEmpty(root) ? null : TryLoadFromRepositoryRoot(root, repository, provider);
+
+    private static bool IsFileAtHead(string repositoryRoot, string filePath)
+    {
+        var relativePathStart = repositoryRoot.Length;
+        while (relativePathStart < filePath.Length &&
+               (filePath[relativePathStart] == Path.DirectorySeparatorChar ||
+                filePath[relativePathStart] == Path.AltDirectorySeparatorChar))
+        {
+            relativePathStart++;
+        }
+
+        var relativePath = filePath.Substring(relativePathStart).Replace('\\', '/');
+        try
+        {
+            // HEAD already matches the CI commit, so matching blob hashes tie this file to that revision.
+            var headHash = AsyncUtil.RunSync(
+                () => ProcessHelpers.RunCommandAsync(
+                    new ProcessHelpers.Command(
+                        "git",
+                        "rev-parse --verify HEAD:" + relativePath,
+                        repositoryRoot)));
+            if (headHash is not { ExitCode: 0 } || headHash.Output.Length == 0)
+            {
+                return false;
+            }
+
+            var workingTreeHash = AsyncUtil.RunSync(
+                () => ProcessHelpers.RunCommandAsync(
+                    new ProcessHelpers.Command(
+                        "git",
+                        "hash-object --path=" + relativePath + " " + relativePath,
+                        repositoryRoot)));
+            return workingTreeHash is { ExitCode: 0 } &&
+                   string.Equals(workingTreeHash.Output, headHash.Output, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Error validating local CODEOWNERS file against HEAD: {Path}", filePath);
+            return false;
+        }
+    }
 
     private static CodeOwners.Dialect DetectDialect(string root, string? repository, string? provider, bool preferRepositoryLayout)
     {
