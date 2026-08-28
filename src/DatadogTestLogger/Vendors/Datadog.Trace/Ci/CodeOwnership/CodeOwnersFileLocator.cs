@@ -112,7 +112,7 @@ internal sealed class CodeOwnersFileLocator
         bool preferRepositoryLayout = false,
         bool requireCodeOwnersAtHead = false)
     {
-        var dialect = DetectDialect(root, repository, provider, preferRepositoryLayout);
+        var dialect = DetectDialect(root, repository, provider, preferRepositoryLayout, requireCodeOwnersAtHead);
         var codeOwnersPath = requireCodeOwnersAtHead
                                  ? FindCodeOwnersPathAtHead(root, dialect)
                                  : FindCodeOwnersPath(root, dialect);
@@ -138,16 +138,10 @@ internal sealed class CodeOwnersFileLocator
             // HEAD controls provider precedence even when a candidate was added or deleted locally.
             foreach (var path in GetCodeOwnersPaths(repositoryRoot, dialect))
             {
-                var relativePath = GetRepositoryRelativePath(repositoryRoot, path);
-                var result = AsyncUtil.RunSync(
-                    () => ProcessHelpers.RunCommandAsync(
-                        new ProcessHelpers.Command(
-                            "git",
-                            "rev-parse --verify HEAD:" + relativePath,
-                            repositoryRoot)));
-                if (result is { ExitCode: 0 } && result.Output.Length > 0)
+                var headHash = GetFileHashAtHead(repositoryRoot, path);
+                if (headHash is not null)
                 {
-                    return IsFileAtHead(repositoryRoot, path, result.Output) ? path : null;
+                    return IsFileAtHead(repositoryRoot, path, headHash) ? path : null;
                 }
             }
         }
@@ -157,6 +151,18 @@ internal sealed class CodeOwnersFileLocator
         }
 
         return null;
+    }
+
+    private static string? GetFileHashAtHead(string repositoryRoot, string filePath)
+    {
+        var relativePath = GetRepositoryRelativePath(repositoryRoot, filePath);
+        var result = AsyncUtil.RunSync(
+            () => ProcessHelpers.RunCommandAsync(
+                new ProcessHelpers.Command(
+                    "git",
+                    "rev-parse --verify HEAD:" + relativePath,
+                    repositoryRoot)));
+        return result is { ExitCode: 0 } && result.Output.Length > 0 ? result.Output : null;
     }
 
     private static bool IsFileAtHead(string repositoryRoot, string filePath, string headHash)
@@ -193,7 +199,12 @@ internal sealed class CodeOwnersFileLocator
         return filePath.Substring(relativePathStart).Replace('\\', '/');
     }
 
-    private static CodeOwners.Dialect DetectDialect(string root, string? repository, string? provider, bool preferRepositoryLayout)
+    private static CodeOwners.Dialect DetectDialect(
+        string root,
+        string? repository,
+        string? provider,
+        bool preferRepositoryLayout,
+        bool repositoryLayoutAtHead)
     {
         var repositoryDialect = GetDialectFromRepository(repository);
         if (repositoryDialect.HasValue)
@@ -201,9 +212,12 @@ internal sealed class CodeOwnersFileLocator
             return repositoryDialect.Value;
         }
 
+        CodeOwners.Dialect? layoutDialect = null;
         if (preferRepositoryLayout)
         {
-            var layoutDialect = GetDialectFromRepositoryLayout(root);
+            layoutDialect = repositoryLayoutAtHead
+                                ? GetDialectFromHeadLayout(root)
+                                : GetDialectFromRepositoryLayout(root);
             if (layoutDialect.HasValue)
             {
                 return layoutDialect.Value;
@@ -220,13 +234,33 @@ internal sealed class CodeOwnersFileLocator
             return CodeOwners.Dialect.GitHub;
         }
 
-        return GetDialectFromRepositoryLayout(root) ?? CodeOwners.Dialect.GitHub;
+        return (preferRepositoryLayout ? layoutDialect : GetDialectFromRepositoryLayout(root)) ?? CodeOwners.Dialect.GitHub;
+    }
+
+    private static CodeOwners.Dialect? GetDialectFromHeadLayout(string root)
+    {
+        try
+        {
+            return GetDialectFromLayout(
+                GetFileHashAtHead(root, Path.Combine(root, ".github", "CODEOWNERS")) is not null,
+                GetFileHashAtHead(root, Path.Combine(root, ".gitlab", "CODEOWNERS")) is not null);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Error detecting local CODEOWNERS layout in HEAD: {RepositoryRoot}", root);
+            return null;
+        }
     }
 
     private static CodeOwners.Dialect? GetDialectFromRepositoryLayout(string root)
     {
         var hasGitHubCodeOwners = File.Exists(Path.Combine(root, ".github", "CODEOWNERS"));
         var hasGitLabCodeOwners = File.Exists(Path.Combine(root, ".gitlab", "CODEOWNERS"));
+        return GetDialectFromLayout(hasGitHubCodeOwners, hasGitLabCodeOwners);
+    }
+
+    private static CodeOwners.Dialect? GetDialectFromLayout(bool hasGitHubCodeOwners, bool hasGitLabCodeOwners)
+    {
         if (hasGitHubCodeOwners == hasGitLabCodeOwners)
         {
             return null;
