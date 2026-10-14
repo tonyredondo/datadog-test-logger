@@ -561,19 +561,25 @@ internal class TestSuiteSerializer
                                                     {
                                                         var msgText = messageItem;
                                                         ProcessMessagesAsSpanTags(ref msgText, scope.Span, output);
-                                                        var logEvent = new CIVisibilityLogEvent("testoptimization", "info",
-                                                            msgText, scope.Span);
-                                                        Tracer.Instance.TracerManager.DirectLogSubmission.Sink
-                                                            .EnqueueLog(logEvent);
+                                                        if (CIVisibility.Settings.Logs)
+                                                        {
+                                                            var logEvent = new CIVisibilityLogEvent("testoptimization", "info",
+                                                                msgText, scope.Span);
+                                                            Tracer.Instance.TracerManager.DirectLogSubmission.Sink
+                                                                .EnqueueLog(logEvent);
+                                                        }
                                                     }
                                                 }
                                                 else
                                                 {
                                                     ProcessMessagesAsSpanTags(ref messageText, scope.Span, output);
-                                                    var logEvent = new CIVisibilityLogEvent("testoptimization", "info",
-                                                        messageText, scope.Span);
-                                                    Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(
-                                                        logEvent);
+                                                    if (CIVisibility.Settings.Logs)
+                                                    {
+                                                        var logEvent = new CIVisibilityLogEvent("testoptimization", "info",
+                                                            messageText, scope.Span);
+                                                        Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(
+                                                            logEvent);
+                                                    }
                                                 }
                                             }
                                         }
@@ -821,8 +827,11 @@ internal class TestSuiteSerializer
                 var iSpan = new InternalISpan(span);
                 var msgText = message.Message;
                 ProcessMessagesAsSpanTags(ref msgText, iSpan, output);
-                var logEvent = new CIVisibilityLogEvent("testoptimization", level, msgText, iSpan);
-                Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+                if (CIVisibility.Settings.Logs)
+                {
+                    var logEvent = new CIVisibilityLogEvent("testoptimization", level, msgText, iSpan);
+                    Tracer.Instance.TracerManager.DirectLogSubmission.Sink.EnqueueLog(logEvent);
+                }
             }
 
             output.AppendLine();
